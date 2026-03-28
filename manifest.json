@@ -1,8 +1,0 @@
-{
-  "name": "Basket Tagg Pro",
-  "short_name": "BasketTagg",
-  "start_url": "/baskettaggpro/",
-  "display": "standalone",
-  "background_color": "#1A1A1A",
-  "theme_color": "#D4AA6A"
-}
