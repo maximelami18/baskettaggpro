@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plan de Séance IA — BasketTaggPro</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#1A1A1A;--bg2:#222;--surf:#2A2A2A;--surf2:#323232;--surf3:#3A3A3A;
+  --blu:#5B8DEF;--blu2:#3A6BC4;--blu-d:rgba(91,141,239,0.12);--blu-g:rgba(91,141,239,0.22);
+  --gold:#D4AA6A;--gold-d:rgba(212,170,106,0.1);
+  --grn:#3DC97A;--grn-d:rgba(61,201,122,0.12);
+  --red:#E05252;--red-d:rgba(224,82,82,0.1);
+  --ora:#F28C3A;
+  --txt:#F0E8D8;--txt2:#A89880;--txt3:#6A5E50;
+  --bdr:rgba(91,141,239,0.12);--bdr2:rgba(91,141,239,0.22);
+  --r:12px;--rsm:8px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{min-height:100%;font-family:'Outfit',sans-serif;background:var(--bg);color:var(--txt);}
+::-webkit-scrollbar{width:5px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--surf3);border-radius:4px;}
+
+/* ── TOPBAR ── */
+.topbar{height:56px;background:var(--surf);border-bottom:1px solid var(--bdr2);display:flex;align-items:center;padding:0 24px;gap:14px;position:sticky;top:0;z-index:100;}
+.topbar-logo{width:34px;height:34px;background:linear-gradient(135deg,var(--blu),var(--blu2));border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.topbar-title{font-size:16px;font-weight:800;color:var(--blu);text-transform:uppercase;letter-spacing:.03em;}
+.topbar-sub{font-size:12px;color:var(--txt3);}
+
+/* ── LAYOUT ── */
+.wrap{max-width:800px;margin:0 auto;padding:28px 20px 60px;}
+
+/* ── CARDS ── */
+.card{background:var(--surf);border:1px solid var(--bdr);border-radius:var(--r);padding:18px;margin-bottom:14px;}
+.card-title{font-size:11px;font-weight:700;color:var(--blu);text-transform:uppercase;letter-spacing:.1em;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.card-title .step{width:20px;height:20px;border-radius:50%;background:var(--blu-d);border:1px solid var(--bdr2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--blu);}
+
+/* ── FORM ── */
+.field{margin-bottom:12px;}
+.field label{display:block;font-size:12px;color:var(--txt3);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px;}
+.inp,.sel{width:100%;height:40px;padding:0 12px;border-radius:var(--rsm);border:1px solid var(--bdr2);background:var(--bg2);color:var(--txt);font-size:14px;font-family:'Outfit',sans-serif;outline:none;transition:border-color .15s;}
+.inp:focus,.sel:focus{border-color:var(--blu);}
+.sel{cursor:pointer;}
+.sel option{background:var(--surf);}
+.ta{width:100%;padding:10px 12px;border-radius:var(--rsm);border:1px solid var(--bdr2);background:var(--bg2);color:var(--txt);font-size:14px;font-family:'Outfit',sans-serif;outline:none;resize:vertical;line-height:1.5;transition:border-color .15s;}
+.ta:focus{border-color:var(--blu);}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+
+/* ── THEMES ── */
+.theme-grid{display:flex;flex-wrap:wrap;gap:7px;}
+.theme-btn{display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:8px;border:1.5px solid rgba(91,141,239,0.18);background:var(--bg2);color:var(--txt3);font-size:13px;font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .15s;user-select:none;}
+.theme-btn:hover{border-color:var(--bdr2);color:var(--txt2);}
+.theme-btn.on{border-color:var(--blu);background:var(--blu-d);color:var(--blu);}
+.theme-count{font-size:12px;color:var(--txt3);text-align:right;margin-top:8px;}
+
+/* ── DETAIL TOGGLE ── */
+.detail-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.detail-opt{padding:14px;border-radius:10px;border:1.5px solid rgba(91,141,239,0.15);background:var(--bg2);cursor:pointer;transition:all .15s;}
+.detail-opt.on{border-color:var(--blu);background:var(--blu-d);}
+.detail-opt-title{font-size:14px;font-weight:700;color:var(--txt2);margin-bottom:3px;}
+.detail-opt.on .detail-opt-title{color:var(--blu);}
+.detail-opt-sub{font-size:12px;color:var(--txt3);line-height:1.4;}
+
+/* ── ÉQUIPE MINI-EDITOR ── */
+.team-row{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--rsm);margin-bottom:6px;}
+.team-avatar{width:32px;height:32px;border-radius:50%;background:var(--surf3);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--txt2);flex-shrink:0;}
+.team-name{flex:1;font-size:14px;font-weight:600;color:var(--txt);}
+.team-count{font-size:12px;color:var(--txt3);}
+
+/* ── BOUTON GÉNÉRER ── */
+.btn-gen{width:100%;height:52px;border-radius:var(--r);border:none;background:linear-gradient(135deg,var(--blu),var(--blu2));color:#fff;font-size:16px;font-weight:800;cursor:pointer;font-family:'Outfit',sans-serif;box-shadow:0 4px 20px rgba(91,141,239,0.3);display:flex;align-items:center;justify-content:center;gap:10px;transition:all .2s;margin-bottom:20px;}
+.btn-gen:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(91,141,239,0.4);}
+.btn-gen:disabled{opacity:.6;cursor:not-allowed;transform:none;}
+.btn-gen svg{flex-shrink:0;}
+
+/* ── RÉSULTAT ── */
+.plan-wrap{background:var(--surf);border:1px solid var(--bdr2);border-radius:var(--r);overflow:hidden;margin-bottom:16px;}
+.plan-header{padding:20px 22px;background:linear-gradient(135deg,rgba(91,141,239,0.1),transparent);border-bottom:1px solid var(--bdr2);}
+.plan-title{font-size:20px;font-weight:900;color:var(--txt);margin-bottom:6px;}
+.plan-resume{font-size:13px;color:var(--txt2);line-height:1.55;}
+.plan-meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;}
+.phase-wrap{border:1px solid var(--bdr);border-radius:10px;overflow:hidden;margin:0 16px 12px;}
+.phase-hdr{padding:12px 16px;background:rgba(91,141,239,0.07);border-bottom:1px solid var(--bdr);display:flex;align-items:center;gap:12px;}
+.phase-name{font-size:15px;font-weight:800;color:var(--blu);flex:1;}
+.phase-dur{font-size:13px;font-weight:700;color:var(--blu);}
+.exo-item{padding:14px 16px;border-bottom:1px solid rgba(255,255,255,0.04);}
+.exo-item:last-child{border-bottom:none;}
+.exo-row{display:flex;gap:10px;align-items:flex-start;}
+.exo-bar{width:4px;min-height:40px;border-radius:4px;flex-shrink:0;margin-top:2px;}
+.exo-title{font-size:14px;font-weight:700;color:var(--txt);margin-bottom:5px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.exo-desc{font-size:13px;color:var(--txt2);line-height:1.55;}
+.coaching-box{margin-top:8px;padding:8px 10px;background:rgba(212,170,106,0.06);border-left:2px solid var(--gold);border-radius:0 6px 6px 0;}
+.coaching-lbl{font-size:10px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px;}
+.coaching-txt{font-size:12px;color:var(--txt2);line-height:1.5;}
+.variante-txt{font-size:12px;color:var(--txt3);line-height:1.4;margin-top:6px;}
+.conseils-wrap{margin:0 16px 16px;background:rgba(212,170,106,0.05);border:1px solid rgba(212,170,106,0.15);border-radius:10px;padding:14px 16px;}
+.conseils-title{font-size:12px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.09em;margin-bottom:10px;}
+.conseil-item{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid rgba(212,170,106,0.06);}
+.conseil-item:last-child{border-bottom:none;}
+.conseil-dot{width:6px;height:6px;border-radius:50%;background:var(--gold);flex-shrink:0;margin-top:5px;}
+.conseil-txt{font-size:13px;color:var(--txt2);line-height:1.5;}
+.plan-actions{padding:14px 16px;border-top:1px solid var(--bdr);display:flex;justify-content:flex-end;gap:8px;}
+.btn-sm{height:34px;padding:0 14px;border-radius:8px;border:1px solid var(--bdr2);background:var(--surf2);color:var(--txt2);font-size:13px;font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;display:inline-flex;align-items:center;gap:6px;transition:all .15s;}
+.btn-sm:hover{background:var(--surf3);color:var(--txt);}
+.btn-sm.blue{border-color:var(--bdr2);background:var(--blu-d);color:var(--blu);}
+.btn-sm svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;}
+
+/* ── HISTORIQUE ── */
+.histo-item{display:flex;align-items:center;gap:12px;padding:11px 14px;background:var(--bg2);border:1px solid var(--bdr);border-radius:10px;margin-bottom:6px;}
+.histo-info{flex:1;min-width:0;}
+.histo-title{font-size:13px;font-weight:700;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.histo-meta{font-size:11px;color:var(--txt3);margin-top:2px;}
+
+/* ── LOADER ── */
+.loader{display:inline-block;width:18px;height:18px;border:2.5px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── TOAST ── */
+#toast-wrap{position:fixed;bottom:22px;right:22px;z-index:9999;display:flex;flex-direction:column;gap:6px;pointer-events:none;}
+.toast{padding:10px 16px;border-radius:9px;font-size:13px;font-weight:600;opacity:0;transform:translateY(6px);transition:all .22s;}
+.toast.show{opacity:1;transform:none;}
+.tok{background:var(--grn-d);border:1px solid rgba(61,201,122,.35);color:var(--grn);}
+.terr{background:var(--red-d);border:1px solid rgba(224,82,82,.3);color:var(--red);}
+
+/* ── ERROR ── */
+.err-box{padding:14px 16px;background:var(--red-d);border:1px solid rgba(224,82,82,.25);border-radius:10px;color:var(--red);font-size:14px;line-height:1.5;}
+.info-box{padding:14px 16px;background:var(--blu-d);border:1px solid var(--bdr2);border-radius:10px;color:var(--blu);font-size:13px;line-height:1.5;}
+
+@media(max-width:600px){
+  .grid2,.detail-row{grid-template-columns:1fr;}
+  .grid4{grid-template-columns:repeat(2,1fr);}
+  .wrap{padding:16px 14px 60px;}
+}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-logo">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
+    </svg>
+  </div>
+  <div>
+    <div class="topbar-title">Plan de séance IA</div>
+    <div class="topbar-sub">BasketTaggPro — Outil coach</div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- Titre -->
+  <div style="margin-bottom:22px;">
+    <div style="font-size:26px;font-weight:900;color:var(--txt);margin-bottom:4px;">Générateur de séance</div>
+    <div style="font-size:14px;color:var(--txt3);">Remplissez le formulaire, l'IA génère un plan complet et directement utilisable sur le terrain.</div>
+  </div>
+
+  <!-- BLOC 1 — Équipe -->
+  <div class="card">
+    <div class="card-title"><span class="step">1</span> Équipe &amp; contexte</div>
+    <div class="grid2">
+      <div class="field">
+        <label>Équipe</label>
+        <select class="sel" id="f-team" onchange="onTeamChange()">
+          <option value="">— Saisie manuelle —</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Niveau</label>
+        <select class="sel" id="f-niveau">
+          <option value="u13">U13</option>
+          <option value="u15">U15</option>
+          <option value="u17">U17</option>
+          <option value="u20">U20</option>
+          <option value="senior" selected>Sénior</option>
+          <option value="pro">Pro / Élite</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Durée (minutes)</label>
+        <input type="number" class="inp" id="f-duree" value="90" min="30" max="180" step="15">
+      </div>
+      <div class="field">
+        <label>Nombre de joueurs</label>
+        <input type="number" class="inp" id="f-effectif" value="12" min="4" max="20" placeholder="Ex: 12">
+      </div>
+    </div>
+    <div class="field" style="margin-bottom:0;">
+      <label>Objectif / contexte <span style="color:var(--blu);font-weight:400;text-transform:none;letter-spacing:0;">(facultatif)</span></label>
+      <textarea class="ta" id="f-objectif" rows="2" placeholder="Ex : préparation match samedi, récupération après 3 matchs en 5 jours, travail intensité défensive…"></textarea>
+    </div>
+  </div>
+
+  <!-- BLOC 2 — Thèmes -->
+  <div class="card">
+    <div class="card-title" style="justify-content:space-between;margin-bottom:10px;">
+      <div style="display:flex;align-items:center;gap:8px;"><span class="step">2</span> Thèmes de travail</div>
+      <div style="font-size:12px;color:var(--txt3);font-weight:400;text-transform:none;letter-spacing:0;" id="theme-count">0 / 4 sélectionnés</div>
+    </div>
+    <div class="theme-grid" id="themes-grid"></div>
+  </div>
+
+  <!-- BLOC 3 — Détail -->
+  <div class="card">
+    <div class="card-title"><span class="step">3</span> Niveau de détail</div>
+    <div class="detail-row">
+      <div class="detail-opt on" id="det-simple" onclick="setDetail('simple')">
+        <div class="detail-opt-title">📋 Structure simple</div>
+        <div class="detail-opt-sub">Phases, durées et description des exercices</div>
+      </div>
+      <div class="detail-opt" id="det-complet" onclick="setDetail('complet')">
+        <div class="detail-opt-title">📖 Détail complet</div>
+        <div class="detail-opt-sub">+ Variantes, points de coaching, matériel nécessaire</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOUTON GÉNÉRER -->
+  <button class="btn-gen" id="btn-gen" onclick="generate()">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+    </svg>
+    Générer le plan de séance
+  </button>
+
+  <!-- RÉSULTAT -->
+  <div id="result"></div>
+
+  <!-- HISTORIQUE -->
+  <div id="histo-wrap"></div>
+
+</div>
+
+<div id="toast-wrap"></div>
+
+<script>
+// ════════════════════════════════
+// DONNÉES
+// ════════════════════════════════
+var THEMES = [
+  {id:'defense_zone',       label:'Défense de zone',             icon:'🛡️'},
+  {id:'defense_indiv',      label:'Défense individuelle',        icon:'🔒'},
+  {id:'transition_off',     label:'Transition offensive',        icon:'⚡'},
+  {id:'transition_def',     label:'Transition défensive',        icon:'🔄'},
+  {id:'pick_roll',          label:'Pick & Roll',                 icon:'🎯'},
+  {id:'jeu_interieur',      label:'Jeu intérieur',               icon:'🏠'},
+  {id:'tir',                label:'Tir & finition',              icon:'🎳'},
+  {id:'pressing',           label:'Pressing & trap',             icon:'💥'},
+  {id:'rebond',             label:'Rebond off. / déf.',          icon:'↩️'},
+  {id:'contre_attaque',     label:'Contre-attaque',              icon:'🏃'},
+  {id:'dribble',            label:'Dribble & pénétration',       icon:'🌀'},
+  {id:'communication',      label:'Communication & leadership',  icon:'📢'},
+];
+
+var INT_COLOR = {faible:'#3DC97A', moyenne:'#D4AA6A', haute:'#F28C3A', maximale:'#E05252'};
+var INT_LABEL = {faible:'Faible', moyenne:'Moyenne', haute:'Haute', maximale:'Maximale'};
+
+// State
+var S = {
+  teamId: '',
+  teams: [],        // équipes créées dans cet outil standalone
+  detail: 'simple',
+  focus: [],
+  savedPlans: [],
+};
+
+// Charger état sauvegardé
+(function(){
+  try{
+    var raw = localStorage.getItem('seance_ia_v1');
+    if(raw){
+      var saved = JSON.parse(raw);
+      S.teams = saved.teams || [];
+      S.savedPlans = saved.savedPlans || [];
+    }
+  }catch(e){}
+})();
+
+function persist(){
+  try{ localStorage.setItem('seance_ia_v1', JSON.stringify({teams:S.teams, savedPlans:S.savedPlans})); }catch(e){}
+}
+
+// ════════════════════════════════
+// INIT
+// ════════════════════════════════
+function init(){
+  renderThemes();
+  renderTeamSelect();
+  renderHisto();
+}
+
+function renderTeamSelect(){
+  var sel = document.getElementById('f-team');
+  sel.innerHTML = '<option value="">— Saisie manuelle —</option>';
+  S.teams.forEach(function(t){
+    sel.innerHTML += '<option value="'+t.id+'"'+(S.teamId===t.id?' selected':'')+'>'+t.name+' ('+t.nb+' joueurs)</option>';
+  });
+  sel.innerHTML += '<option value="__new__">+ Créer une équipe…</option>';
+}
+
+function onTeamChange(){
+  var val = document.getElementById('f-team').value;
+  if(val === '__new__'){
+    var name = prompt('Nom de l\'équipe :');
+    if(!name){renderTeamSelect();return;}
+    var nb = parseInt(prompt('Nombre de joueurs :')) || 12;
+    var t = {id: Date.now().toString(36), name: name.trim(), nb: nb};
+    S.teams.push(t);
+    S.teamId = t.id;
+    persist();
+    renderTeamSelect();
+    document.getElementById('f-effectif').value = nb;
+  } else {
+    S.teamId = val;
+    if(val){
+      var t = S.teams.find(function(x){return x.id===val;});
+      if(t) document.getElementById('f-effectif').value = t.nb;
+    }
+  }
+}
+
+// ════════════════════════════════
+// THÈMES
+// ════════════════════════════════
+function renderThemes(){
+  var grid = document.getElementById('themes-grid');
+  grid.innerHTML = '';
+  THEMES.forEach(function(th){
+    var on = S.focus.indexOf(th.id) >= 0;
+    var btn = document.createElement('button');
+    btn.className = 'theme-btn' + (on?' on':'');
+    btn.innerHTML = th.icon + ' ' + th.label;
+    btn.onclick = function(){ toggleTheme(th.id); };
+    grid.appendChild(btn);
+  });
+  document.getElementById('theme-count').textContent = S.focus.length + ' / 4 sélectionnés';
+}
+
+function toggleTheme(id){
+  var idx = S.focus.indexOf(id);
+  if(idx >= 0){ S.focus.splice(idx,1); }
+  else if(S.focus.length < 4){ S.focus.push(id); }
+  else { toast('Maximum 4 thèmes','err'); return; }
+  renderThemes();
+}
+
+// ════════════════════════════════
+// DÉTAIL
+// ════════════════════════════════
+function setDetail(v){
+  S.detail = v;
+  document.getElementById('det-simple').classList.toggle('on', v==='simple');
+  document.getElementById('det-complet').classList.toggle('on', v==='complet');
+}
+
+// ════════════════════════════════
+// GÉNÉRATION IA
+// ════════════════════════════════
+async function generate(){
+  if(S.focus.length === 0){
+    toast('Sélectionnez au moins 1 thème','err'); return;
+  }
+  var btn = document.getElementById('btn-gen');
+  var res = document.getElementById('result');
+
+  // Lire valeurs
+  var niveau   = document.getElementById('f-niveau').value;
+  var duree    = parseInt(document.getElementById('f-duree').value) || 90;
+  var effectif = document.getElementById('f-effectif').value || '12';
+  var objectif = document.getElementById('f-objectif').value.trim();
+  var teamName = '';
+  if(S.teamId){
+    var t = S.teams.find(function(x){return x.id===S.teamId;});
+    if(t) teamName = t.name;
+  }
+
+  var niveauxLbl = {u13:'U13',u15:'U15',u17:'U17',u20:'U20',senior:'Sénior',pro:'Professionnel / Élite'};
+  var focusLbl = S.focus.map(function(id){
+    var th = THEMES.find(function(x){return x.id===id;});
+    return th ? th.label : id;
+  }).join(', ');
+  var detailLbl = S.detail==='simple'
+    ? 'Structure simple : exercices avec nom, durée, description courte. Pas de variantes ni coaching détaillé.'
+    : 'Plan complet : exercices avec nom, durée, description détaillée, variante, point de coaching précis, matériel nécessaire.';
+
+  // Loading
+  btn.disabled = true;
+  btn.innerHTML = '<div class="loader"></div> Génération en cours…';
+  res.innerHTML = '<div class="info-box" style="text-align:center;">✨ L\'IA rédige votre plan de séance basketball…<br><small style="opacity:.7;margin-top:4px;display:block;">Cela prend 10 à 20 secondes</small></div>';
+
+  var systemPrompt = "Tu es un coach de basketball expert avec 20 ans d'expérience à haut niveau (Pro A, Équipe de France jeunes). "
+    + "Tu génères des plans de séance d'entraînement professionnels, précis et directement utilisables sur le terrain. "
+    + "Tu connais parfaitement les exercices classiques et innovants du basketball moderne. "
+    + "IMPORTANT : Réponds UNIQUEMENT avec un objet JSON valide. Aucun texte avant ou après. Pas de balises markdown.";
+
+  var userPrompt = "Génère un plan de séance d'entraînement basketball avec ces paramètres :\n"
+    + "- Niveau : " + niveauxLbl[niveau] + "\n"
+    + "- Durée totale : " + duree + " minutes\n"
+    + "- Nombre de joueurs : " + effectif + "\n"
+    + (teamName ? "- Équipe : " + teamName + "\n" : "")
+    + "- Thèmes de travail prioritaires : " + focusLbl + "\n"
+    + (objectif ? "- Contexte / objectif du coach : " + objectif + "\n" : "")
+    + "- Format : " + detailLbl + "\n\n"
+    + "Structure JSON attendue (respecte-la exactement) :\n"
+    + "{\n"
+    + "  \"titre\": \"string\",\n"
+    + "  \"resume\": \"string (1-2 phrases sur l'intention de la séance)\",\n"
+    + "  \"intensite\": \"faible|moyenne|haute|maximale\",\n"
+    + "  \"phases\": [\n"
+    + "    {\n"
+    + "      \"nom\": \"string (Échauffement / Corps de séance / Retour au calme)\",\n"
+    + "      \"duree\": number,\n"
+    + "      \"objectif\": \"string\",\n"
+    + "      \"exercices\": [\n"
+    + "        {\n"
+    + "          \"nom\": \"string\",\n"
+    + "          \"duree\": number,\n"
+    + "          \"description\": \"string\",\n"
+    + (S.detail==='complet'
+       ? "          \"variante\": \"string\",\n"
+       + "          \"coaching\": \"string\",\n"
+       + "          \"materiel\": \"string\",\n"
+       : "")
+    + "          \"intensite\": \"faible|moyenne|haute|maximale\"\n"
+    + "        }\n"
+    + "      ]\n"
+    + "    }\n"
+    + "  ],\n"
+    + "  \"conseils_coach\": [\"string\", \"string\", \"string\"]\n"
+    + "}";
+
+  try {
+    var response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 4000,
+        system: systemPrompt,
+        messages: [{ role: "user", content: userPrompt }]
+      })
+    });
+
+    if(!response.ok){
+      var errText = await response.text();
+      throw new Error('API error ' + response.status + ': ' + errText.slice(0,200));
+    }
+
+    var data = await response.json();
+    var raw = '';
+    if(data.content && data.content[0] && data.content[0].text){
+      raw = data.content[0].text;
+    } else {
+      throw new Error('Réponse API inattendue : ' + JSON.stringify(data).slice(0,200));
+    }
+
+    // Nettoyer le JSON
+    raw = raw.replace(/```json\s*/gi,'').replace(/```\s*/g,'').trim();
+    // Extraire le premier objet JSON si du texte parasite
+    var jsonStart = raw.indexOf('{');
+    var jsonEnd = raw.lastIndexOf('}');
+    if(jsonStart >= 0 && jsonEnd >= 0) raw = raw.slice(jsonStart, jsonEnd+1);
+
+    var plan = JSON.parse(raw);
+
+    // Afficher
+    displayPlan(plan, duree);
+
+    // Sauvegarder
+    S.savedPlans.push({
+      id: Date.now().toString(36),
+      titre: plan.titre,
+      date: new Date().toLocaleDateString('fr-FR'),
+      duree: duree,
+      detail: S.detail,
+      focus: S.focus.slice(),
+      plan: plan
+    });
+    persist();
+    renderHisto();
+    toast('Plan généré avec succès ✓','ok');
+
+  } catch(err){
+    res.innerHTML = '<div class="err-box">'
+      + '<div style="font-weight:700;margin-bottom:6px;">❌ Erreur lors de la génération</div>'
+      + '<div style="font-size:13px;opacity:.8;">' + err.message + '</div>'
+      + '<div style="font-size:12px;color:var(--txt3);margin-top:8px);">Vérifiez votre connexion internet et réessayez.</div>'
+      + '</div>';
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> Générer le plan de séance';
+}
+
+// ════════════════════════════════
+// AFFICHAGE DU PLAN
+// ════════════════════════════════
+function displayPlan(plan, dureeTotal){
+  var res = document.getElementById('result');
+  var totalPhases = (plan.phases||[]).reduce(function(s,p){return s+(p.duree||0);},0);
+  var ic = INT_COLOR[plan.intensite] || '#A89880';
+
+  var html = '<div class="plan-wrap">'
+
+    // Header
+    + '<div class="plan-header">'
+    + '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;">'
+    + '<div style="flex:1;">'
+    + '<div class="plan-title">' + (plan.titre||'Plan de séance') + '</div>'
+    + (plan.resume ? '<div class="plan-resume">' + plan.resume + '</div>' : '')
+    + '</div>'
+    + '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0;">'
+    + '<div style="font-size:14px;font-weight:700;color:var(--blu);">⏱ ' + totalPhases + ' min</div>'
+    + '<div class="badge" style="background:' + ic + '20;color:' + ic + ';">Intensité ' + (INT_LABEL[plan.intensite]||plan.intensite||'') + '</div>'
+    + '</div>'
+    + '</div>'
+    + '</div>';
+
+  // Phases
+  html += '<div style="padding:14px 16px 4px;">';
+  (plan.phases||[]).forEach(function(phase){
+    var exosHTML = (phase.exercices||[]).map(function(ex){
+      var eic = INT_COLOR[ex.intensite] || '#A89880';
+      var coaching = (ex.coaching && S.detail==='complet')
+        ? '<div class="coaching-box"><div class="coaching-lbl">📌 Point de coaching</div><div class="coaching-txt">' + ex.coaching + '</div></div>' : '';
+      var variante = (ex.variante && S.detail==='complet')
+        ? '<div class="variante-txt"><span style="color:var(--blu);font-weight:600;">Variante : </span>' + ex.variante + '</div>' : '';
+      var materiel = (ex.materiel && S.detail==='complet')
+        ? '<div style="font-size:12px;color:var(--txt3);margin-top:4px;"><span style="font-weight:600;">Matériel : </span>' + ex.materiel + '</div>' : '';
+      return '<div class="exo-item"><div class="exo-row">'
+        + '<div class="exo-bar" style="background:' + eic + ';"></div>'
+        + '<div style="flex:1;min-width:0;">'
+        + '<div class="exo-title">'
+        + ex.nom
+        + '<span class="badge" style="background:' + eic + '25;color:' + eic + ';">' + (ex.duree||'?') + ' min</span>'
+        + '<span class="badge" style="background:' + eic + '15;color:' + eic + ';font-size:10px;">' + (INT_LABEL[ex.intensite]||ex.intensite||'') + '</span>'
+        + '</div>'
+        + '<div class="exo-desc">' + (ex.description||'') + '</div>'
+        + coaching + variante + materiel
+        + '</div></div></div>';
+    }).join('');
+
+    html += '<div class="phase-wrap" style="margin-bottom:10px;">'
+      + '<div class="phase-hdr">'
+      + '<div class="phase-name">' + phase.nom + '</div>'
+      + '<div class="phase-dur">' + phase.duree + ' min</div>'
+      + '</div>'
+      + (phase.objectif ? '<div style="padding:8px 16px;font-size:12px;color:var(--txt3);border-bottom:1px solid var(--bdr);background:rgba(91,141,239,0.03);">' + phase.objectif + '</div>' : '')
+      + exosHTML
+      + '</div>';
+  });
+  html += '</div>';
+
+  // Conseils
+  if(plan.conseils_coach && plan.conseils_coach.length){
+    html += '<div class="conseils-wrap"><div class="conseils-title">💡 Conseils du coach</div>';
+    plan.conseils_coach.forEach(function(c){
+      html += '<div class="conseil-item"><div class="conseil-dot"></div><div class="conseil-txt">' + c + '</div></div>';
+    });
+    html += '</div>';
+  }
+
+  // Actions
+  html += '<div class="plan-actions">'
+    + '<button class="btn-sm" onclick="printPlan()"><svg viewBox="0 0 24 24"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/></svg>Imprimer / PDF</button>'
+    + '</div>';
+
+  html += '</div>';
+
+  // Stocker le plan courant pour l'impression
+  window._currentPlan = plan;
+  res.innerHTML = html;
+  res.scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+// ════════════════════════════════
+// IMPRESSION
+// ════════════════════════════════
+function printPlan(){
+  var el = document.getElementById('result'); if(!el) return;
+  var w = window.open('','_blank');
+  w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8">'
+    + '<title>Plan de séance</title>'
+    + '<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">'
+    + '<style>'
+    + 'body{font-family:Outfit,Arial,sans-serif;color:#1a1a1a;padding:28px;max-width:820px;margin:0 auto;}'
+    + 'h1{font-size:22px;font-weight:900;margin-bottom:6px;}'
+    + '.resume{font-size:13px;color:#555;margin-bottom:16px;}'
+    + '.phase{margin-bottom:18px;border:1px solid #ddd;border-radius:8px;overflow:hidden;page-break-inside:avoid;}'
+    + '.phase-hdr{background:#f0f4ff;padding:10px 16px;font-size:14px;font-weight:800;border-bottom:1px solid #ddd;display:flex;justify-content:space-between;}'
+    + '.exo{padding:10px 16px;border-bottom:1px solid #f0f0f0;}'
+    + '.exo:last-child{border-bottom:none;}'
+    + '.exo-title{font-size:13px;font-weight:700;margin-bottom:4px;}'
+    + '.exo-desc{font-size:12px;color:#444;line-height:1.5;}'
+    + '.coaching{background:#fffbf0;border-left:3px solid #D4AA6A;padding:7px 10px;margin-top:7px;font-size:12px;color:#6a4a00;}'
+    + '.variante{font-size:11px;color:#888;margin-top:4px;}'
+    + '.conseils{background:#f5f5f5;border-radius:8px;padding:14px;margin-top:16px;}'
+    + '.badge{display:inline-block;padding:1px 8px;border-radius:20px;font-size:11px;font-weight:700;margin-left:6px;}'
+    + '@media print{body{padding:0;}}'
+    + '</style></head><body>');
+
+  var p = window._currentPlan;
+  if(!p){ w.document.write('<p>Aucun plan</p>'); w.document.close(); return; }
+
+  w.document.write('<h1>' + p.titre + '</h1>');
+  if(p.resume) w.document.write('<div class="resume">' + p.resume + '</div>');
+
+  (p.phases||[]).forEach(function(phase){
+    w.document.write('<div class="phase"><div class="phase-hdr"><span>' + phase.nom + '</span><span>' + phase.duree + ' min</span></div>');
+    (phase.exercices||[]).forEach(function(ex){
+      w.document.write('<div class="exo">');
+      w.document.write('<div class="exo-title">' + ex.nom + '<span class="badge" style="background:#e8f0ff;color:#3A6BC4;">' + ex.duree + ' min</span></div>');
+      w.document.write('<div class="exo-desc">' + ex.description + '</div>');
+      if(ex.coaching) w.document.write('<div class="coaching"><strong>📌 Coaching :</strong> ' + ex.coaching + '</div>');
+      if(ex.variante) w.document.write('<div class="variante"><strong>Variante :</strong> ' + ex.variante + '</div>');
+      if(ex.materiel) w.document.write('<div class="variante"><strong>Matériel :</strong> ' + ex.materiel + '</div>');
+      w.document.write('</div>');
+    });
+    w.document.write('</div>');
+  });
+
+  if(p.conseils_coach && p.conseils_coach.length){
+    w.document.write('<div class="conseils"><strong style="font-size:13px;">💡 Conseils du coach</strong><ul style="margin-top:8px;padding-left:18px;">');
+    p.conseils_coach.forEach(function(c){ w.document.write('<li style="font-size:12px;color:#444;margin-bottom:4px;">' + c + '</li>'); });
+    w.document.write('</ul></div>');
+  }
+
+  w.document.close();
+  w.focus();
+  setTimeout(function(){ w.print(); }, 500);
+}
+
+// ════════════════════════════════
+// HISTORIQUE
+// ════════════════════════════════
+function renderHisto(){
+  var wrap = document.getElementById('histo-wrap');
+  if(!S.savedPlans.length){ wrap.innerHTML=''; return; }
+
+  var h = '<div style="margin-top:8px;">'
+    + '<div style="font-size:12px;font-weight:700;color:var(--blu);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px;">Séances générées (' + S.savedPlans.length + ')</div>';
+
+  S.savedPlans.slice().reverse().forEach(function(p, i){
+    var realIdx = S.savedPlans.length - 1 - i;
+    var focusLbl = (p.focus||[]).slice(0,2).map(function(id){
+      var th = THEMES.find(function(x){return x.id===id;}); return th?th.icon:'';
+    }).join(' ');
+    h += '<div class="histo-item">'
+      + '<div class="histo-info">'
+      + '<div class="histo-title">' + focusLbl + ' ' + (p.titre||'Séance') + '</div>'
+      + '<div class="histo-meta">' + p.date + ' · ' + p.duree + ' min · ' + (p.detail==='complet'?'Détail complet':'Structure simple') + '</div>'
+      + '</div>'
+      + '<button class="btn-sm blue" onclick="loadSaved(' + realIdx + ')">Voir</button>'
+      + '<button class="btn-sm" style="color:var(--red);border-color:rgba(224,82,82,.2);" onclick="deleteSaved(' + realIdx + ')">✕</button>'
+      + '</div>';
+  });
+
+  h += '</div>';
+  wrap.innerHTML = h;
+}
+
+function loadSaved(idx){
+  var p = S.savedPlans[idx]; if(!p) return;
+  S.detail = p.detail || 'simple';
+  setDetail(S.detail);
+  displayPlan(p.plan, p.duree);
+  toast('Séance chargée','ok');
+}
+
+function deleteSaved(idx){
+  S.savedPlans.splice(idx,1);
+  persist();
+  renderHisto();
+}
+
+// ════════════════════════════════
+// TOAST
+// ════════════════════════════════
+function toast(msg, type){
+  var wrap = document.getElementById('toast-wrap');
+  var d = document.createElement('div');
+  d.className = 'toast ' + (type==='ok' ? 'tok' : 'terr');
+  d.textContent = msg;
+  wrap.appendChild(d);
+  requestAnimationFrame(function(){ requestAnimationFrame(function(){ d.classList.add('show'); }); });
+  setTimeout(function(){ d.classList.remove('show'); setTimeout(function(){ d.remove(); }, 300); }, 2800);
+}
+
+// ════════════════════════════════
+// DÉMARRAGE
+// ════════════════════════════════
+init();
+</script>
+</body>
+</html>
