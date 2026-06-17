@@ -4,6 +4,7 @@
   "description": "Logiciel d'analyse vidéo basketball",
   "start_url": "/baskettaggpro/",
   "display": "standalone",
+  "orientation": "landscape",
   "background_color": "#1A1A1A",
   "theme_color": "#D4AA6A",
   "icons": [
