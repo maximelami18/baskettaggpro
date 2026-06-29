@@ -1724,7 +1724,7 @@ function showPlayerStatsModal(tid,pid){
   var stats=[['Pts total',totPts],['Moy. pts',(totPts/mc).toFixed(1)],['Moy. reb.',(totReb/mc).toFixed(1)],['Moy. pd.',(totPd/mc).toFixed(1)],['% 2pts',pct2],['% 3pts',pct3],['% LF',pctLF],['Matchs',mCount],['Moy. +/-',(totPm/mc).toFixed(1)],['Moy. éval.',(totEval/mc).toFixed(1)]];
   var h='<div class="modal-bg" onclick="closeModal()"><div class="modal-box" onclick="event.stopPropagation()">'
     +'<div style="display:flex;align-items:center;gap:15px;margin-bottom:20px;background:var(--acc-d);border-radius:var(--r);padding:18px;">'
-    +'<div style="width:64px;height:64px;border-radius:16px;background:'+(p.photo?'url('+p.photo+') center/cover':'linear-gradient(135deg,var(--acc-d),var(--bg2))')+';display:flex;align-items:center;justify-content:center;font-size:26px;overflow:hidden;flex-shrink:0;border:1px solid var(--bdr2);">'+(p.photo?'':'👤')+'</div>'
+    +'<div style="width:64px;height:64px;border-radius:16px;background:'+(p.photo?'url('+p.photo+') top/cover':'linear-gradient(135deg,var(--acc-d),var(--bg2))')+';display:flex;align-items:center;justify-content:center;font-size:26px;overflow:hidden;flex-shrink:0;border:1px solid var(--bdr2);">'+(p.photo?'':'👤')+'</div>'
     +'<div><div style="font-size:21px;font-weight:800;color:var(--txt);letter-spacing:-0.02em;">'+p.first+' '+p.last+'</div>'
     +'<div style="font-size:14px;color:var(--txt2);margin-top:3px;">#'+p.num+' · '+p.pos+' · '+team.name+'</div>'
     +'<div style="margin-top:10px;display:flex;gap:7px;flex-wrap:wrap;">'+badge(team.champ,'acc')+badge(mCount+' match'+(mCount>1?'s':''),'def')+(totMin>0?'<span style="font-size:13px;color:var(--acc);font-weight:600;background:var(--acc-d);padding:3px 10px;border-radius:20px;border:1px solid var(--bdr2);">⏱ Moy. '+avgMin+' min</span>':'')+'</div></div>'
@@ -2816,7 +2816,7 @@ function renderSeqPanel(){
             +'<div><div style="font-size:11px;color:var(--txt3);margin-bottom:3px;">Sous-famille</div><input class="inp" id="seqSub" value="'+(s.sub||'')+'"/></div>'
             +'</div>'
             +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px;">'
-            +'<div><div style="font-size:11px;color:var(--txt3);margin-bottom:3px;">Action</div><select id="seqA" class="sel" style="height:32px;font-size:13px;">'+allA.map(function(a){return'<option'+(s.action===a?' selected':'')+'>'+a+'</option>';}).join('')+'</select></div>'
+            +'<div><div style="font-size:11px;color:var(--txt3);margin-bottom:3px;">Action</div><select id="seqA" class="sel" style="height:32px;font-size:13px;">'+(allA.length?allA.map(function(a){return'<option'+(s.action===a?' selected':'')+'>'+a+'</option>';}).join(''):'<option selected>'+s.action+'</option>')+'</select></div>'
             +'<div><div style="font-size:11px;color:var(--txt3);margin-bottom:3px;">Résultat</div><select id="seqR" class="sel" style="height:32px;font-size:13px;">'+allR.map(function(r){return'<option'+(s.result===r?' selected':'')+'>'+r+'</option>';}).join('')+'</select></div>'
             +'</div>'
             +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px;">'
@@ -3481,7 +3481,7 @@ function renderIndivActionPanel(ap,board,team){
       +'<div style="flex:1;padding:10px;display:grid;grid-template-columns:repeat('+cols+',1fr);grid-template-rows:repeat('+rows+',1fr);gap:'+gap+'px;">';
     mPl.forEach(function(p){
       var photoInner=p.photo
-        ?'<div style="width:'+ph+'px;height:'+ph+'px;border-radius:50%;background:url('+p.photo+') center/cover;border:3px solid var(--acc);flex-shrink:0;"></div>'
+        ?'<div style="width:'+ph+'px;height:'+ph+'px;border-radius:50%;background:url('+p.photo+') center 15%/cover;border:3px solid var(--acc);flex-shrink:0;"></div>'
         :'<div style="width:'+ph+'px;height:'+ph+'px;border-radius:50%;background:linear-gradient(135deg,rgba(212,170,106,0.22),rgba(212,170,106,0.06));border:3px solid var(--bdr2);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><span style="font-size:'+rSz+'px;font-weight:900;color:var(--acc);">#'+p.num+'</span></div>';
       hs+='<button onclick="selectIndivPlayer('+p.id+')" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;border-radius:12px;border:1.5px solid var(--bdr2);background:var(--surf2);cursor:pointer;padding:10px 6px;transition:border-color 0.15s,background 0.15s;font-family:inherit;min-height:0;" onmouseover="this.style.borderColor=\'#D4AA6A\';this.style.background=\'rgba(212,170,106,0.08)\'" onmouseout="this.style.borderColor=\'rgba(212,170,106,0.16)\';this.style.background=\'#323232\'">'
         +photoInner
@@ -3520,7 +3520,7 @@ function renderIndivActionPanel(ap,board,team){
       +'<div style="flex:1;padding:10px;display:grid;grid-template-columns:repeat('+cols+',1fr);grid-template-rows:repeat('+rows+',1fr);gap:'+gap+'px;">';
     mPl.forEach(function(p){
       var photoInner=p.photo
-        ?'<div style="width:'+ph+'px;height:'+ph+'px;border-radius:50%;background:url('+p.photo+') center/cover;border:3px solid var(--acc);flex-shrink:0;"></div>'
+        ?'<div style="width:'+ph+'px;height:'+ph+'px;border-radius:50%;background:url('+p.photo+') center 15%/cover;border:3px solid var(--acc);flex-shrink:0;"></div>'
         :'<div style="width:'+ph+'px;height:'+ph+'px;border-radius:50%;background:linear-gradient(135deg,rgba(212,170,106,0.22),rgba(212,170,106,0.06));border:3px solid var(--bdr2);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><span style="font-size:'+rSz+'px;font-weight:900;color:var(--acc);">#'+p.num+'</span></div>';
       h+='<button onclick="selectIndivPlayer('+p.id+')" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;border-radius:12px;border:1.5px solid var(--bdr2);background:var(--surf2);cursor:pointer;padding:10px 6px;transition:border-color 0.15s,background 0.15s;font-family:inherit;min-height:0;" onmouseover="this.style.borderColor=\'#D4AA6A\';this.style.background=\'rgba(212,170,106,0.08)\'" onmouseout="this.style.borderColor=\'rgba(212,170,106,0.16)\';this.style.background=\'#323232\'">'
         +photoInner
@@ -3539,7 +3539,7 @@ function renderIndivActionPanel(ap,board,team){
     var h='<div style="flex:1;display:flex;flex-direction:column;overflow:hidden;">'
       +'<div style="display:flex;align-items:center;gap:11px;padding:11px 16px;background:linear-gradient(90deg,rgba(212,170,106,0.13),transparent);border-bottom:1.5px solid var(--bdr2);flex-shrink:0;">'
       +(selPObj
-        ?'<div style="width:42px;height:42px;border-radius:11px;background:'+(selPObj.photo?'url('+selPObj.photo+') center/cover':'linear-gradient(135deg,var(--acc),var(--acc2))')+';display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;border:1px solid var(--bdr2);">'+(selPObj.photo?'':'<span style="font-size:16px;color:#150E00;font-weight:900;">#'+selPObj.num+'</span>')+'</div>'
+        ?'<div style="width:42px;height:42px;border-radius:11px;background:'+(selPObj.photo?'url('+selPObj.photo+') center 15%/cover':'linear-gradient(135deg,var(--acc),var(--acc2))')+';display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;border:1px solid var(--bdr2);">'+(selPObj.photo?'':'<span style="font-size:16px;color:#150E00;font-weight:900;">#'+selPObj.num+'</span>')+'</div>'
           +'<div><div style="font-size:18px;font-weight:800;color:var(--acc);">#'+selPObj.num+' '+selPObj.first+' '+selPObj.last+'</div><div style="font-size:13px;color:var(--txt3);">'+selPObj.pos+'</div></div>'
         :'')
       +'<button onclick="CS.selPlayer=null;CS.hlPlayer=null;renderActionPanel()" class="btn bg bsm" style="margin-left:auto;font-size:13px;">← Changer de joueur</button>'
@@ -4113,7 +4113,7 @@ function openShotModal(key,val,sv,made){
       +'</button>';
     onP.forEach(function(p){
       var photoHtml=p.photo
-        ?'<div style="width:58px;height:58px;border-radius:50%;background:url('+p.photo+') center/cover;border:3px solid rgba(212,170,106,0.3);flex-shrink:0;"></div>'
+        ?'<div style="width:58px;height:58px;border-radius:50%;background:url('+p.photo+') center 15%/cover;border:3px solid rgba(212,170,106,0.3);flex-shrink:0;"></div>'
         :'<div style="width:58px;height:58px;border-radius:50%;background:var(--surf3);border:3px solid rgba(212,170,106,0.2);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:var(--acc);">#'+p.num+'</div>';
       h+='<button id="ast_'+p.id+'" onclick="setAssist('+p.id+')" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:18px 12px;border-radius:14px;border:1.5px solid var(--bdr2);background:var(--surf2);color:var(--txt);font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;min-height:100px;transition:all 0.12s;">'
         +photoHtml
@@ -4330,7 +4330,7 @@ function openReboundModal(){
   onP.forEach(function(p){
     if(!p)return;
     var photoHtml=p.photo
-      ?'<div style="width:64px;height:64px;border-radius:50%;background:url('+p.photo+') center/cover;border:3px solid rgba(212,170,106,0.25);margin:0 auto 10px;"></div>'
+      ?'<div style="width:64px;height:64px;border-radius:50%;background:url('+p.photo+') center 15%/cover;border:3px solid rgba(212,170,106,0.25);margin:0 auto 10px;"></div>'
       :'<div style="width:64px;height:64px;border-radius:50%;background:var(--surf3);border:3px solid rgba(212,170,106,0.15);margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:var(--acc);">#'+p.num+'</div>';
     h+='<button id="reb_'+p.id+'" onclick="selectRebPlayer(this,'+p.id+')" style="padding:16px 8px 14px;border-radius:14px;border:2px solid var(--bdr2);background:var(--surf2);color:var(--txt);cursor:pointer;font-family:inherit;text-align:center;transition:all 0.12s;display:flex;flex-direction:column;align-items:center;">'
       +photoHtml
@@ -4795,7 +4795,7 @@ function openSeqPlayersModal(){
       var disabled=!sel&&defs.length>=5;
       var photo=p.photo;
       var photoHtml=photo
-        ?'<div style="width:56px;height:56px;border-radius:50%;background:url('+photo+') center/cover;border:3px solid '+(sel?'var(--acc)':'rgba(212,170,106,0.2)')+';margin:0 auto 8px;"></div>'
+        ?'<div style="width:56px;height:56px;border-radius:50%;background:url('+photo+') center 15%/cover;border:3px solid '+(sel?'var(--acc)':'rgba(212,170,106,0.2)')+';margin:0 auto 8px;"></div>'
         :'<div style="width:56px;height:56px;border-radius:50%;background:var(--surf3);border:3px solid '+(sel?'var(--acc)':'rgba(212,170,106,0.12)')+';margin:0 auto 8px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:var(--acc);">#'+p.num+'</div>';
       h+='<button onclick="seqSelDefender('+p.id+')" style="padding:12px 6px 10px;border-radius:12px;border:2px solid '+(sel?'var(--acc)':'var(--bdr2)')+';background:'+(sel?'var(--acc-d)':'var(--surf2)')+';cursor:'+(disabled?'not-allowed':'pointer')+';font-family:inherit;text-align:center;opacity:'+(disabled?'0.35':'1')+';transition:all 0.12s;display:flex;flex-direction:column;align-items:center;">'
         +photoHtml
@@ -4828,7 +4828,7 @@ function openSeqPlayersModal(){
     var photo=getPlayerPhoto(pid);
     var onclick='seqSelPlayer(&quot;'+role+'&quot;,'+pid+')';
     var photoHtml=photo
-      ?'<div style="width:56px;height:56px;border-radius:50%;background:url('+photo+') center/cover;border:3px solid '+(sel?color:'rgba(212,170,106,0.25)')+';margin:0 auto 8px;flex-shrink:0;"></div>'
+      ?'<div style="width:56px;height:56px;border-radius:50%;background:url('+photo+') center 15%/cover;border:3px solid '+(sel?color:'rgba(212,170,106,0.25)')+';margin:0 auto 8px;flex-shrink:0;"></div>'
       :'<div style="width:56px;height:56px;border-radius:50%;background:var(--surf3);border:3px solid '+(sel?color:'rgba(212,170,106,0.15)')+';margin:0 auto 8px;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;color:'+numColor+';">#'+getPlayerNum(pid)+'</div>';
     return'<button id="sqp_'+role+'_'+pid+'" onclick="'+onclick+'" style="padding:12px 6px 10px;border-radius:12px;border:2px solid '+border+';background:'+bg+';cursor:pointer;font-family:inherit;text-align:center;transition:all 0.12s;display:flex;flex-direction:column;align-items:center;">'+
       photoHtml+
@@ -8240,7 +8240,7 @@ function openIndivShotPlayerPicker(){
   players.forEach(function(p){
     var photo=p.photo;
     var photoHtml=photo
-      ?'<div style="width:46px;height:46px;border-radius:50%;background:url('+photo+') center/cover;border:2px solid rgba(212,170,106,0.3);margin:0 auto 6px;"></div>'
+      ?'<div style="width:46px;height:46px;border-radius:50%;background:url('+photo+') center 15%/cover;border:2px solid rgba(212,170,106,0.3);margin:0 auto 6px;"></div>'
       :'<div style="width:46px;height:46px;border-radius:50%;background:var(--surf3);border:2px solid rgba(212,170,106,0.15);margin:0 auto 6px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:var(--acc);">#'+p.num+'</div>';
     h+='<button onclick="closeModal();openIndivShotModal('+p.id+')" style="padding:10px 6px 8px;border-radius:10px;border:1.5px solid var(--bdr2);background:var(--surf2);cursor:pointer;font-family:inherit;text-align:center;transition:all 0.12s;display:flex;flex-direction:column;align-items:center;" onmouseover="this.style.borderColor=\'var(--acc)\'" onmouseout="this.style.borderColor=\'var(--bdr2)\'">'
       +photoHtml
@@ -13689,7 +13689,7 @@ function openToolRapportJoueur(){
     +(mj>0?'<button onclick="genRapportJoueurPDF()" style="padding:0 14px;height:34px;border-radius:8px;border:1px solid var(--bdr2);background:transparent;color:var(--acc);font-size:12px;font-weight:700;cursor:pointer;font-family:Outfit,sans-serif;">📥 PDF</button>':''))
     // Fiche joueur
     +'<div style="background:var(--surf);border:1px solid var(--bdr2);border-radius:14px;padding:18px;display:flex;align-items:center;gap:14px;margin-bottom:14px;">'
-    +'<div style="width:56px;height:56px;border-radius:14px;background:'+(p.photo?'url('+p.photo+') center/cover':'var(--bg2)')+';border:1px solid var(--bdr2);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">'+(p.photo?'':'👤')+'</div>'
+    +'<div style="width:56px;height:56px;border-radius:14px;background:'+(p.photo?'url('+p.photo+') center 15%/cover':'var(--bg2)')+';border:1px solid var(--bdr2);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">'+(p.photo?'':'👤')+'</div>'
     +'<div><div style="font-size:18px;font-weight:800;color:var(--txt);">#'+p.num+' '+p.first+' '+p.last+'</div>'
     +'<div style="font-size:12px;color:var(--txt2);margin-top:2px;">'+p.pos+' · '+team.name+' · '+mj+' match'+(mj>1?'s':'')+'</div></div></div>'
     // Stats moyennes — toutes colonnes
