@@ -1799,7 +1799,7 @@ function renderTeams(){
 
       team.players.forEach(function(p,pi){
         var isFirst=pi===0, isLast=pi===team.players.length-1;
-        var bg=p.photo?'url('+p.photo+') center/cover':'linear-gradient(135deg,var(--acc-d) 0%,rgba(212,170,106,0.05) 100%)';
+        var bg=p.photo?'url('+p.photo+') top/cover':'linear-gradient(135deg,var(--acc-d) 0%,rgba(212,170,106,0.05) 100%)';
         h+='<div style="border-radius:14px;border:1px solid var(--bdr);background:var(--surf);overflow:hidden;position:relative;">';
         // Boutons déplacement
         h+='<div style="position:absolute;top:5px;left:5px;display:flex;flex-direction:column;gap:2px;z-index:2;">';
@@ -1809,7 +1809,7 @@ function renderTeams(){
         // Position badge
         h+='<div style="position:absolute;top:5px;left:31px;background:rgba(10,10,10,0.55);color:rgba(255,255,255,0.4);font-size:10px;font-weight:700;padding:2px 6px;border-radius:20px;backdrop-filter:blur(4px);">'+(pi+1)+'</div>';
         // Photo area
-        h+='<div style="height:80px;background:'+bg+';display:flex;align-items:center;justify-content:center;position:relative;">';
+        h+='<div style="height:120px;background:'+bg+';display:flex;align-items:center;justify-content:center;position:relative;">';
         if(!p.photo)h+='<span style="font-size:32px;opacity:0.25;">👤</span>';
         h+='<div style="position:absolute;top:6px;right:6px;background:var(--acc);color:#150E00;font-size:11px;font-weight:900;padding:2px 7px;border-radius:20px;">#'+p.num+'</div>';
         h+='</div>';
@@ -9019,7 +9019,7 @@ function confirmIndivShot(){
       resultPts:made?(is3pt?3:2):0,
       debut:fmtTime(debS),fin:fmtTime(finS),
       player:player?(player.first+' '+player.last):'Équipe',playerId:pid,
-      seqPlayers:[],qt:CS.qt,preroll:10,videoIdx:_currentVideoIdx||0,
+      seqPlayers:[],qt:CS.qt,preroll:6,videoIdx:_currentVideoIdx||0,
       fromShot:true,shotKey:key,shotId:shotId
     });
   }
@@ -9155,7 +9155,7 @@ function _commitPendingShot(famLabel, subLabel, actLabel, resLabel){
       resultPts:sh.made?(sh.is3pt?3:2):0,
       debut:fmtTime(debS),fin:fmtTime(finS),
       player:pName,playerId:sh.pid,
-      seqPlayers:[],qt:sh.qt,preroll:10,videoIdx:sh.videoIdx,
+      seqPlayers:[],qt:sh.qt,preroll:6,videoIdx:sh.videoIdx,
       fromShot:true,shotKey:key,shotId:shotId
     });
   }
