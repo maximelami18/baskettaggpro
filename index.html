@@ -2817,7 +2817,7 @@ function renderSeqPanel(){
             +'</div>'
             +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px;">'
             +'<div><div style="font-size:11px;color:var(--txt3);margin-bottom:3px;">Action</div><select id="seqA" class="sel" style="height:32px;font-size:13px;">'+(allA.length?allA.map(function(a){return'<option'+(s.action===a?' selected':'')+'>'+a+'</option>';}).join(''):'<option selected>'+s.action+'</option>')+'</select></div>'
-            +'<div><div style="font-size:11px;color:var(--txt3);margin-bottom:3px;">Résultat</div><select id="seqR" class="sel" style="height:32px;font-size:13px;">'+allR.map(function(r){return'<option'+(s.result===r?' selected':'')+'>'+r+'</option>';}).join('')+'</select></div>'
+            +'<div><div style="font-size:11px;color:var(--txt3);margin-bottom:3px;">Résultat</div><select id="seqR" class="sel" style="height:32px;font-size:13px;">'+(allR.length?allR.map(function(r){return'<option'+(s.result===r?' selected':'')+'>'+r+'</option>';}).join(''):'<option selected>'+s.result+'</option>')+'</select></div>'
             +'</div>'
             +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px;">'
             +'<div><div style="font-size:11px;color:var(--txt3);margin-bottom:3px;">Début</div><input class="inp" id="seqD" value="'+s.debut+'" style="height:32px;font-size:13px;font-family:\'JetBrains Mono\',monospace;"/></div>'
