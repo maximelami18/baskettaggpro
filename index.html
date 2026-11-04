@@ -422,7 +422,7 @@ document.addEventListener('DOMContentLoaded', function(){
 var _SB_URL="https://umuvirwbtpflizxupwbr.supabase.co";
 // Version de ce fichier — à incrémenter à chaque déploiement, en cohérence avec la valeur
 // mise à jour dans la table Supabase `app_version` (voir _checkAppVersion ci-dessous).
-var APP_VERSION="2026-11-04-270";
+var APP_VERSION="2026-11-04-271";
 var _SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtdXZpcndidHBmbGl6eHVwd2JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3MTI1MDEsImV4cCI6MjA5MDI4ODUwMX0.fFQaF-zP9dzcWITJDf6GBmvu0pdcuvlaUz0A0qW0kfo";
 var _LICENCE_KEY='btp_licence';
 var _MACHINE_KEY='btp_machine';
@@ -3546,12 +3546,17 @@ function renderDashboard(){
 
   // ── Stats cards ──
   h+='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px;">';
-  var _gap=(parseFloat(avg1)||0)-(parseFloat(avg2)||0);
+  var _cms=_dashMatches.filter(function(m){var o=_matchOutcomeFor(m,team.id);return _dashFilter==='V'?o==='V':_dashFilter==='D'?o==='D':true;});
+  var _cn=_cms.length,_cW=_cms.filter(function(m){return _matchOutcomeFor(m,team.id)==='V';}).length,_cL=_cms.filter(function(m){return _matchOutcomeFor(m,team.id)==='D';}).length;
+  var _cPf=_cms.reduce(function(a,m){return a+_matchScoreFor(m,team.id).pts;},0),_cPa=_cms.reduce(function(a,m){return a+_matchScoreFor(m,team.id).enc;},0);
+  var cAvg1=_cn?(_cPf/_cn).toFixed(1):'—',cAvg2=_cn?(_cPa/_cn).toFixed(1):'—';
+  var _gap=_cn?(_cPf-_cPa)/_cn:0;
+  var _fl=_dashFilter==='V'?'matchs gagnés':_dashFilter==='D'?'matchs perdus':'tous les matchs';
   var cards=[
-    {label:'Matchs joués',val:_dashMC+'',sub:_dashWins+' V · '+_dashLosses+' D · '+winPct+'% de victoires',col:'var(--txt)'},
-    {label:'Points marqués',val:avg1,sub:'moyenne/match',col:'var(--acc)'},
-    {label:'Points encaissés',val:avg2,sub:'moyenne/match',col:'var(--txt2)'},
-    {label:'Écart',val:(_gap>0?'+':_gap<0?'−':'')+Math.abs(_gap).toFixed(1),sub:'moyenne/match',col:_gap>0?'var(--grn)':_gap<0?'var(--red)':'var(--txt2)'},
+    {label:'Matchs joués',val:_cn+'',sub:_dashFilter==='all'?_cW+' V · '+_cL+' D · '+(_cn?Math.round(_cW/_cn*100):0)+'% de victoires':_fl,col:'var(--txt)'},
+    {label:'Points marqués',val:cAvg1,sub:'moyenne/match · '+_fl,col:'var(--acc)'},
+    {label:'Points encaissés',val:cAvg2,sub:'moyenne/match · '+_fl,col:'var(--txt2)'},
+    {label:'Écart',val:(_gap>0?'+':_gap<0?'−':'')+Math.abs(_gap).toFixed(1),sub:'moyenne/match · '+_fl,col:_gap>0?'var(--grn)':_gap<0?'var(--red)':'var(--txt2)'},
   ];
   cards.forEach(function(card){
     h+='<div style="background:var(--surf);border:1px solid var(--bdr);border-radius:16px;padding:20px;position:relative;overflow:hidden;">'
