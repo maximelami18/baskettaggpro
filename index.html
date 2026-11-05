@@ -65,6 +65,21 @@ select option{background:var(--surf);color:var(--txt);}
 #mainContent{flex:1;min-height:0;display:flex;overflow:hidden;}
 #sidebar{width:228px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--bdr);padding:16px 12px;display:flex;flex-direction:column;gap:4px;overflow-y:auto;}
 #pageArea{flex:1;min-width:0;min-height:0;overflow-y:auto;overflow-x:hidden;padding:26px;background:var(--bg);}
+
+/* ── v304 : menu « Console » réduit/ouvert ── */
+#sidebar{width:228px;transition:width .18s ease;}
+#sidebar.rail{width:70px;padding:16px 10px;}
+#sidebar .navBtn{height:44px;padding:0 8px;gap:12px;border-radius:9px;font-weight:600;font-size:14.5px;white-space:nowrap;overflow:hidden;}
+#sidebar .ni{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+#sidebar .ni svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;}
+#sidebar .navBtn.active{background:rgba(212,170,106,.1);border-color:transparent;color:var(--txt);font-weight:800;}
+#sidebar .navBtn.active .ni{background:var(--acc);color:#150E00;}
+#sidebar.rail .navBtn{width:46px;padding:0;justify-content:center;margin:0 auto;}
+#sidebar.rail .nl,#sidebar.rail .nlh{display:none;}
+.sbSep{height:1px;background:var(--bdr);margin:6px 6px 8px;}
+#sbToggle{width:36px;height:36px;border-radius:8px;border:1px solid rgba(255,255,255,.12);background:transparent;color:var(--txt2);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;}
+#sbToggle:hover{background:var(--surf2);color:var(--txt);}
+#sbToggle svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;}
 body.board-fs #topbar{display:none!important;}
 body.board-fs #sidebar{display:none!important;}
 body.board-fs #pageArea{padding:14px 18px;}
@@ -198,7 +213,8 @@ body.has-pending-coding #btnActionReplay{display:flex;}
 <div id="mainView" style="display:flex;">
   <div id="topbar">
     <div style="display:flex;align-items:center;gap:13px;">
-      <img src="icon-512.png" alt="Basket Tagg Pro" style="width:40px;height:40px;border-radius:12px;flex-shrink:0;object-fit:cover;">
+      <button id="sbToggle" onclick="toggleSidebar()" title="Ouvrir / fermer le menu" aria-label="Menu"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/></svg></button>
+      <img src="data:image/png;base64,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" alt="Basket Tagg Pro" style="width:36px;height:36px;border-radius:9px;flex-shrink:0;object-fit:cover;">
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--acc);letter-spacing:0.03em;">BASKET TAGG PRO</div>
         <div id="userLabel" style="font-size:12px;color:var(--txt3);"></div>
@@ -216,18 +232,20 @@ body.has-pending-coding #btnActionReplay{display:flex;}
     </div>
   </div>
   <div id="mainContent">
-    <div id="sidebar">
-      <div style="font-size:11px;font-weight:700;color:var(--acc);text-transform:uppercase;letter-spacing:0.14em;padding:6px 13px 6px;">Menu</div>
-      <button class="navBtn active" onclick="navTo('dashboard')">🏠&nbsp; Accueil</button>
-      <button class="navBtn" onclick="navTo('teams')">👥&nbsp; Mes équipes</button>
-      <button class="navBtn" onclick="navTo('matches')">📅&nbsp; Mes matchs</button>
-      <button class="navBtn" onclick="navTo('boards')">🎯&nbsp; Boards</button>
-      <button class="navBtn" onclick="navTo('export')">📤&nbsp; Export vidéo</button>
-      <button class="navBtn" onclick="navTo('exportstats')">📋&nbsp; Export stats PDF</button>
-      <button class="navBtn" onclick="navTo('outils')">🛠️&nbsp; Outils</button>
-      <button class="navBtn" onclick="navTo('settings')">⚙️&nbsp; Paramètres</button>
-      <div style="margin-top:20px;padding-top:12px;border-top:1px solid var(--bdr);">
-        <button class="navBtn" onclick="navTo('legal')" style="font-size:11px;color:var(--txt3);">📄&nbsp; Mentions légales &amp; CGV</button>
+    <div id="sidebar" class="rail">
+      <div class="nlh" style="font-size:11px;font-weight:700;color:var(--acc);text-transform:uppercase;letter-spacing:0.14em;padding:6px 13px 6px;">Menu</div>
+      <button class="navBtn active" onclick="navTo('dashboard')" title="Accueil"><span class="ni"><svg viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg></span><span class="nl">Accueil</span></button>
+      <button class="navBtn" onclick="navTo('teams')" title="Mes équipes"><span class="ni"><svg viewBox="0 0 24 24"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/><path d="M16 3.1a4 4 0 0 1 0 7.8"/><path d="M21 21v-2a4 4 0 0 0-3-3.85"/></svg></span><span class="nl">Mes équipes</span></button>
+      <button class="navBtn" onclick="navTo('matches')" title="Mes matchs"><span class="ni"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></span><span class="nl">Mes matchs</span></button>
+      <button class="navBtn" onclick="navTo('boards')" title="Boards"><span class="ni"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="m7.5 7.5 4 4m0-4-4 4"/><circle cx="16" cy="16" r="2.2"/><path d="M13 6.5h4"/></svg></span><span class="nl">Boards</span></button>
+      <button class="navBtn" onclick="navTo('export')" title="Export vidéo"><span class="ni"><svg viewBox="0 0 24 24"><path d="M20.2 6 3 11l-.9-2.4c-.3-1.1.3-2.2 1.3-2.5l13.5-4c1.1-.3 2.2.3 2.5 1.3Z"/><path d="m6.2 5.3 3.1 3.9M12.4 3.4l3.1 4M3 11h18v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></svg></span><span class="nl">Export vidéo</span></button>
+      <button class="navBtn" onclick="navTo('exportstats')" title="Export stats PDF"><span class="ni"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M12 11v6m-3-3 3 3 3-3"/></svg></span><span class="nl">Export stats PDF</span></button>
+      <button class="navBtn" onclick="navTo('outils')" title="Outils"><span class="ni"><svg viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></span><span class="nl">Outils</span></button>
+      <div style="flex:1;min-height:12px;"></div>
+      <div class="sbSep"></div>
+      <button class="navBtn" onclick="navTo('settings')" title="Paramètres"><span class="ni"><svg viewBox="0 0 24 24"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg></span><span class="nl">Paramètres</span></button>
+      <div class="nlh" style="padding-top:2px;">
+        <button class="navBtn" onclick="navTo('legal')" title="Mentions légales &amp; CGV" style="font-size:11px;color:var(--txt3);"><span class="ni"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h5"/></svg></span><span class="nl">Mentions légales &amp; CGV</span></button>
       </div>
     </div>
     <div id="pageArea"></div>
@@ -422,7 +440,7 @@ document.addEventListener('DOMContentLoaded', function(){
 var _SB_URL="https://umuvirwbtpflizxupwbr.supabase.co";
 // Version de ce fichier — à incrémenter à chaque déploiement, en cohérence avec la valeur
 // mise à jour dans la table Supabase `app_version` (voir _checkAppVersion ci-dessous).
-var APP_VERSION="2026-11-05-299";
+var APP_VERSION="2026-11-05-304";
 var _SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtdXZpcndidHBmbGl6eHVwd2JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3MTI1MDEsImV4cCI6MjA5MDI4ODUwMX0.fFQaF-zP9dzcWITJDf6GBmvu0pdcuvlaUz0A0qW0kfo";
 var _LICENCE_KEY='btp_licence';
 var _MACHINE_KEY='btp_machine';
@@ -3399,6 +3417,9 @@ function updatePM(scored, isTeam){
 // NAV
 // ════════════════════════════════════
 var currentPage='dashboard';
+
+function toggleSidebar(){var sb=document.getElementById('sidebar');if(!sb)return;sb.classList.toggle('rail');try{localStorage.setItem('btp_sb',sb.classList.contains('rail')?'rail':'open');}catch(e){}}
+(function(){try{var v=localStorage.getItem('btp_sb');if(v==='open'){var sb=document.getElementById('sidebar');if(sb)sb.classList.remove('rail');}}catch(e){}})();
 function navTo(page){currentPage=page;if(page==='export')_expSelectedIds=null;document.querySelectorAll('.navBtn').forEach(function(b){b.classList.remove('active');});var map={dashboard:0,teams:1,matches:2,boards:3,export:4,exportstats:5,outils:6,settings:7,legal:8};var btns=document.querySelectorAll('.navBtn');if(map[page]!=null&&btns[map[page]])btns[map[page]].classList.add('active');if(page==='outils'||page==='statsadv'||page==='scoutindiv'||page==='statscollect'||page==='statsplus'||page==='scoutcollectif'||page==='playbook'||page==='comparaison'||page==='scoutbuilder'||page==='scout')btns[6].classList.add('active');renderPage();}
 function renderPage(){
   var pa=document.getElementById('pageArea');
@@ -3609,13 +3630,13 @@ function renderDashboard(){
     {label:'Écart',val:(_gap>0?'+':_gap<0?'−':'')+Math.abs(_gap).toFixed(1),sub:'moyenne/match · '+_fl,col:_gap>0?'var(--grn)':_gap<0?'var(--red)':'var(--txt2)'},
   ];
   var _formH='';
-  _cms.slice(-8).forEach(function(m){var o=_matchOutcomeFor(m,team.id);if(o!=='V'&&o!=='D')return;_formH+='<i style="width:22px;height:22px;border-radius:6px;font-style:normal;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;background:'+(o==='V'?'rgba(61,201,122,.18);color:var(--grn)':'rgba(224,82,82,.18);color:var(--red)')+';">'+o+'</i>';});
+  _cms.slice(-5).forEach(function(m){var o=_matchOutcomeFor(m,team.id);if(o!=='V'&&o!=='D')return;_formH+='<i style="width:clamp(17px,1.7vw,24px);height:clamp(17px,1.7vw,24px);border-radius:6px;font-style:normal;font-size:clamp(9px,.85vw,11px);font-weight:800;display:flex;align-items:center;justify-content:center;background:'+(o==='V'?'rgba(61,201,122,.18);color:var(--grn)':'rgba(224,82,82,.18);color:var(--red)')+';">'+o+'</i>';});
   cards.forEach(function(card){
     h+='<div style="background:linear-gradient(180deg,#262626,#1f1f1f);border:1px solid var(--bdr);border-radius:16px;padding:14px 18px;position:relative;overflow:hidden;min-height:104px;display:flex;flex-direction:column;justify-content:space-between;">'
       +'<div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:'+card.col+';"></div>'
       +'<div style="font-size:11px;color:var(--txt3);font-weight:700;text-transform:uppercase;letter-spacing:0.14em;">'+card.label+'</div>'
-      +'<div style="display:flex;align-items:center;gap:12px;"><div style="font-size:38px;font-weight:900;color:'+card.col+';letter-spacing:-0.03em;line-height:1;">'+card.val+'</div>'
-      +(card.form&&_formH?'<div style="display:flex;gap:4px;flex-wrap:wrap;">'+_formH+'</div>':'')+'</div>'
+      +'<div style="display:flex;align-items:center;gap:10px;position:relative;min-height:46px;"><div style="font-size:38px;font-weight:900;color:'+card.col+';letter-spacing:-0.03em;line-height:1;">'+card.val+'</div>'
+      +(card.form&&_formH?'<div style="margin-left:auto;margin-right:7%;flex-shrink:0;"><div style="font-size:9px;letter-spacing:.2em;font-weight:800;color:var(--txt3);text-align:center;margin-bottom:6px;white-space:nowrap;">5 DERNIERS MATCHS</div><div style="display:flex;gap:5px;justify-content:center;">'+_formH+'</div></div>':'')+'</div>'
       +'<div style="font-size:12px;color:var(--txt3);">'+card.sub+'</div>'
       +'</div>';
   });
@@ -3758,7 +3779,7 @@ function showPlayerImpactModal(tid,pid,keep){var team=gT(tid),p=team&&team.playe
   // ── Hero
   h+='<div style="position:relative;overflow:hidden;height:96px;background:linear-gradient(100deg,color-mix(in srgb,'+_pc+' 55%,#0a0d14) 0%,color-mix(in srgb,'+_pc+' 30%,#0a0d14) 58%,#0a0d14 100%);">'
    +(p.photo?'<div style="position:absolute;right:0;top:0;bottom:0;width:300px;background:url('+p.photo+') center '+_py+'%/cover;-webkit-mask-image:linear-gradient(90deg,transparent,#000 38%);mask-image:linear-gradient(90deg,transparent,#000 38%);"></div>':'')
-   +'<div style="position:absolute;left:22px;bottom:9px;"><div style="font-size:11.5px;letter-spacing:.3em;font-weight:800;color:'+GOLD+';">▮ IMPACT SUR L\'ÉQUIPE</div><div style="font-size:12px;letter-spacing:.2em;color:var(--txt2);margin-top:4px;font-weight:700;">'+esc((p.first||'').toUpperCase())+'</div><div style="font-size:30px;font-weight:900;color:#fff;letter-spacing:-.01em;line-height:1;margin-top:1px;display:flex;align-items:center;gap:10px;"><span style="background:'+_pc+';font-size:14px;padding:4px 9px;border-radius:8px;letter-spacing:0;">#'+esc(String(_nh(p)||'').replace('#',''))+'</span>'+esc((p.last||'').toUpperCase())+'</div></div>'
+   +'<div style="position:absolute;left:22px;bottom:9px;"><div style="font-size:11.5px;letter-spacing:.3em;font-weight:800;color:'+GOLD+';">▮ IMPACT SUR L\'ÉQUIPE</div><div style="font-size:12px;letter-spacing:.2em;color:var(--txt2);margin-top:4px;font-weight:700;">'+esc((p.first||'').toUpperCase())+'</div><div style="font-size:30px;font-weight:900;color:#fff;letter-spacing:-.01em;line-height:1;margin-top:1px;display:flex;align-items:center;gap:10px;">'+''+/* numéro retiré v301 */esc((p.last||'').toUpperCase())+'</div></div>'
    +'<div style="position:absolute;right:12px;top:10px;display:flex;gap:8px;z-index:3;"><button onclick="showPlayerStatsModal('+tid+','+pid+')" style="background:rgba(0,0,0,.45);border:1px solid var(--bdr2);color:var(--txt2);height:34px;padding:0 14px;border-radius:9px;cursor:pointer;font-size:13px;">← Fiche</button><button onclick="closeModal()" style="background:rgba(0,0,0,.45);border:1px solid var(--bdr2);color:var(--txt2);width:34px;height:34px;border-radius:9px;cursor:pointer;">✕</button></div></div>';
   h+='<div style="padding:10px 20px 14px;">';
   if(!I.rows.length){h+='<div style="padding:30px;text-align:center;color:var(--txt3);">Aucun match avec statistiques pour cette équipe.</div></div></div></div>';document.getElementById('modalContainer').innerHTML=h;return;}
@@ -3786,8 +3807,8 @@ function showPlayerImpactModal(tid,pid,keep){var team=gT(tid),p=team&&team.playe
   // ── 4 facteurs (colonne droite)
   h+='<div style="height:6px;"></div>'; /* titre 4 facteurs retiré v297 */
   var FAC=[['Tir (eFG%)','tirs réussis, 3 pts ×1,5','efg',pp,true,100],['Balles perdues (TOV%)','part des possessions perdues · moins = mieux','tov',pp,false,100],['Rebonds off. (ORB%)','part des rebonds offensifs pris','orbp',pp,true,100],['Lancers obtenus (FT rate)','lancers tentés ÷ tirs tentés','ftr',f2,true,1]];
-  FAC.forEach(function(F){var k=F[2],a=A[k],b=S[k],g=G[k],mx=Math.max(a||0,b||0,g||0)*1.12||1;
-    function box(v,isA){var wp=v==null?0:Math.max(2,v/mx*100),gp=g==null?0:g/mx*100;return'<div title="'+F[1]+'" style="background:var(--bg2);border:1px solid var(--bdr);border-radius:12px;padding:6px 11px 7px;min-width:0;"><div style="display:flex;justify-content:space-between;gap:6px;align-items:baseline;"><span style="font-size:11px;font-weight:800;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+F[0]+'</span><span style="font-size:9px;color:var(--txt3);white-space:nowrap;">éq. '+F[3](g)+'</span></div><div style="display:flex;align-items:center;gap:8px;margin-top:2px;"><div style="font-size:20px;font-weight:900;color:'+(isA?'#E6B96E':'#9AA4C0')+';font-variant-numeric:tabular-nums;min-width:64px;">'+F[3](v)+'</div><div style="position:relative;flex:1;height:7px;border-radius:4px;background:var(--surf2);"><div style="position:absolute;left:0;top:0;bottom:0;width:'+wp+'%;border-radius:4px;background:'+(isA?'linear-gradient(90deg,#B8893F,#E6B96E)':'linear-gradient(90deg,#55607E,#9AA4C0)')+';"></div><div style="position:absolute;left:'+gp+'%;top:-3px;bottom:-3px;width:2px;background:#fff;"></div></div></div></div>';}
+  FAC.forEach(function(F){var k=F[2],a=A[k],b=S[k],g=G[k],mx=(F[5]===100?1:2);/* v300 : % → max 100 %, FT rate → max 2 (min 0) ; ancien: Math.max(a||0,b||0,g||0)*1.12||1 */
+    function box(v,isA){var wp=v==null?0:Math.min(100,Math.max(1,v/mx*100)),gp=g==null?0:Math.min(100,g/mx*100);return'<div title="'+F[1]+'" style="background:var(--bg2);border:1px solid var(--bdr);border-radius:12px;padding:6px 11px 7px;min-width:0;"><div style="display:flex;justify-content:space-between;gap:6px;align-items:baseline;"><span style="font-size:11px;font-weight:800;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+F[0]+'</span><span style="font-size:9px;color:var(--txt3);white-space:nowrap;">éq. '+F[3](g)+'</span></div><div style="display:flex;align-items:center;gap:8px;margin-top:2px;"><div style="font-size:20px;font-weight:900;color:'+(isA?'#E6B96E':'#9AA4C0')+';font-variant-numeric:tabular-nums;min-width:64px;">'+F[3](v)+'</div><div style="position:relative;flex:1;height:7px;border-radius:4px;background:var(--surf2);"><div style="position:absolute;left:0;top:0;bottom:0;width:'+wp+'%;border-radius:4px;background:'+(isA?'linear-gradient(90deg,#B8893F,#E6B96E)':'linear-gradient(90deg,#55607E,#9AA4C0)')+';"></div><div style="position:absolute;left:'+gp+'%;top:-3px;bottom:-3px;width:2px;background:#fff;"></div></div></div></div>';}
     var dl=(enough&&a!=null&&b!=null)?bridge((a-b)*(F[5]===100?100:1),F[5]===100?function(x){return(Math.round(x*10)/10).toFixed(1)+'%';}:f2,F[4]):'';
     h+='<div style="display:grid;grid-template-columns:1fr 58px 1fr;align-items:center;margin-bottom:6px;">'+box(a,true)+'<div style="padding:0 3px;">'+dl+'</div>'+box(b,false)+'</div>';});
   h+='<div style="font-size:9.5px;color:var(--txt3);">barre = la stat · trait blanc = moyenne de l\'équipe · ORB% « — » si stats adverses non codées</div>';
@@ -4021,18 +4042,10 @@ function renderTeams(){
   var allChamps=[];
   DB.teams.forEach(function(t){if(t.champ&&allChamps.indexOf(t.champ)<0)allChamps.push(t.champ);});
   if(allChamps.length>1){
-    h+='<div class="card" style="padding:16px 20px;margin-bottom:20px;">';
-    h+='<div style="font-size:10px;font-weight:700;color:var(--txt3);letter-spacing:0.08em;margin-bottom:10px;">FILTRER PAR CHAMPIONNAT</div>';
-    h+='<div style="display:flex;flex-wrap:wrap;gap:8px;">';
-    allChamps.forEach(function(c){
-      var sel=_teamChampFilter.indexOf(c)>=0;
-      h+='<button onclick="toggleTeamChampFilter(\''+c.replace(/'/g,"\\'")+'\')" style="display:inline-flex;align-items:center;gap:7px;padding:8px 13px;border-radius:9px;border:1.5px solid '+(sel?'var(--acc)':'var(--bdr2)')+';background:'+(sel?'var(--acc-d)':'var(--surf2)')+';color:'+(sel?'var(--acc)':'var(--txt2)')+';font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.15s;">';
-      h+='<span style="width:8px;height:8px;border-radius:50%;background:'+(sel?'var(--acc)':'var(--txt3)')+';flex-shrink:0;transition:background 0.15s;"></span>';
-      h+=c+'</button>';
-    });
-    if(_teamChampFilter.length>0){
-      h+='<button onclick="_teamChampFilter=[];renderPage()" style="padding:8px 13px;border-radius:9px;border:1.5px solid var(--bdr2);background:transparent;color:var(--txt3);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">✕ Tout afficher</button>';
-    }
+    /* v304 : filtres au style de Mes matchs (ancienne version : index_pre_v304.bak) */
+    h+='<div class="card" style="padding:14px 20px;margin-bottom:18px;"><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;"><span style="font-size:11px;font-weight:700;color:var(--acc);letter-spacing:.1em;margin-right:4px;">FILTRER PAR CHAMPIONNAT</span>';
+    allChamps.forEach(function(c){var sel=_teamChampFilter.indexOf(c)>=0;h+='<button onclick="toggleTeamChampFilter(\''+c.replace(/'/g,"\\'")+'\')" style="padding:7px 13px;border-radius:20px;border:1px solid '+(sel?'var(--acc)':'var(--bdr)')+';background:'+(sel?'var(--acc-d)':'rgba(255,255,255,.05)')+';color:'+(sel?'var(--acc)':'var(--txt2)')+';font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;">'+(sel?'✓ ':'')+_tpEsc(c)+'</button>';});
+    if(_teamChampFilter.length>0)h+='<button onclick="_teamChampFilter=[];renderPage()" style="padding:7px 12px;border-radius:20px;border:1px solid var(--bdr);background:transparent;color:var(--txt3);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">✕ Tout afficher</button>';
     h+='</div></div>';
   }
 
@@ -4046,17 +4059,24 @@ function renderTeams(){
     var _tmW=_tmDyn.filter(function(m){return _matchOutcomeFor(m,team.id)==='V';}).length;
     var _tmL=_tmDyn.filter(function(m){return _matchOutcomeFor(m,team.id)==='D';}).length;
     var stat=function(v,l,c){return '<div><div style="font-size:26px;font-weight:900;color:'+c+';line-height:1;">'+v+'</div><div style="font-size:9px;letter-spacing:.16em;color:var(--txt3);font-weight:700;margin-top:4px;">'+l+'</div></div>';};
-    cardsH+='<div style="background:linear-gradient(180deg,color-mix(in srgb,'+tc+' 42%,var(--surf)) 0,var(--surf) 58%);border:1px solid '+(exp?'var(--acc)':'var(--bdr)')+';border-top:4px solid '+tc+';border-radius:20px;padding:22px 16px 16px;text-align:center;min-width:0;position:relative;'+(exp?'box-shadow:0 0 0 1px var(--acc);':'')+'">'
-      +(team.gender==='M'||team.gender==='F'?'<div title="'+(team.gender==='F'?'Équipe féminine':'Équipe masculine')+'" style="position:absolute;top:12px;right:12px;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:26px;line-height:1;font-weight:900;background:rgba(0,0,0,.35);border:1.5px solid '+(team.gender==='F'?'#F28BB8':'#6FA8FF')+';color:'+(team.gender==='F'?'#F28BB8':'#6FA8FF')+';">'+(team.gender==='F'?'♀':'♂')+'</div>':'')
-      +'<div style="display:flex;justify-content:center;"><div style="width:92px;height:92px;border-radius:20px;overflow:hidden;background:var(--acc-d);display:flex;align-items:center;justify-content:center;border:2px solid '+(team.logo?'transparent':'var(--bdr2)')+';">'
-      +(team.logo?'<img src="'+team.logo+'" style="width:100%;height:100%;object-fit:cover;"/>':'<span style="font-size:34px;font-weight:900;color:var(--acc);">'+(team.name?_tpEsc(team.name[0].toUpperCase()):'?')+'</span>')+'</div></div>'
-      +'<div style="font-size:20px;font-weight:900;color:var(--txt);margin-top:12px;letter-spacing:-.01em;word-break:break-word;">'+_tpEsc(team.name)+'</div>'
-      +'<div style="font-size:12px;color:var(--txt3);margin-top:2px;">'+_tpEsc(team.champ||'')+(team.season?' · '+_tpEsc(team.season):'')+'</div>'
-      +'<div style="display:flex;justify-content:center;gap:22px;margin:16px 0;">'+stat(_tmW,'VICTOIRES','var(--grn)')+stat(_tmL,'DÉFAITES','var(--red)')+stat(team.players.length,_tgF(team)?'JOUEUSES':'JOUEURS','var(--txt)')+'</div>'
-      +'<div style="display:flex;gap:6px;">'
-      +'<button onclick="openTeamModal('+team.id+')" style="height:36px;padding:0 12px;border-radius:9px;border:1px solid var(--bdr2);background:var(--surf2);color:var(--txt2);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">✎</button>'
-      +'<button onclick="deleteTeam('+team.id+')" style="height:36px;padding:0 12px;border-radius:9px;border:1px solid var(--red-d);background:var(--red-d);color:var(--red);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">✕</button>'
-      +'<button onclick="toggleTeamExpand('+team.id+')" style="flex:1;height:36px;border-radius:9px;border:'+(exp?'1px solid var(--acc)':'none')+';background:'+(exp?'var(--acc-d)':'var(--acc)')+';color:'+(exp?'var(--acc)':'#150E00')+';font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;">'+(exp?'▲ Fermer':'Effectif')+'</button></div></div>';
+    /* v304 : carte « D · version B » — logo rond sans contour, avatars joueurs. Ancienne carte : index_pre_v304.bak */
+    var _frm=_tmDyn.slice(-5).map(function(m){var o=_matchOutcomeFor(m,team.id);return '<i style="width:22px;height:22px;border-radius:6px;font-style:normal;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;background:'+(o==='V'?'rgba(61,201,122,.18);color:var(--grn)':'rgba(224,82,82,.18);color:var(--red)')+';">'+o+'</i>';}).join('');
+    var _pl=(team.players||[]),_maxAv=16,_avH=_pl.slice(0,_maxAv).map(function(p){var py=(p.photoY==null||isNaN(p.photoY))?22:p.photoY;var ini=_tpEsc(((p.first||'?').charAt(0)+(p.last||'').charAt(0)).toUpperCase());return '<span title="'+_tpEsc((p.first||'')+' '+(p.last||''))+'" style="width:38px;height:38px;border-radius:50%;border:2px solid var(--surf);margin-left:-9px;background:var(--surf2);display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--txt3);flex-shrink:0;overflow:hidden;">'+(p.photo?'<img src="'+_tpEsc(p.photo)+'" style="width:100%;height:100%;object-fit:cover;object-position:50% '+py+'%;display:block;">':ini)+'</span>';}).join('');
+    if(_pl.length>_maxAv)_avH+='<span style="height:38px;padding:0 10px;border-radius:19px;border:2px solid var(--surf);margin-left:-9px;background:var(--surf2);display:inline-flex;align-items:center;font-size:11px;font-weight:800;color:var(--acc);flex-shrink:0;">+'+(_pl.length-_maxAv)+'</span>';
+    var _gcol=team.gender==='F'?'#F28BB8':'#6FA8FF';
+    cardsH+='<div style="background:var(--surf);border:1px solid '+(exp?'var(--acc)':'var(--bdr)')+';border-radius:22px;padding:20px 20px 16px 24px;min-width:0;position:relative;overflow:hidden;'+(exp?'box-shadow:0 0 0 1px var(--acc);':'')+'">'
+      +'<div style="position:absolute;left:0;top:0;bottom:0;width:5px;background:'+tc+';"></div>'
+      +'<div style="display:flex;gap:20px;">'
+      +'<div style="width:104px;height:104px;border-radius:50%;overflow:hidden;background:'+(team.logo?'#fff':'var(--acc-d)')+';display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;">'
+      +(team.logo?'<img src="'+team.logo+'" style="width:100%;height:100%;object-fit:cover;"/>':'<span style="font-size:38px;font-weight:900;color:var(--acc);">'+(team.name?_tpEsc(team.name[0].toUpperCase()):'?')+'</span>')+'</div>'
+      +'<div style="flex:1;min-width:0;"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;"><div style="min-width:0;"><div style="font-size:24px;font-weight:900;color:var(--txt);letter-spacing:-.01em;word-break:break-word;">'+_tpEsc(team.name)+(team.gender==='M'||team.gender==='F'?' <span title="'+(team.gender==='F'?'Équipe féminine':'Équipe masculine')+'" style="color:'+_gcol+';font-size:18px;">'+(team.gender==='F'?'♀':'♂')+'</span>':'')+'</div>'
+      +'<div style="font-size:12px;color:var(--txt3);margin-top:2px;">'+_tpEsc(team.champ||'')+(team.season?' · '+_tpEsc(team.season):'')+'</div></div>'
+      +'<div style="display:flex;gap:6px;flex-shrink:0;"><button onclick="openTeamModal('+team.id+')" style="height:36px;width:36px;border-radius:9px;border:1px solid var(--bdr2);background:var(--surf2);color:var(--txt2);font-size:13px;cursor:pointer;font-family:inherit;">✎</button>'
+      +'<button onclick="deleteTeam('+team.id+')" style="height:36px;width:36px;border-radius:9px;border:1px solid var(--red-d);background:var(--red-d);color:var(--red);font-size:13px;cursor:pointer;font-family:inherit;">✕</button></div></div>'
+      +'<div style="display:flex;gap:26px;margin-top:14px;align-items:flex-end;">'+stat(_tmW,'VICT.','var(--grn)')+stat(_tmL,'DÉF.','var(--red)')+stat(team.players.length,_tgF(team)?'JOUEUSES':'JOUEURS','var(--txt)')
+      +'<div style="margin-left:auto;text-align:right;"><div style="font-size:9px;letter-spacing:.16em;color:var(--txt3);font-weight:800;margin-bottom:6px;">FORME</div><div style="display:flex;gap:4px;justify-content:flex-end;">'+(_frm||'<span style="font-size:11px;color:var(--txt3);">aucun match</span>')+'</div></div></div></div></div>'
+      +'<div style="display:flex;align-items:center;gap:14px;margin-top:14px;padding-top:14px;border-top:1px solid var(--bdr);"><div style="display:flex;padding-left:9px;flex:1;min-width:0;overflow:hidden;">'+_avH+'</div>'
+      +'<button onclick="toggleTeamExpand('+team.id+')" style="width:140px;flex-shrink:0;height:38px;border-radius:10px;border:'+(exp?'1px solid var(--acc)':'none')+';background:'+(exp?'var(--acc-d)':'linear-gradient(180deg,#E3BE82,#D4AA6A)')+';color:'+(exp?'var(--acc)':'#150E00')+';font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;">'+(exp?'▲ Fermer':'Effectif →')+'</button></div></div>';
     // Players grid
     if(exp){
       rosterH+='<div style="margin-top:6px;margin-bottom:16px;border-radius:16px;border:1px solid var(--bdr);background:var(--bg2);padding:4px 20px 20px;"><div style="padding-top:14px;font-size:15px;font-weight:800;color:var(--txt);">Effectif · '+team.name+'</div>';
@@ -4077,7 +4097,7 @@ function renderTeams(){
     }
 
   });
-  h+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px;margin-bottom:16px;">'+cardsH+'</div>'+rosterH;
+  h+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(440px,1fr));gap:16px;margin-bottom:16px;">'+cardsH+'</div>'+rosterH;
   return h;
 }
 
@@ -4167,82 +4187,127 @@ function applyTeamSort(t){
 }
 function openTeamModal(tid){
   var team=tid?gT(tid):null;
-  window._TF={tid:tid||0,gender:team&&team.gender?team.gender:'',sortMode:team&&team.sortMode?team.sortMode:'manual',numsFixed:team?team.numsFixed!==false:true,name:team?team.name:'',champ:team?team.champ:'',season:team?team.season:'2025/2026',logo:team&&team.logo?team.logo:null,color:team&&team.color?team.color:''};
-  _renderTeamModal();
+  window._TF={tid:tid||0,gender:team&&team.gender?team.gender:'',sortMode:team&&team.sortMode?team.sortMode:'manual',numsFixed:team?team.numsFixed!==false:true,name:team?team.name:'',champ:team?team.champ:'',season:team?team.season:'2025/2026',logo:team&&team.logo?team.logo:null,logoSrc:team?(team.logoOrig||team.logo||null):null,z:team&&team.logoCrop?team.logoCrop.z:1,lx:team&&team.logoCrop?team.logoCrop.x:0,ly:team&&team.logoCrop?team.logoCrop.y:0,cropDirty:false,color:team&&team.color?team.color:''};
+  window._tmI=null;_renderTeamModal();
 }
 
-var _TM_PAL=['#D4AA6A','#E8C23D','#E8793D','#E05252','#E86AA6','#B07AE8','#5B8DEF','#2EC4B6','#3DC97A','#8D6E63','#78909C','#2B2B2B'];
+/* v302 : création d'équipe « Bannière » — couleur auto (logo) ou palette libre en haut à droite. Ancienne version (palette de pastilles) : voir index_pre_v302.bak */
+function _tmHex2rgb(h){var m=/^#?([0-9a-f]{6})$/i.exec(h||'');if(!m)return null;var v=parseInt(m[1],16);return [v>>16&255,v>>8&255,v&255];}
+function _tmRgb2hex(r,g,b){return '#'+[r,g,b].map(function(x){return ('0'+Math.round(x).toString(16)).slice(-2);}).join('');}
+function _tmHsv2rgb(h,s,v){var f=function(n){var k=(n+h/60)%6;return v-v*s*Math.max(0,Math.min(k,4-k,1));};return [f(5)*255,f(3)*255,f(1)*255];}
+function _tmRgb2hsv(r,g,b){r/=255;g/=255;b/=255;var mx=Math.max(r,g,b),mn=Math.min(r,g,b),d=mx-mn,h=0;if(d){if(mx===r)h=((g-b)/d+6)%6;else if(mx===g)h=(b-r)/d+2;else h=(r-g)/d+4;h*=60;}return [h,mx?d/mx:0,mx];}
+function _tmCssRgb(c){var m=/rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/.exec(c||'');return m?[+m[1],+m[2],+m[3]]:null;}
 function _tmColor(){var tf=window._TF||{};if(tf.color)return tf.color;return _teamCol({id:'tmp'+(tf.tid||0),logo:tf.logo||null});}
 function _tmPrev(again){
-  var tf=window._TF;if(!tf)return;var el=document.getElementById('tm_prev');if(!el)return;
+  var tf=window._TF;if(!tf)return;var bn=document.getElementById('tm_bn');if(!bn)return;
   var c=_tmColor();
-  el.style.background='linear-gradient(180deg,color-mix(in srgb,'+c+' 42%,var(--surf)) 0,var(--surf) 58%)';el.style.borderTop='4px solid '+c;
-  var lg=document.getElementById('tm_prev_logo');if(lg)lg.innerHTML=tf.logo?'<img src="'+tf.logo+'" style="width:100%;height:100%;object-fit:cover;"/>':'<span style="font-size:24px;font-weight:900;color:var(--acc);">'+(tf.name?_tpEsc(tf.name[0].toUpperCase()):'?')+'</span>';
-  var nm=document.getElementById('tm_prev_name');if(nm)nm.textContent=tf.name||'Nom de l\'équipe';
-  var sb=document.getElementById('tm_prev_sub');if(sb)sb.textContent=((tf.champ||'')+(tf.season?' · '+tf.season:''))||'Championnat · Saison';
-  var gd=document.getElementById('tm_prev_g');if(gd){if(tf.gender==='M'||tf.gender==='F'){gd.style.display='flex';gd.textContent=tf.gender==='F'?'♀':'♂';gd.style.color=tf.gender==='F'?'#F28BB8':'#6FA8FF';gd.style.borderColor=tf.gender==='F'?'#F28BB8':'#6FA8FF';}else gd.style.display='none';}
-  document.querySelectorAll('[data-tmc]').forEach(function(b){var on=(b.getAttribute('data-tmc')||'')===(tf.color||'');b.style.boxShadow=on?'0 0 0 2px var(--surf),0 0 0 4px #fff':'none';b.style.transform=on?'scale(1.12)':'none';});
+  bn.style.background='linear-gradient(135deg,'+c+',color-mix(in srgb,'+c+' 30%,#101010))';
+  var rgb=tf.color?_tmHex2rgb(tf.color):_tmCssRgb(c);var lum=rgb?(0.299*rgb[0]+0.587*rgb[1]+0.114*rgb[2])/255:0.4;
+  bn.style.color=lum>0.68?'#17120a':'#fff';
+  var sw=document.getElementById('tm_sw');if(sw)sw.style.background=c;
+  var nm=document.getElementById('tm_bn_name');if(nm)nm.textContent=tf.name||'Nom de l\'équipe';
+  var sb=document.getElementById('tm_bn_sub');if(sb)sb.textContent=[(tf.champ||''),(tf.season||'')].filter(Boolean).join(' · ')+(tf.gender==='F'?' · ♀ féminine':tf.gender==='M'?' · ♂ masculine':'');
+  var lb=document.getElementById('tm_logo_prev');if(lb&&!tf.logo&&!lb.querySelector('img')){}
   if(!tf.color&&tf.logo&&!again)setTimeout(function(){_tmPrev(true);},450);
 }
-function _tmSetColor(c){if(!window._TF)return;window._TF.color=c||'';var ci=document.getElementById('tm_cust');if(ci&&c&&/^#[0-9a-f]{6}$/i.test(c))ci.value=c;_tmPrev();}
-function _tmColorHtml(tf){
-  var sw=_TM_PAL.map(function(c){return '<button type="button" data-tmc="'+c+'" onclick="_tmSetColor(\''+c+'\')" title="'+c+'" style="width:26px;height:26px;border-radius:50%;border:1.5px solid rgba(255,255,255,.25);background:'+c+';cursor:pointer;padding:0;transition:transform .12s;"></button>';}).join('');
-  var cust=/^#[0-9a-f]{6}$/i.test(tf.color||'')?tf.color:'#D4AA6A';
-  return '<div style="margin-top:14px;"><div style="font-size:13px;font-weight:700;margin-bottom:8px;">Couleur de la carte</div>'
-    +'<div style="display:flex;gap:14px;align-items:center;">'
-    +'<div id="tm_prev" style="width:150px;flex-shrink:0;border:1px solid var(--bdr);border-radius:16px;padding:12px 8px 10px;text-align:center;position:relative;">'
-    +'<div id="tm_prev_g" style="display:none;position:absolute;top:6px;right:6px;width:22px;height:22px;border-radius:50%;align-items:center;justify-content:center;font-size:15px;font-weight:900;background:rgba(0,0,0,.35);border:1.5px solid;"></div>'
-    +'<div id="tm_prev_logo" style="width:52px;height:52px;border-radius:12px;overflow:hidden;background:var(--acc-d);margin:0 auto;display:flex;align-items:center;justify-content:center;"></div>'
-    +'<div id="tm_prev_name" style="font-size:13px;font-weight:900;margin-top:7px;word-break:break-word;line-height:1.15;"></div>'
-    +'<div id="tm_prev_sub" style="font-size:9.5px;color:var(--txt3);margin-top:2px;"></div></div>'
-    +'<div style="flex:1;min-width:0;"><div style="display:flex;flex-wrap:wrap;gap:7px;">'+sw
-    +'<label title="Couleur personnalisée" style="width:26px;height:26px;border-radius:50%;border:1.5px dashed var(--acc);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px;color:var(--acc);position:relative;overflow:hidden;">+<input id="tm_cust" type="color" value="'+cust+'" oninput="_tmSetColor(this.value)" style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;"/></label></div>'
-    +'<button type="button" data-tmc="" onclick="_tmSetColor(\'\')" style="margin-top:10px;height:30px;padding:0 12px;border-radius:8px;border:1px solid var(--bdr2);background:transparent;color:var(--txt2);font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;">Auto (couleur du logo)</button></div></div></div>';
+function _tmPopToggle(){
+  var p=document.getElementById('tm_pop');if(!p)return;var open=p.style.display==='none'||!p.style.display;
+  p.style.display=open?'block':'none';
+  if(open){var c=_tmColor(),rgb=window._TF.color?_tmHex2rgb(window._TF.color):_tmCssRgb(c)||[212,170,106];window._TF._hsv=_tmRgb2hsv(rgb[0],rgb[1],rgb[2]);_tmPickUI();}
 }
+function _tmPickUI(){
+  var tf=window._TF,h=tf._hsv;if(!h)return;
+  var sp=document.getElementById('tm_sp'),hu=document.getElementById('tm_hu'),hx=document.getElementById('tm_hx');if(!sp)return;
+  sp.style.background='linear-gradient(to top,#000,transparent),linear-gradient(to right,#fff,hsl('+Math.round(h[0])+',100%,50%))';
+  var k=document.getElementById('tm_spk');k.style.left=(h[1]*100)+'%';k.style.top=((1-h[2])*100)+'%';
+  document.getElementById('tm_huk').style.left=(h[0]/360*100)+'%';
+  var rgb=_tmHsv2rgb(h[0],h[1],h[2]);var hex=_tmRgb2hex(rgb[0],rgb[1],rgb[2]);
+  k.style.background=hex;if(document.activeElement!==hx)hx.value=hex.toUpperCase();
+}
+function _tmPickSet(){var h=window._TF._hsv,rgb=_tmHsv2rgb(h[0],h[1],h[2]);window._TF.color=_tmRgb2hex(rgb[0],rgb[1],rgb[2]);_tmPickUI();_tmPrev();}
+function _tmDrag(el,fn){
+  el.onpointerdown=function(e){e.preventDefault();try{el.setPointerCapture(e.pointerId);}catch(x){}var mv=function(ev){var r=el.getBoundingClientRect();fn(Math.max(0,Math.min(1,(ev.clientX-r.left)/r.width)),Math.max(0,Math.min(1,(ev.clientY-r.top)/r.height)));};mv(e);el.onpointermove=mv;el.onpointerup=function(){el.onpointermove=null;el.onpointerup=null;};};
+}
+function _tmHexIn(v){var rgb=_tmHex2rgb(v);if(!rgb)return;window._TF._hsv=_tmRgb2hsv(rgb[0],rgb[1],rgb[2]);window._TF.color=v.charAt(0)==='#'?v:'#'+v;_tmPickUI();_tmPrev();}
+function _tmReset(){window._TF.color='';window._TF._hsv=null;var c=_tmColor(),rgb=_tmCssRgb(c)||[212,170,106];window._TF._hsv=_tmRgb2hsv(rgb[0],rgb[1],rgb[2]);_tmPickUI();_tmPrev();}
+
 function _renderTeamModal(){
   var tf=window._TF;
   var mc=document.getElementById('modalContainer');if(!mc)return;
-  mc.innerHTML='<div style="position:fixed;inset:0;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:1000;">'
-    +'<div style="background:var(--surf);border-radius:20px;padding:28px;width:460px;max-width:90vw;max-height:94vh;overflow:auto;box-shadow:0 20px 60px rgba(0,0,0,0.5);border:1px solid var(--bdr2);">'
-    +'<div style="font-size:20px;font-weight:800;color:var(--txt);margin-bottom:22px;">'+(tf.tid?'Modifier l\'équipe':'Nouvelle équipe')+'</div>'
-
-    // Logo
-    +'<div style="display:flex;align-items:center;gap:16px;margin-bottom:18px;">'
-    +'<div id="tm_logo_prev" onclick="document.getElementById(\'tm_logo_inp\').click()" style="width:80px;height:80px;border-radius:16px;border:2px dashed var(--acc);background:var(--acc-d);display:flex;align-items:center;justify-content:center;overflow:hidden;cursor:pointer;flex-shrink:0;">'
-    +(tf.logo?'<img src="'+tf.logo+'" style="width:100%;height:100%;object-fit:cover;"/>':'<div style="text-align:center;"><div style="font-size:26px;">🖼</div><div style="font-size:10px;color:var(--acc);font-weight:700;margin-top:2px;">Logo</div></div>')
-    +'</div>'
-    +'<input type="file" id="tm_logo_inp" accept="image/*" style="display:none;" onchange="_onTeamLogoChange(this)"/>'
-    +'<div style="color:var(--txt3);font-size:13px;line-height:1.6;">Cliquez sur le logo<br>pour importer une image<br><span style="color:var(--acc);font-weight:600;">PNG, JPG, WEBP</span></div>'
-    +'</div>'
-
-    // Fields
-    +'<div style="display:grid;gap:10px;margin-bottom:22px;">'
-    +'<div style="display:flex;gap:8px;">'+['M','F'].map(function(g){var on=tf.gender===g;return '<button type="button" onclick="window._TF.gender=\''+g+'\';_renderTeamModal()" style="flex:1;height:42px;border-radius:10px;font-family:inherit;font-size:14px;font-weight:800;cursor:pointer;border:1.5px solid '+(on?'var(--acc)':'var(--bdr2)')+';background:'+(on?'var(--acc)':'var(--surf2)')+';color:'+(on?'#150E00':'var(--txt2)')+';">'+(g==='M'?'♂ Équipe masculine':'♀ Équipe féminine')+'</button>';}).join('')+'</div>'
-    +'<input class="inp" id="tm_name" placeholder="Nom de l\'équipe *" value="'+tf.name+'" oninput="window._TF.name=this.value;_tmPrev()" style="height:44px;font-size:15px;"/>'
-    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">'
-    +'<input class="inp" id="tm_champ" placeholder="Championnat" value="'+tf.champ+'" oninput="window._TF.champ=this.value;_tmPrev()" style="height:40px;"/>'
-    +'<input class="inp" id="tm_season" placeholder="Saison" value="'+tf.season+'" oninput="window._TF.season=this.value;_tmPrev()" style="height:40px;"/>'
-    +'</div>'+_tmColorHtml(tf)+_numQ(tf)+_sortQ(tf)+'</div>'
-
-    // Buttons
-    +'<div style="display:flex;justify-content:flex-end;gap:10px;">'
-    +'<button onclick="document.getElementById(\'modalContainer\').innerHTML=\'\'" style="height:42px;padding:0 20px;border-radius:10px;border:1px solid var(--bdr2);background:var(--surf2);color:var(--txt2);font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;">Annuler</button>'
-    +'<button type="button" onclick="saveTeamModal()" style="height:42px;padding:0 24px;border-radius:10px;border:none;background:var(--acc);color:#150E00;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;">Enregistrer</button>'
-    +'</div></div></div>';
+  var inpS='height:42px;font-size:14px;';
+  var lab=function(t){return '<div style="font-size:10px;letter-spacing:.18em;font-weight:900;color:var(--txt3);margin:14px 0 6px;">'+t+'</div>';};
+  mc.innerHTML='<div style="position:fixed;inset:0;background:rgba(0,0,0,0.72);display:flex;align-items:center;justify-content:center;z-index:1000;">'
+    +'<div style="background:var(--surf);border-radius:22px;width:560px;max-width:94vw;max-height:94vh;overflow:auto;box-shadow:0 20px 60px rgba(0,0,0,0.55);border:1px solid var(--bdr2);">'
+    // Bannière
+    +'<div id="tm_bn" style="height:190px;position:relative;border-radius:22px 22px 0 0;color:#fff;">'
+    +'<div style="position:absolute;right:-30px;top:-30px;width:220px;height:220px;border-radius:50%;background:rgba(255,255,255,.08);pointer-events:none;overflow:hidden;"></div>'
+    +'<div style="position:absolute;left:28px;top:24px;font-size:11px;letter-spacing:.2em;font-weight:900;opacity:.75;">'+(tf.tid?'MODIFIER L\'ÉQUIPE':'NOUVELLE ÉQUIPE')+'</div>'
+    +'<button type="button" onclick="_tmPopToggle()" style="position:absolute;right:18px;top:16px;display:flex;align-items:center;gap:8px;background:rgba(0,0,0,.32);border:1px solid rgba(255,255,255,.3);border-radius:999px;padding:6px 12px 6px 7px;font-size:12px;font-weight:800;color:#fff;cursor:pointer;font-family:inherit;z-index:3;"><i id="tm_sw" style="width:22px;height:22px;border-radius:50%;border:2px solid #fff;display:block;"></i>Couleur ▾</button>'
+    +'<div id="tm_pop" style="display:none;position:absolute;right:18px;top:58px;width:250px;background:#1b1b1b;border:1px solid rgba(255,255,255,.14);border-radius:16px;padding:14px;box-shadow:0 18px 50px rgba(0,0,0,.65);z-index:5;color:var(--txt);">'
+    +'<div id="tm_sp" style="height:130px;border-radius:10px;position:relative;touch-action:none;cursor:crosshair;"><b id="tm_spk" style="position:absolute;width:16px;height:16px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.5);transform:translate(-50%,-50%);pointer-events:none;"></b></div>'
+    +'<div id="tm_hu" style="height:14px;border-radius:7px;margin-top:14px;position:relative;touch-action:none;cursor:pointer;background:linear-gradient(90deg,#f00,#ff0,#0f0,#0ff,#00f,#f0f,#f00);"><b id="tm_huk" style="position:absolute;top:-3px;width:20px;height:20px;border-radius:50%;border:3px solid #fff;background:transparent;box-shadow:0 0 0 1px rgba(0,0,0,.5);transform:translateX(-50%);pointer-events:none;"></b></div>'
+    +'<input id="tm_hx" maxlength="7" oninput="_tmHexIn(this.value)" style="margin-top:12px;width:100%;height:34px;border-radius:9px;background:#111;border:1px solid var(--bdr2);color:var(--txt);padding:0 10px;font-size:13px;font-weight:700;font-family:inherit;"/>'
+    +'<button type="button" onclick="_tmReset()" style="margin-top:10px;background:none;border:none;color:var(--acc);font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;padding:0;">↺ Revenir à la couleur du logo</button></div>'
+    +'<div style="position:absolute;left:150px;right:20px;bottom:18px;"><div id="tm_bn_name" style="font-size:28px;font-weight:900;text-shadow:0 2px 10px rgba(0,0,0,.3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div><div id="tm_bn_sub" style="font-size:13px;opacity:.88;margin-top:2px;"></div></div>'
+    +'<div id="tm_logo_prev" onclick="document.getElementById(\'tm_logo_inp\').click()" title="Importer un logo" style="position:absolute;left:28px;bottom:-34px;width:100px;height:100px;border-radius:50%;border:4px solid var(--surf);background:var(--surf2);display:flex;align-items:center;justify-content:center;overflow:hidden;cursor:pointer;z-index:2;">'
+    +(tf.logoSrc?'<canvas id="tm_cv2" width="200" height="200" style="width:100%;height:100%;display:block;"></canvas>':'<div style="text-align:center;color:var(--acc);"><div style="font-size:26px;">🖼</div><div style="font-size:11px;font-weight:800;margin-top:2px;">Logo</div></div>')
+    +'</div><input type="file" id="tm_logo_inp" accept="image/*" style="display:none;" onchange="_onTeamLogoChange(this)"/></div>'
+    // Corps
+    +'<div style="padding:50px 28px 24px;">'
+    +'<div style="display:flex;gap:8px;">'+['M','F'].map(function(g){var on=tf.gender===g;return '<button type="button" onclick="window._TF.gender=\''+g+'\';_renderTeamModal()" style="flex:1;height:42px;border-radius:11px;font-family:inherit;font-size:14px;font-weight:800;cursor:pointer;border:1.5px solid '+(on?'var(--acc)':'var(--bdr2)')+';background:'+(on?'var(--acc)':'transparent')+';color:'+(on?'#150E00':'var(--txt2)')+';">'+(g==='M'?'♂ Équipe masculine':'♀ Équipe féminine')+'</button>';}).join('')+'</div>'
+    +(tf.logoSrc?lab('CADRAGE DU LOGO')+'<div style="display:flex;gap:20px;align-items:center;background:var(--surf2);border:1px solid var(--bdr);border-radius:14px;padding:14px;">'
+      +'<div style="width:132px;height:132px;border-radius:50%;overflow:hidden;background:#fff;flex-shrink:0;box-shadow:0 0 0 2px var(--acc);touch-action:none;cursor:grab;"><canvas id="tm_cv" width="264" height="264" style="width:100%;height:100%;display:block;"></canvas></div>'
+      +'<div style="flex:1;min-width:0;"><div style="font-size:12px;color:var(--txt3);margin-bottom:10px;">Glisse le logo pour le centrer, règle la taille avec le curseur. L\'aperçu en haut à gauche se met à jour en direct.</div>'
+      +'<div style="display:flex;align-items:center;gap:10px;"><button type="button" onclick="_tmZoomBy(-0.1)" style="width:34px;height:34px;border-radius:9px;border:1px solid var(--bdr2);background:var(--surf);color:var(--txt);font-size:18px;cursor:pointer;font-family:inherit;">−</button>'
+      +'<input type="range" id="tm_zoom" min="0.3" max="3" step="0.01" value="'+(tf.z||1)+'" oninput="_tmZoomSet(parseFloat(this.value))" style="flex:1;accent-color:#D4AA6A;"/>'
+      +'<button type="button" onclick="_tmZoomBy(0.1)" style="width:34px;height:34px;border-radius:9px;border:1px solid var(--bdr2);background:var(--surf);color:var(--txt);font-size:18px;cursor:pointer;font-family:inherit;">+</button></div>'
+      +'<button type="button" onclick="_tmCropReset()" style="margin-top:10px;background:none;border:none;color:var(--acc);font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;padding:0;">↺ Recentrer / taille d\'origine</button></div></div>':'')
+    +lab('NOM')+'<input class="inp" id="tm_name" placeholder="Nom de l\'équipe *" value="'+tf.name+'" oninput="window._TF.name=this.value;_tmPrev()" style="'+inpS+'"/>'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;"><div>'+lab('CHAMPIONNAT')+'<input class="inp" id="tm_champ" placeholder="Championnat" value="'+tf.champ+'" oninput="window._TF.champ=this.value;_tmPrev()" style="'+inpS+'"/></div>'
+    +'<div>'+lab('SAISON')+'<input class="inp" id="tm_season" placeholder="Saison" value="'+tf.season+'" oninput="window._TF.season=this.value;_tmPrev()" style="'+inpS+'"/></div></div>'
+    +_numQ(tf)+_sortQ(tf)
+    +'<div style="display:flex;justify-content:flex-end;gap:10px;margin-top:22px;">'
+    +'<button onclick="document.getElementById(\'modalContainer\').innerHTML=\'\'" style="height:44px;padding:0 22px;border-radius:11px;border:1px solid var(--bdr2);background:var(--surf2);color:var(--txt2);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">Annuler</button>'
+    +'<button type="button" onclick="saveTeamModal()" style="height:44px;padding:0 28px;border-radius:11px;border:none;background:linear-gradient(180deg,#E3BE82,#D4AA6A);color:#150E00;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;">'+(tf.tid?'Enregistrer':'Créer l\'équipe')+'</button>'
+    +'</div></div></div></div>';
+  var sp=document.getElementById('tm_sp'),hu=document.getElementById('tm_hu');
+  if(sp)_tmDrag(sp,function(x,y){if(!tf._hsv)return;tf._hsv[1]=x;tf._hsv[2]=1-y;_tmPickSet();});
+  if(hu)_tmDrag(hu,function(x){if(!tf._hsv)return;tf._hsv[0]=Math.min(359.9,x*360);_tmPickSet();});
   setTimeout(function(){var el=document.getElementById('tm_name');if(el)el.focus();},30);
-  _tmPrev();
+  _tmPrev();_tmCropInit();
 }
 
+/* v304 : recadrage du logo (zoom + centrage) avec aperçu direct. Le logo d'origine est conservé (team.logoOrig), team.logo = version recadrée carrée. */
+function _tmLoadImg(cb){var tf=window._TF;if(!tf||!tf.logoSrc){cb(null);return;}if(window._tmI&&window._tmI.src===tf.logoSrc){cb(window._tmI);return;}var im=new Image();im.onload=function(){window._tmI=im;cb(im);};im.onerror=function(){cb(null);};im.src=tf.logoSrc;}
+function _tmDrawCrop(cv,im,size){if(!cv||!im)return;var tf=window._TF,c=cv.getContext('2d');cv.width=size;cv.height=size;c.clearRect(0,0,size,size);var sc=size/Math.min(im.width,im.height)*(tf.z||1);var w=im.width*sc,h=im.height*sc;c.drawImage(im,size/2+(tf.lx||0)*size-w/2,size/2+(tf.ly||0)*size-h/2,w,h);}
+function _tmCropRefresh(){_tmLoadImg(function(im){if(!im)return;_tmDrawCrop(document.getElementById('tm_cv'),im,264);_tmDrawCrop(document.getElementById('tm_cv2'),im,200);});}
+function _tmBake(){var tf=window._TF;_tmLoadImg(function(im){if(!im)return;var cv=document.createElement('canvas');_tmDrawCrop(cv,im,300);tf.logo=cv.toDataURL('image/png');tf.cropDirty=true;_tmPrev();});}
+function _tmCropInit(){
+  var tf=window._TF;if(!tf||!tf.logoSrc)return;_tmCropRefresh();
+  var el=document.getElementById('tm_cv');if(!el)return;var box=el.parentNode;
+  box.onpointerdown=function(e){e.preventDefault();try{box.setPointerCapture(e.pointerId);}catch(x){}var r=box.getBoundingClientRect(),sx=e.clientX,sy=e.clientY,ox=tf.lx||0,oy=tf.ly||0;
+    box.onpointermove=function(ev){tf.lx=Math.max(-1.5,Math.min(1.5,ox+(ev.clientX-sx)/r.width));tf.ly=Math.max(-1.5,Math.min(1.5,oy+(ev.clientY-sy)/r.height));_tmCropRefresh();};
+    box.onpointerup=function(){box.onpointermove=null;box.onpointerup=null;_tmBake();};};
+}
+var _tmBakeT=null;
+function _tmZoomSet(z){var tf=window._TF;if(!tf)return;tf.z=Math.max(0.3,Math.min(3,z));var r=document.getElementById('tm_zoom');if(r&&parseFloat(r.value)!==tf.z)r.value=tf.z;_tmCropRefresh();clearTimeout(_tmBakeT);_tmBakeT=setTimeout(_tmBake,150);}
+function _tmZoomBy(d){var tf=window._TF;if(tf)_tmZoomSet((tf.z||1)+d);}
+function _tmCropReset(){var tf=window._TF;if(!tf)return;tf.z=1;tf.lx=0;tf.ly=0;var r=document.getElementById('tm_zoom');if(r)r.value=1;_tmCropRefresh();_tmBake();}
 function _onTeamLogoChange(inp){
   var f=inp.files[0];if(!f)return;
   var r=new FileReader();
   r.onload=function(e){
-    compressImage(e.target.result,300,0.8,function(compressed){
-      if(window._TF)window._TF.logo=compressed;
-      var el=document.getElementById('tm_logo_prev');
-      if(el&&compressed){el.innerHTML='<img src="'+compressed+'" style="width:100%;height:100%;object-fit:cover;"/>';}
-      _tmPrev();
-    });
+    var im=new Image();
+    im.onload=function(){
+      var sc=Math.min(1,600/Math.max(im.width,im.height)),cv=document.createElement('canvas');cv.width=Math.round(im.width*sc);cv.height=Math.round(im.height*sc);
+      cv.getContext('2d').drawImage(im,0,0,cv.width,cv.height);
+      var png=/png|svg|gif|webp/i.test(f.type||'');
+      var tf=window._TF;if(!tf)return;
+      tf.logoSrc=png?cv.toDataURL('image/png'):cv.toDataURL('image/jpeg',0.88);tf.z=1;tf.lx=0;tf.ly=0;window._tmI=null;
+      _renderTeamModal();_tmBake();
+    };
+    im.onerror=function(){toast('Image illisible','red');};
+    im.src=e.target.result;
   };
   r.readAsDataURL(f);
 }
@@ -4256,9 +4321,10 @@ function saveTeamModal(){
     var t=gT(tf.tid);if(!t)return;
     t.name=name;t.gender=tf.gender;t.champ=(tf.champ||'').trim();t.season=(tf.season||'').trim();t.numsFixed=tf.numsFixed!==false;t.sortMode=tf.sortMode||'manual';applyTeamSort(t);
     if(tf.logo)t.logo=tf.logo;
+    if(tf.cropDirty&&tf.logoSrc){t.logoOrig=tf.logoSrc;t.logoCrop={z:tf.z,x:tf.lx,y:tf.ly};}
     if(tf.color)t.color=tf.color;else delete t.color;
   } else {
-    DB.teams.push({id:nid(),gender:tf.gender,name:name,champ:(tf.champ||'').trim(),season:(tf.season||'').trim(),logo:tf.logo||null,wins:0,losses:0,mCount:0,ptsFor:0,ptsAgainst:0,players:[],numsFixed:tf.numsFixed!==false,sortMode:tf.sortMode||'manual',color:tf.color||undefined});
+    DB.teams.push({id:nid(),gender:tf.gender,name:name,champ:(tf.champ||'').trim(),season:(tf.season||'').trim(),logo:tf.logo||null,wins:0,losses:0,mCount:0,ptsFor:0,ptsAgainst:0,players:[],numsFixed:tf.numsFixed!==false,sortMode:tf.sortMode||'manual',color:tf.color||undefined,logoOrig:(tf.cropDirty&&tf.logoSrc)?tf.logoSrc:undefined,logoCrop:(tf.cropDirty&&tf.logoSrc)?{z:tf.z,x:tf.lx,y:tf.ly}:undefined});
   }
   window._TF=null;
   saveDB();
@@ -4602,8 +4668,8 @@ function _mxRow(m,cnt){
    +'<div class="mxC2b"><div class="mxSub">'+sub.join('')+'</div></div><div class="mxC3">'+sc+'</div>'
    +'<div class="mxB">'
    +'<div class="mxBt g mxK4 k1"><button onclick="openCoding(\'codage\','+m.id+')">Codage</button></div>'
-   +'<div class="mxBt mxK5 k2"><button onclick="openCoding(\'instats\','+m.id+')">InStats</button></div>'
-   +'<div class="mxBt mxK6 k3"><button onclick="openCoding(\'stats\','+m.id+')">Prise de stats</button></div>'
+   +'<div class="mxBt g mxK5 k2"><button onclick="openCoding(\'instats\','+m.id+')">InStats</button></div>'
+   +'<div class="mxBt g mxK6 k3"><button onclick="openCoding(\'stats\','+m.id+')">Prise de stats</button></div>'
    +'<div class="mxBt mxK7 k4"><button onclick="exportMatchXML('+m.id+')" title="Exporter en XML">⬇ Export XML</button></div>'
    +'<div class="mxBt mxK8 k5 mxMn"><button onclick="mxMenu('+m.id+',event)">⋯</button>'+menu+'</div>'
    +_mxCt('mxK4 k1',nq,' séquences')+_mxCt('mxK5 k2',ni,' tirs')+_mxCt('mxK6 k3',na,' actions')
