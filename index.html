@@ -422,7 +422,7 @@ document.addEventListener('DOMContentLoaded', function(){
 var _SB_URL="https://umuvirwbtpflizxupwbr.supabase.co";
 // Version de ce fichier — à incrémenter à chaque déploiement, en cohérence avec la valeur
 // mise à jour dans la table Supabase `app_version` (voir _checkAppVersion ci-dessous).
-var APP_VERSION="2026-11-05-289";
+var APP_VERSION="2026-11-05-291";
 var _SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtdXZpcndidHBmbGl6eHVwd2JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3MTI1MDEsImV4cCI6MjA5MDI4ODUwMX0.fFQaF-zP9dzcWITJDf6GBmvu0pdcuvlaUz0A0qW0kfo";
 var _LICENCE_KEY='btp_licence';
 var _MACHINE_KEY='btp_machine';
@@ -3932,6 +3932,27 @@ function showPlayerStatsModal(tid,pid){
 // ════════════════════════════════════
 var _expT=null;
 
+var _teamColMap={};
+function _teamCol(team){
+  if(team.color)return team.color;
+  if(!team.logo)return 'var(--acc)';
+  var k=team.id+'|'+String(team.logo).length;
+  if(_teamColMap[k]!==undefined)return _teamColMap[k]||'var(--acc)';
+  _teamColMap[k]=null;
+  try{var im=new Image();im.onload=function(){try{
+    var c=document.createElement('canvas');c.width=c.height=40;var x=c.getContext('2d');x.drawImage(im,0,0,40,40);var d=x.getImageData(0,0,40,40).data;
+    var bins=[];for(var i=0;i<12;i++)bins.push({w:0,r:0,g:0,b:0});var fb={w:0,r:0,g:0,b:0};
+    for(var p=0;p<d.length;p+=4){var r=d[p],g=d[p+1],b=d[p+2],a=d[p+3];if(a<128)continue;
+      var mx=Math.max(r,g,b),mn=Math.min(r,g,b),l=(mx+mn)/510,sat=mx===mn?0:(mx-mn)/(255-Math.abs(mx+mn-255));
+      if(l>0.93)continue;
+      if(sat<0.3||l<0.12){fb.w+=0.2;fb.r+=r*0.2;fb.g+=g*0.2;fb.b+=b*0.2;continue;}
+      var h;var dd=mx-mn;if(mx===r)h=((g-b)/dd+6)%6;else if(mx===g)h=(b-r)/dd+2;else h=(r-g)/dd+4;
+      var bi=Math.floor(h*2)%12,w=sat;bins[bi].w+=w;bins[bi].r+=r*w;bins[bi].g+=g*w;bins[bi].b+=b*w;}
+    var best=bins.reduce(function(a,b){return b.w>a.w?b:a;},{w:0});if(best.w<4)best=fb;
+    if(best.w>0){_teamColMap[k]='rgb('+Math.round(best.r/best.w)+','+Math.round(best.g/best.w)+','+Math.round(best.b/best.w)+')';if(currentPage==='teams')renderPage();}
+  }catch(e){}};im.src=team.logo;}catch(e){}
+  return 'var(--acc)';
+}
 function renderTeams(){
   var h='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">'
     +'<div>'
@@ -3975,13 +3996,13 @@ function renderTeams(){
   var cardsH='',rosterH='';
   teamsToShow.forEach(function(team){
     var exp=_expT===team.id;
-    var _hue=0;String(team.name||'').split('').forEach(function(ch){_hue=(_hue*31+ch.charCodeAt(0))%360;});
-    var tc=team.color||('hsl('+_hue+' 55% 48%)');
+    var tc=_teamCol(team);
     var _tmDyn=_toolMatchesForTeam(String(team.id)).filter(function(m){return m.outcome&&m.outcome!=='-';});
     var _tmW=_tmDyn.filter(function(m){return _matchOutcomeFor(m,team.id)==='V';}).length;
     var _tmL=_tmDyn.filter(function(m){return _matchOutcomeFor(m,team.id)==='D';}).length;
     var stat=function(v,l,c){return '<div><div style="font-size:26px;font-weight:900;color:'+c+';line-height:1;">'+v+'</div><div style="font-size:9px;letter-spacing:.16em;color:var(--txt3);font-weight:700;margin-top:4px;">'+l+'</div></div>';};
-    cardsH+='<div style="background:linear-gradient(180deg,color-mix(in srgb,'+tc+' 42%,var(--surf)) 0,var(--surf) 58%);border:1px solid '+(exp?'var(--acc)':'var(--bdr)')+';border-top:4px solid '+tc+';border-radius:20px;padding:22px 16px 16px;text-align:center;min-width:0;'+(exp?'box-shadow:0 0 0 1px var(--acc);':'')+'">'
+    cardsH+='<div style="background:linear-gradient(180deg,color-mix(in srgb,'+tc+' 42%,var(--surf)) 0,var(--surf) 58%);border:1px solid '+(exp?'var(--acc)':'var(--bdr)')+';border-top:4px solid '+tc+';border-radius:20px;padding:22px 16px 16px;text-align:center;min-width:0;position:relative;'+(exp?'box-shadow:0 0 0 1px var(--acc);':'')+'">'
+      +(team.gender==='M'||team.gender==='F'?'<div title="'+(team.gender==='F'?'Équipe féminine':'Équipe masculine')+'" style="position:absolute;top:12px;right:12px;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:26px;line-height:1;font-weight:900;background:rgba(0,0,0,.35);border:1.5px solid '+(team.gender==='F'?'#F28BB8':'#6FA8FF')+';color:'+(team.gender==='F'?'#F28BB8':'#6FA8FF')+';">'+(team.gender==='F'?'♀':'♂')+'</div>':'')
       +'<div style="display:flex;justify-content:center;"><div style="width:92px;height:92px;border-radius:20px;overflow:hidden;background:var(--acc-d);display:flex;align-items:center;justify-content:center;border:2px solid '+(team.logo?'transparent':'var(--bdr2)')+';">'
       +(team.logo?'<img src="'+team.logo+'" style="width:100%;height:100%;object-fit:cover;"/>':'<span style="font-size:34px;font-weight:900;color:var(--acc);">'+(team.name?_tpEsc(team.name[0].toUpperCase()):'?')+'</span>')+'</div></div>'
       +'<div style="font-size:20px;font-weight:900;color:var(--txt);margin-top:12px;letter-spacing:-.01em;word-break:break-word;">'+_tpEsc(team.name)+'</div>'
