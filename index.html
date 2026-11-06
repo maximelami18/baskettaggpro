@@ -460,7 +460,7 @@ document.addEventListener('DOMContentLoaded', function(){
 var _SB_URL="https://umuvirwbtpflizxupwbr.supabase.co";
 // Version de ce fichier — à incrémenter à chaque déploiement, en cohérence avec la valeur
 // mise à jour dans la table Supabase `app_version` (voir _checkAppVersion ci-dessous).
-var APP_VERSION = "2026-11-06-375";
+var APP_VERSION = "2026-11-06-376";
 var _SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtdXZpcndidHBmbGl6eHVwd2JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3MTI1MDEsImV4cCI6MjA5MDI4ODUwMX0.fFQaF-zP9dzcWITJDf6GBmvu0pdcuvlaUz0A0qW0kfo";
 var _LICENCE_KEY='btp_licence';
 var _MACHINE_KEY='btp_machine';
@@ -34283,7 +34283,7 @@ function fdHtml(){var f=SC.f,n=filtered().length,nat=distinct(function(p){return
   +'<div class="fd-s"><div class="fd-t">Physique</div>'+rg('Taille','hmin','hmax','m')+rg('Poids','wmin','wmax','kg')+rg('Âge','amin','amax','ans')+'</div>'
   +'<div class="fd-s"><div class="fd-t">Statut &amp; tags</div><div class="sc-row">'+chips(STS.map(function(x){return[x[0],x[1]];}),'st',function(o){return o[1];})+'</div>'+(tg.length?'<div class="sc-row" style="margin-top:10px;">'+chips(tg,'tag')+'</div>':'')+'</div>'
   +'<div class="fd-s wide"><div class="fd-t">Nationalité</div><div class="sc-row" style="max-height:300px;overflow:auto;">'+natH+'</div></div>'
-  +(SC.libre?'':'<div class="fd-s wide"><div class="fd-t">Championnat</div><div class="sc-row">'+lgH+'</div><div style="display:flex;gap:10px;align-items:center;margin-top:14px;max-width:520px;"><span style="font-size:13px;color:var(--txt3);">🏟 Club</span><select class="sc-in" onchange="scFv(\'club\',this.value)"><option value="">Tous</option>'+cl.map(function(o){return'<option'+(f.club===o[0]?' selected':'')+' value="'+E(o[0])+'">'+E(o[0])+' ('+o[1]+')</option>';}).join('')+'</select></div></div>')
+  +(SC.libre?'':'<div class="fd-s wide"><div class="fd-t">Championnat</div><div class="sc-row">'+lgH+'</div><div style="display:flex;gap:10px;align-items:center;margin-top:14px;max-width:520px;"><span style="font-size:13px;color:var(--txt3);white-space:nowrap;line-height:1;">Club</span><select class="sc-in" onchange="scFv(\'club\',this.value)"><option value="">Tous</option>'+cl.map(function(o){return'<option'+(f.club===o[0]?' selected':'')+' value="'+E(o[0])+'">'+E(o[0])+' ('+o[1]+')</option>';}).join('')+'</select></div></div>')
   +'<div class="fd-s wide" style="margin-top:12px;">'+sfPanel()+'</div>'
   +'<div class="fd-s wide" style="margin-top:12px;">'+(topPanel()||'<div class="fd-t">Classement dans un championnat</div><div style="font-size:13px;color:var(--txt3);">Disponible quand des stats match par match sont importées.</div>')+'</div>'
   +'<div class="fd-s wide" style="margin-top:12px;"><div class="fd-t">Autres</div><div class="sc-row"><button class="sc-chip'+(f.fav?' on':'')+'" onclick="scFavF()">★ Favoris seulement</button><button class="sc-chip'+(f.vid?' on':'')+'" onclick="scFv(\'vid\','+(f.vid?'false':'true')+')">▶ Avec vidéo</button><span style="width:14px"></span>'+[0,1,2,3,4,5].map(function(k){return'<button class="sc-chip'+((f.rmin||0)===k?' on':'')+'" onclick="scFv(\'rmin\','+k+')">'+(k?k+'★':'Toutes notes')+'</button>';}).join('')+'</div></div>'
@@ -34480,7 +34480,7 @@ function fdHtml(){var f=SC.f,n=filtered().length,q=norm(SC.fq||''),nat=distinct(
   +'<div class="fd-s"><div class="fd-t">Rôle</div>'+rolH+'</div>'
   +'<div class="fd-s wide"><div class="fd-t">Physique</div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:30px;">'+fdSlHtml('Taille','hmin','hmax',1.60,2.30,0.01,'m',2,ph)+fdSlHtml('Poids','wmin','wmax',55,150,1,'kg',0,pf)+fdSlHtml('Âge','amin','amax',16,45,1,'ans',0,pf)+'</div></div>'
   +'<div class="fd-s'+(SC.libre?' wide':'')+'"><div class="fd-t">Nationalité</div><div class="fdc" data-x="nat">'+natH+'</div></div>'
-  +(SC.libre?'':'<div class="fd-s"><div class="fd-t">Championnat</div><div class="fdc" data-x="lg">'+lgH+'</div><div style="display:flex;gap:10px;align-items:center;margin-top:12px;"><span style="font-size:13px;color:var(--txt3);">🏟 Club</span><select class="sc-in" onchange="scFv(\'club\',this.value)"><option value="">Tous</option>'+cl.map(function(o){return'<option'+(f.club===o[0]?' selected':'')+' value="'+E(o[0])+'">'+E(o[0])+' ('+o[1]+')</option>';}).join('')+'</select></div></div>')
+  +(SC.libre?'':'<div class="fd-s"><div class="fd-t">Championnat</div><div class="fdc" data-x="lg">'+lgH+'</div><div style="display:flex;gap:10px;align-items:center;margin-top:12px;"><span style="font-size:13px;color:var(--txt3);white-space:nowrap;line-height:1;">Club</span><select class="sc-in" onchange="scFv(\'club\',this.value)"><option value="">Tous</option>'+cl.map(function(o){return'<option'+(f.club===o[0]?' selected':'')+' value="'+E(o[0])+'">'+E(o[0])+' ('+o[1]+')</option>';}).join('')+'</select></div></div>')
   +'<div class="fd-s" style="margin-top:0;">'+sfPanel()+'</div>'
   +'<div class="fd-s" style="margin-top:0;">'+(topPanel()||'<div class="fd-t">Classement dans un championnat</div><div style="font-size:13px;color:var(--txt3);">Disponible quand des stats match par match sont importées.</div>')+'</div>'
   +'<div class="fd-s wide" style="margin-top:14px;"><div class="fd-t">Autres</div><div class="sc-row"><button class="sc-chip'+(f.fav?' on':'')+'" onclick="scFavF()">★ Favoris seulement</button><button class="sc-chip'+(f.vid?' on':'')+'" onclick="scFv(\'vid\','+(f.vid?'false':'true')+')">▶ Avec vidéo</button></div></div>'
@@ -34998,13 +34998,14 @@ window.fdFit=function(){var a=document.querySelectorAll('.fdc');for(var i=0;i<a.
     if(!ch.length)continue;
     var mk=function(t){var kk=k,b=document.createElement('button');b.className='sc-chip fdmore';b.style.borderStyle='dashed';b.onclick=function(){fdMore(kk);};b.textContent=t;return b;};
     if(fdX[k]){c.appendChild(mk('− Réduire'));continue;}
-    var R=1,tops=[];ch.forEach(function(e){if(tops.indexOf(e.offsetTop)<0)tops.push(e.offsetTop);});tops.sort(function(x,y){return x-y;});
-    if(tops.length<=R)continue;
-    var lim=tops[R-1],vis=ch.filter(function(e){return e.offsetTop<=lim;});
-    ch.forEach(function(e){if(vis.indexOf(e)<0)e.style.setProperty('display','none','important');});
-    var btn=mk('');c.appendChild(btn);
-    var upd=function(){btn.textContent='＋ '+(ch.length-vis.length)+' autres…';};upd();
-    while(btn.offsetTop>lim&&vis.length>1){var l=vis.pop();l.style.setProperty('display','none','important');upd();}
+    var R=(k==='nat'?2:1),W=c.clientWidth,G=8,ws=ch.map(function(e){return e.offsetWidth;});
+    var fitN=function(n,bw){var row=1,x=0,i;for(i=0;i<n;i++){var w=ws[i];if(x>0&&x+G+w>W){row++;x=0;}if(row>R)return false;x+=(x>0?G:0)+w;}
+      if(bw){if(x>0&&x+G+bw>W){row++;x=0;}if(row>R)return false;}return true;};
+    if(fitN(ch.length,0))continue;
+    var tb=mk('＋ '+ch.length+' autres…');tb.style.visibility='hidden';c.appendChild(tb);var bw=tb.offsetWidth;tb.remove();
+    var n=ch.length;while(n>1&&!fitN(n,bw))n--;
+    for(var j=n;j<ch.length;j++)ch[j].style.setProperty('display','none','important');
+    c.appendChild(mk('＋ '+(ch.length-n)+' autres…'));
   }};
 var _s359=document.createElement('style');_s359.textContent='.fdc{display:flex;flex-wrap:wrap;gap:8px;align-content:flex-start;}'
 +'.fd-b{gap:12px!important;padding:10px 22px 14px!important;}.fd-s{padding:12px 16px!important;border-radius:16px!important;}.fd-s .fd-t{margin-bottom:8px!important;}'
