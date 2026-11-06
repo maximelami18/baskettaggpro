@@ -460,7 +460,7 @@ document.addEventListener('DOMContentLoaded', function(){
 var _SB_URL="https://umuvirwbtpflizxupwbr.supabase.co";
 // Version de ce fichier — à incrémenter à chaque déploiement, en cohérence avec la valeur
 // mise à jour dans la table Supabase `app_version` (voir _checkAppVersion ci-dessous).
-var APP_VERSION="2026-11-06-338";
+var APP_VERSION="2026-11-06-339";
 var _SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtdXZpcndidHBmbGl6eHVwd2JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3MTI1MDEsImV4cCI6MjA5MDI4ODUwMX0.fFQaF-zP9dzcWITJDf6GBmvu0pdcuvlaUz0A0qW0kfo";
 var _LICENCE_KEY='btp_licence';
 var _MACHINE_KEY='btp_machine';
@@ -34591,8 +34591,8 @@ function bbCur(p){var ss=bbSeasons(p);return ss.indexOf(BB_SEA)>=0?BB_SEA:(ss[0]
 function bbSel(p){var s=SC.ssn;if(s==='all')return'all';return(s&&bbSeasons(p).indexOf(s)>=0)?s:bbCur(p);}
 function bbRowsOf(p,sel){return(p.bbs||[]).filter(function(r){return sel==='all'||r.season===sel;});}
 function bbAgg(R){var W=0,S={},M={p2:[0,0],p3:[0,0],ft:[0,0]},K=['min','pts','reb','d','o','ast','stl','blk','to','eval','m2','a2','m3','a3','mf','af'],X={p2:['m2','a2'],p3:['m3','a3'],ft:['mf','af']},Q={p2:[0,0],p3:[0,0],ft:[0,0]};K.forEach(function(k){S[k]=0;});
-  R.forEach(function(r){var g=r.gp||0;if(!g)return;W+=g;K.forEach(function(k){if(r[k]!=null)S[k]+=r[k]*g;});['p2','p3','ft'].forEach(function(k){var m=r[X[k][0]],a=r[X[k][1]];if(m!=null&&a!=null){Q[k][0]+=m*g;Q[k][1]+=a*g;}else if(r[k]!=null){M[k][0]+=r[k]*g;M[k][1]+=g;}});});
-  if(!W)return null;var o={gp:W};K.forEach(function(k){o[k]=S[k]/W;});['p2','p3','ft'].forEach(function(k){o[k]=Q[k][1]>0?Q[k][0]/Q[k][1]*100:(M[k][1]?M[k][0]/M[k][1]:null);});return o;}
+  R.forEach(function(r){var g=r.gp||0;if(!g)return;W+=g;K.forEach(function(k){if(r[k]!=null)S[k]+=r[k]*g;});['p2','p3','ft'].forEach(function(k){var m=r[X[k][0]],a=r[X[k][1]];if(r[k]!=null){var w=(a!=null&&a>0)?a*g:g;M[k][0]+=r[k]*w;M[k][1]+=w;}else if(m!=null&&a!=null&&a>0){M[k][0]+=m/a*100*a*g;M[k][1]+=a*g;}});});
+  if(!W)return null;var o={gp:W};K.forEach(function(k){o[k]=S[k]/W;});['p2','p3','ft'].forEach(function(k){o[k]=M[k][1]?M[k][0]/M[k][1]:null;});return o;}
 function bbStat(p,k){if(!(p.bbs&&p.bbs.length))return getStat(p,k,'avg',true);var a=bbAgg(bbRowsOf(p,bbSel(p)));if(!a)return getStat(p,k,'avg',true);return k==='pir'?a.eval:a[k];}
 function bbClubLogo(r){if(r.teamLogo)return r.teamLogo;var m=((DB.scMeta||{}).clubs)||{},n=norm(r.team||'');if(!n)return'';var ks=Object.keys(m);for(var i=0;i<ks.length;i++){var q=norm(ks[i]);if(q===n||(q.length>4&&n.length>4&&(q.indexOf(n)>=0||n.indexOf(q)>=0)))return m[ks[i]];}return'';}
 function bbCompsOf(p,r){var out=[];if(r.season===bbCur(p)){((DB.scGames||{})[p.id]||[]).forEach(function(g){var l=gLg(g);if(out.indexOf(l)<0)out.push(l);});}
