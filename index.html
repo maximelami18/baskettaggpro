@@ -460,7 +460,7 @@ document.addEventListener('DOMContentLoaded', function(){
 var _SB_URL="https://umuvirwbtpflizxupwbr.supabase.co";
 // Version de ce fichier — à incrémenter à chaque déploiement, en cohérence avec la valeur
 // mise à jour dans la table Supabase `app_version` (voir _checkAppVersion ci-dessous).
-var APP_VERSION="2026-11-06-340";
+var APP_VERSION="2026-11-06-341";
 var _SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtdXZpcndidHBmbGl6eHVwd2JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3MTI1MDEsImV4cCI6MjA5MDI4ODUwMX0.fFQaF-zP9dzcWITJDf6GBmvu0pdcuvlaUz0A0qW0kfo";
 var _LICENCE_KEY='btp_licence';
 var _MACHINE_KEY='btp_machine';
@@ -34798,7 +34798,7 @@ function bbLgClean(){db();var nk=function(x){return norm(x||'').replace(/[^a-z0-
   var cnt={},add=function(x){if(x)cnt[x]=(cnt[x]||0)+1;};
   DB.scPlayers.forEach(function(p){String(p.lg||'').split(/\s\+\s/).forEach(add);(p.lgs||[]).forEach(add);((DB.scGames||{})[p.id]||[]).forEach(function(r){add(r[26]);});(p.bbs||[]).forEach(function(r){add(r.comp);});(p.stats||[]).forEach(function(x){add(x.lg);});['clubBy','logoBy'].forEach(function(f){Object.keys(p[f]||{}).forEach(add);});Object.keys(p.bbg||{}).forEach(function(sea){(p.bbg[sea]||[]).forEach(function(r){add(r[26]);});});});
   var canon={},info=(DB.scMeta||{}).lgInfo||{};Object.keys(info).forEach(function(k){if(info[k]&&info[k].name)canon[nk(info[k].name)]=info[k].name;});
-  var groups={};Object.keys(cnt).forEach(function(n){var k=nk(cl(n));if(!k)return;(groups[k]=groups[k]||[]).push(n);});
+  var groups={};Object.keys(cnt).forEach(function(n){var k=nk(cl(n)),k2=nk(cl(String(n).replace(/\s*\([^)]*\)\s*$/,'')));if(canon[k2])k=k2;if(!k)return;(groups[k]=groups[k]||[]).push(n);});
   var map={},n=0;Object.keys(groups).forEach(function(k){var v=groups[k],c=canon[k];if(!c){var best=v.slice().sort(function(a,b){var pa=(a===cl(a)&&a!==a.toLowerCase())?1:0,pb=(b===cl(b)&&b!==b.toLowerCase())?1:0;return pb-pa||cnt[b]-cnt[a];})[0];c=cl(best);}
     v.forEach(function(x){if(x!==c){map[x]=c;n++;}});});
   if(!n)return 0;var M=function(x){return map[x]!==undefined?map[x]:x;};
