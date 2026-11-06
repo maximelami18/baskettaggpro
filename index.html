@@ -460,7 +460,7 @@ document.addEventListener('DOMContentLoaded', function(){
 var _SB_URL="https://umuvirwbtpflizxupwbr.supabase.co";
 // Version de ce fichier — à incrémenter à chaque déploiement, en cohérence avec la valeur
 // mise à jour dans la table Supabase `app_version` (voir _checkAppVersion ci-dessous).
-var APP_VERSION="2026-11-06-346";
+var APP_VERSION="2026-11-06-350";
 var _SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtdXZpcndidHBmbGl6eHVwd2JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3MTI1MDEsImV4cCI6MjA5MDI4ODUwMX0.fFQaF-zP9dzcWITJDf6GBmvu0pdcuvlaUz0A0qW0kfo";
 var _LICENCE_KEY='btp_licence';
 var _MACHINE_KEY='btp_machine';
@@ -34569,7 +34569,7 @@ function bbApply(j,lg,team,st){db();BB._lgd=1;DB.scGames=DB.scGames||{};DB.scMet
   var p=DB.scPlayers.filter(function(x){return x.bbSlug===j.slug;})[0],isNew=!p;
   if(!p){p={id:uid(),status:'new',rating:0,notes:'',added:Date.now(),src:'bebasket',tags:[],videos:[],stats:[]};DB.scPlayers.push(p);p._k=1;}
   if(p._k){delete p._k;var KK=(DB.scMeta.bbKeep||{}),kk=bbKeepKey(j),ko=kk&&(KK[kk]||KK[kk.split('|')[0]+'|']);if(ko&&!KK[kk])kk=kk.split('|')[0]+'|';if(ko){Object.keys(ko).forEach(function(f){if(p[f]==null||p[f]===''||p[f]==='new'||p[f]===0||(Array.isArray(p[f])&&!p[f].length))p[f]=ko[f];});delete KK[kk];}}
-  p.bbSlug=j.slug;p.elCode=p.elCode||('bb:'+j.slug);p.upd=Date.now();p.bbAt=Date.now();
+  p.bbSlug=j.slug;if(j.clubSlug)p.clubSlug=j.clubSlug;p.elCode=p.elCode||('bb:'+j.slug);p.upd=Date.now();p.bbAt=Date.now();
   ['first','last','born','h','w','nat','photo'].forEach(function(k){if(j[k]&&(isNew||!p[k]||p.src==='bebasket'))p[k]=j[k];});
   if(j.pos){var ep=elPos(j.pos);if(ep[0]&&(!p.pos||p.src==='bebasket')){p.pos=ep[0];if(ep[1])p.pos2=ep[1];}}
   var comp=bbLgName(lg),cLogo=((DB.scMeta.lgInfo||{})[lg]||{}).logo||(j.comps&&j.comps[0]&&j.comps[0].logo)||'';var nk=function(x){return norm(x||'').replace(/[^a-z0-9]/g,'');};if(cLogo){DB.scMeta.lgLogos=DB.scMeta.lgLogos||{};Object.keys(DB.scMeta.lgLogos).forEach(function(k){if(k!==comp&&nk(k)===nk(comp))delete DB.scMeta.lgLogos[k];});DB.scMeta.lgLogos[comp]=cLogo;}
@@ -34610,12 +34610,12 @@ function bbSeasonTbl(p){if(!(p.bbs&&p.bbs.length))return seasonTbl(p);var sel=bb
   var ex=function(r){return{fo:r.fo==null?null:r.fo,pm:r.pm==null?null:r.pm};};
   var cell=function(r,e){e=e||{};var pm=cvx(e.pm,1,1);return[r.gp==null?'—':Math.round(r.gp),f(r.min),'<b>'+f(r.pts)+'</b>',f(r.m2),f(r.a2),pc(r.p2),f(r.m3),f(r.a3),pc(r.p3),f(r.mf),f(r.af),pc(r.ft),f(r.d),f(r.o),f(r.reb),f(r.ast),f(r.stl),f(r.blk),f(r.to),f(e.fo),cvx(r.eval,0,1),pm].map(function(v){return'<td>'+v+'</td>';}).join('');};
   var aex=function(){var sf=0,wf=0,sp=0,wp=0;R.forEach(function(r){var e=ex(r),g=r.gp||0;if(e.fo!=null){sf+=e.fo*g;wf+=g;}if(e.pm!=null){sp+=e.pm*g;wp+=g;}});return{fo:wf?sf/wf:null,pm:wp?sp/wp:null};};
-  var hide=null;if(!SC.sx){var ssn=bbSeasons(p);if(ssn.length>3){var mx=ssn[0],mn=ssn[ssn.length-1];hide={n:0};R.forEach(function(r,i){if(r.season!==mx&&r.season!==mn&&r.season!==sel){hide[i]=1;hide.n++;if(hide.first==null)hide.first=i;}});}}
+  var hide=null;if(!SC.sx){var ssn=bbSeasons(p);if(ssn.length>1){var mx=ssn[0],mn=ssn[ssn.length-1];hide={n:0};R.forEach(function(r,i){if(r.season!==mx&&r.season!==sel){hide[i]=1;hide.n++;if(hide.first==null)hide.first=i;}});}}
   var a=bbAgg(R),ns=bbSeasons(p).length;if(a)['m2','a2','m3','a3','mf','af'].forEach(function(k){if(!R.some(function(r){return r[k]!=null;}))a[k]=null;});
   return'<div class="bb-pt"><table class="sc-gt"><thead><tr>'+['SAISON','CLUB','COMPÉTITION','MJ','MIN','PTS','2PM','2PT','%2PTS','3PM','3PT','%3PTS','LFM','LFT','%LF','REB D','REB O','REB T','PD','INT','CO','BP','FAUTES','EVAL','+/-'].map(function(t,i){return'<th'+(i<3?' style="text-align:left;"':'')+'>'+t+'</th>';}).join('')+'</tr></thead><tbody>'
    +R.map(function(r,ri){var on=(sel==='all'||r.season===sel)&&sel!=='all';if(hide&&hide[ri]){return hide.first===ri?'<tr class="bb-mr"><td colspan="25" style="text-align:left;"><button class="sc-btn sm" onclick="scSx(1)">+ Afficher les '+hide.n+' autres saisons</button></td></tr>':'';}return'<tr class="'+(on?'bb-on':'')+'"><td style="text-align:left;white-space:nowrap;">'+E(r.season)+'</td><td style="text-align:left;white-space:nowrap;"><span class="bb-tm">'+(bbClubLogo(r)?cl2(bbClubLogo(r),26,"this.parentNode.outerHTML=\'<span class=bb-sp0></span>\'"):'<span class="bb-sp0"></span>')+'<b>'+E(r.team||'—')+'</b></span></td><td style="text-align:left;">'+bbCompsCell(p,r)+'</td>'+cell(r,ex(r))+'</tr>';}).join('')
    +(a?'<tr class="tot"><td colspan="3" style="text-align:left;white-space:nowrap;"><b>MOYENNE · '+ns+' SAISON'+(ns>1?'S':'')+' · '+Math.round(a.gp)+' MATCH'+(a.gp>1?'S':'')+'</b></td>'+cell(a,aex())+'</tr>':'')
-   +(SC.sx&&bbSeasons(p).length>3?'<tr class="bb-mr"><td colspan="25" style="text-align:left;"><button class="sc-btn sm" onclick="scSx(0)">− Réduire</button></td></tr>':'')+'</tbody></table></div>';}
+   +(SC.sx&&bbSeasons(p).length>1?'<tr class="bb-mr"><td colspan="25" style="text-align:left;"><button class="sc-btn sm" onclick="scSx(0)">− Réduire</button></td></tr>':'')+'</tbody></table></div>';}
 function bbMatchTbl(p){if(!(p.bbs&&p.bbs.length))return matchTbl(p);var sel=bbSel(p),cur=bbCur(p),M=function(t){return'<div class="bb-msg">'+t+'</div>';};
   if(sel==='all')return M('Choisis une saison dans la barre du haut pour voir les matchs un par un.');
   if(sel===cur&&((DB.scGames||{})[p.id]||[]).length)return matchTbl(p);
@@ -34649,12 +34649,12 @@ function simInner(p){var L=simList(p,10),gap=simGap(),more=SC.simMore===p.id,LL=
 /* ── Actualiser : relit aussi les joueurs BeBasket ── */
 var _bbRf=window.scRefreshAll;
 window.scRefreshAll=function(){db();var L=((DB.scMeta||{}).bbLeagues||[]),has=DB.scPlayers.some(function(p){return p.bbSlug;});
-  if(!has||!L.length||BB.busy||!navigator.onLine){return _bbRf&&_bbRf();}
+  if(BB.busy)return;if(!navigator.onLine){toast('Pas de connexion','red');return;}if(!has||!L.length){toast('Importe d\'abord des championnats : rien à actualiser pour l\'instant','red');return;}
   var b=document.getElementById('scRfB');if(b){b.disabled=true;b.textContent='⏳ Actualisation…';}BB.busy=1;BB.stop=0;var st={add:0,upd:0,fail:0,n:0,tot:0,errs:[]};
   var ps=DB.scPlayers.filter(function(p){return p.bbSlug;}),ch=Promise.resolve();
   ps.forEach(function(p,i){ch=ch.then(function(){var lg=(p.bbs||[]).map(function(s){return s.compSlug;}).filter(Boolean).pop()||L[0];
     return bbCall('action=player&slug='+encodeURIComponent(p.bbSlug)+'&league='+encodeURIComponent(lg)+'&year='+BB_YEAR).then(function(j){bbApply(j,lg,null,st);st.n++;if(b)b.textContent='⏳ '+st.n+'/'+ps.length;if(st.n%10===0)saveDB();}).catch(function(){st.fail++;}).then(function(){return bbWait(900);});});});
-  ch.then(function(){BB.busy=0;saveDB();toast('✓ Actualisation : '+st.upd+' joueur'+(st.upd>1?'s':'')+' mis à jour'+(st.fail?' · '+st.fail+' échec(s)':''),'acc');return _bbRf&&_bbRf();}).then(function(){if(b){b.disabled=false;b.textContent='🔄 Actualiser les stats';}renderScoutPage();});};
+  ch.then(function(){BB.busy=0;saveDB();toast('✓ Actualisation : '+st.upd+' joueur'+(st.upd>1?'s':'')+' mis à jour'+(st.fail?' · '+st.fail+' échec(s)':''),'acc');}).then(function(){if(b){b.disabled=false;b.textContent='🔄 Actualiser les stats';}renderScoutPage();});};
 
 /* ── styles v322 ── */
 (function(){if(document.getElementById('scCss322'))return;var s=document.createElement('style');s.id='scCss322';s.textContent=`
@@ -34847,6 +34847,26 @@ function bbCompsOf(p,r){var out=[],k2=function(x){return norm(x||'').replace(/[^
   var L=(DB.scMeta||{}).bbLeagues||[],info=(DB.scMeta||{}).lgInfo||{};
   (r.comps||[]).forEach(function(c){if(L.indexOf(c.slug)<0)return;var nm=bbLgName(c.slug),lg=(info[c.slug]||{}).logo||c.logo;if(lg){DB.scMeta.lgLogos=DB.scMeta.lgLogos||{};if(!DB.scMeta.lgLogos[nm])DB.scMeta.lgLogos[nm]=lg;}add(nm);});
   if(!out.length&&r.comp)out=[r.comp];return out;}
+
+/* ── v349 : actualisation intelligente (seulement les équipes qui ont joué du nouveau) ── */
+window.scRefreshAll=function(){db();var L=((DB.scMeta||{}).bbLeagues||[]),has=DB.scPlayers.some(function(p){return p.bbSlug;});
+  if(BB.busy)return;if(!navigator.onLine){toast('Pas de connexion','red');return;}if(!has||!L.length){toast('Importe d\'abord des championnats : rien à actualiser pour l\'instant','red');return;}
+  var b=document.getElementById('scRfB'),say=function(t){if(b){b.disabled=true;b.textContent=t;}};say('⏳ Recherche des nouveaux matchs…');BB.busy=1;BB.stop=0;
+  var st={add:0,upd:0,fail:0,n:0,tot:0,errs:[]},chg={},all=false,seen={};DB.scMeta.bbDone=DB.scMeta.bbDone||{};
+  var ch=Promise.resolve();
+  L.forEach(function(lg){ch=ch.then(function(){return bbCall('action=played&league='+encodeURIComponent(lg)).then(function(j){var prev=DB.scMeta.bbDone[lg],ds=j.done||[];seen[lg]=ds.map(function(g){return g.id;});
+      if(!prev){all=true;}else{ds.forEach(function(g){if(prev.indexOf(g.id)<0)(g.teams||[]).forEach(function(t){chg[t]=1;});});}}).catch(function(){all=true;}).then(function(){return bbWait(400);});});});
+  ch=ch.then(function(){
+    var ps=DB.scPlayers.filter(function(p){return p.bbSlug;});
+    var todo=all?ps:ps.filter(function(p){if(isLibre(p))return false;if(!p.clubSlug)return true;return !!chg[p.clubSlug];});
+    st.tot=todo.length;if(!todo.length){return 0;}
+    var idx=0,done=0;
+    var worker=function(){return new Promise(function(res){(function next(){if(BB.stop||idx>=todo.length)return res();var p=todo[idx++];
+      var lg=(p.bbs||[]).map(function(s){return s.compSlug;}).filter(Boolean).pop()||L[0];
+      bbCall('action=player&slug='+encodeURIComponent(p.bbSlug)+'&league='+encodeURIComponent(lg)+'&year='+BB_YEAR).then(function(j){bbApply(j,lg,null,st);}).catch(function(){st.fail++;}).then(function(){done++;say('⏳ '+done+'/'+todo.length);if(done%10===0){try{saveDB();}catch(e){}}return bbWait(250);}).then(next);})();});};
+    return Promise.all([worker(),worker(),worker()]);});
+  ch.then(function(){BB.busy=0;if(!st.fail){Object.keys(seen).forEach(function(lg){DB.scMeta.bbDone[lg]=seen[lg].slice(0,600);});}saveDB();
+    toast(st.tot?('✓ Actualisation : '+st.upd+' joueur'+(st.upd>1?'s':'')+' mis à jour sur '+st.tot+(st.fail?' · '+st.fail+' échec(s)':'')):'✓ Rien de nouveau : tous les joueurs sont à jour','acc');}).then(function(){if(b){b.disabled=false;b.textContent='🔄 Actualiser les stats';}renderScoutPage();});};
 
 })();
 
