@@ -460,7 +460,7 @@ document.addEventListener('DOMContentLoaded', function(){
 var _SB_URL="https://umuvirwbtpflizxupwbr.supabase.co";
 // Version de ce fichier — à incrémenter à chaque déploiement, en cohérence avec la valeur
 // mise à jour dans la table Supabase `app_version` (voir _checkAppVersion ci-dessous).
-var APP_VERSION = "2026-11-06-370";
+var APP_VERSION = "2026-11-06-372";
 var _SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtdXZpcndidHBmbGl6eHVwd2JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3MTI1MDEsImV4cCI6MjA5MDI4ODUwMX0.fFQaF-zP9dzcWITJDf6GBmvu0pdcuvlaUz0A0qW0kfo";
 var _LICENCE_KEY='btp_licence';
 var _MACHINE_KEY='btp_machine';
@@ -34989,11 +34989,14 @@ window.scFDel=function(){if(!SCF||!SCF.id)return;if(typeof scDel==='function'){v
 
 /* ═══ v359 : filtres compacts — tout visible sans défiler ═══ */
 window.fdX=window.fdX||{};
-window.fdMore=function(k){fdX[k]=!fdX[k];if(k==='nlg'&&typeof needRender==='function')needRender();else fdDraw();};
+window.fdMore=function(k){fdX[k]=!fdX[k];
+  if(k==='nlg'&&typeof needRender==='function'){var fin=function(){var e=document.querySelector('.fdc[data-x=nlg]'),p=e;while(p&&!(p.scrollHeight>p.clientHeight+2&&/(auto|scroll)/.test(getComputedStyle(p).overflowY)))p=p.parentElement;return p;};
+    var sc=fin(),top=sc?sc.scrollTop:0;needRender();setTimeout(function(){var q=fin();if(q){q.scrollTop=top;var b=document.querySelector('.fdc[data-x=nlg] .fdmore');if(b&&fdX[k]){var r=b.getBoundingClientRect(),h=q.getBoundingClientRect();if(r.bottom>h.bottom)q.scrollTop+=r.bottom-h.bottom+20;}}},60);}
+  else fdDraw();};
 window.fdFit=function(){var a=document.querySelectorAll('.fdc');for(var i=0;i<a.length;i++){var c=a[i],k=c.getAttribute('data-x'),ch=[].slice.call(c.children).filter(function(e){return!e.classList.contains('fdmore');});
     var old=c.querySelector('.fdmore');if(old)old.remove();ch.forEach(function(e){e.style.display='';});
     if(!ch.length)continue;
-    var mk=function(t){var b=document.createElement('button');b.className='sc-chip fdmore';b.style.borderStyle='dashed';b.onclick=function(){fdMore(k);};b.textContent=t;return b;};
+    var mk=function(t){var kk=k,b=document.createElement('button');b.className='sc-chip fdmore';b.style.borderStyle='dashed';b.onclick=function(){fdMore(kk);};b.textContent=t;return b;};
     if(fdX[k]){c.appendChild(mk('− Réduire'));continue;}
     var R=(k==='lg'||k==='nlg')?1:3,tops=[];ch.forEach(function(e){if(tops.indexOf(e.offsetTop)<0)tops.push(e.offsetTop);});tops.sort(function(x,y){return x-y;});
     if(tops.length<=R)continue;
