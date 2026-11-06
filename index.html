@@ -460,7 +460,7 @@ document.addEventListener('DOMContentLoaded', function(){
 var _SB_URL="https://umuvirwbtpflizxupwbr.supabase.co";
 // Version de ce fichier — à incrémenter à chaque déploiement, en cohérence avec la valeur
 // mise à jour dans la table Supabase `app_version` (voir _checkAppVersion ci-dessous).
-var APP_VERSION = "2026-11-06-358";
+var APP_VERSION = "2026-11-06-365";
 var _SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtdXZpcndidHBmbGl6eHVwd2JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3MTI1MDEsImV4cCI6MjA5MDI4ODUwMX0.fFQaF-zP9dzcWITJDf6GBmvu0pdcuvlaUz0A0qW0kfo";
 var _LICENCE_KEY='btp_licence';
 var _MACHINE_KEY='btp_machine';
@@ -33862,7 +33862,7 @@ function gCmp(a,b){var x=gLg(a),y=gLg(b);return x<y?-1:x>y?1:((a[1]-b[1])||(a[0]
 function lgAb(l){return({'Euroleague':'EL','EuroCup':'EC','Betclic Élite (France)':'BE','Élite 2 (France)':'É2','Espoirs Élite (France)':'ES','Espoirs Élite 2 (France)':'ES2','Liga Endesa (Espagne)':'ACB','NBA':'NBA','NBA G League':'GL','Segunda FEB (Espagne)':'SF','BBL (Allemagne)':'BBL','LBA (Italie)':'LBA','Basketball Champions League':'BCL'})[l]||String(l||'?').slice(0,3).toUpperCase();}
 function lgShort(l){return String(l||'').replace(' (France)','').replace(' (Espagne)','').replace(' (Allemagne)','');}
 function gRows(p,all){db();var R=(DB.scGames||{})[p.id]||[],f=(typeof all==='string'&&all)?all:(all?'':(SC&&SC.f&&SC.f.lg));if(f)return R.filter(function(r){return gLg(r)===f;});return R;}
-function lgsOf(p){var m={},add=function(x){if(x)String(x).split(/\s\+\s/).forEach(function(y){y=y.trim();if(y)m[y]=1;});};add(p.lg);(p.lgs||[]).forEach(add);(p.stats||[]).forEach(function(s){if(s.lg&&s.api)add(s.lg);});((DB.scGames||{})[p.id]||[]).forEach(function(r){add(gLg(r));});return Object.keys(m);}
+function lgsOf0(p){var m={},add=function(x){if(x)String(x).split(/\s\+\s/).forEach(function(y){y=y.trim();if(y)m[y]=1;});};add(p.lg);(p.lgs||[]).forEach(add);(p.stats||[]).forEach(function(s){if(s.lg&&s.api)add(s.lg);});((DB.scGames||{})[p.id]||[]).forEach(function(r){add(gLg(r));});return Object.keys(m);}
 function inLg(p,l){return lgsOf(p).indexOf(l)>=0;}
 function clubOf(p){var f=SC&&SC.f&&SC.f.lg;return(f&&p.clubBy&&p.clubBy[f])||p.club||'';}
 function logoOf(p){var f=SC&&SC.f&&SC.f.lg;return(f&&p.logoBy&&p.logoBy[f])||p.clubLogo||'';}
@@ -34267,7 +34267,7 @@ function cntHead315(l){return'<div class="sc-cnt315"><span><b style="color:var(-
 function fdDraw(){var o=document.getElementById('scFD');if(!SC.fopen){if(o)o.remove();return;}
   var fresh=!o;if(fresh){o=document.createElement('div');o.id='scFD';o.className='sc-fd315 anim';o.onclick=function(e){if(e.target===o)scFdClose();};document.body.appendChild(o);}
   var ob=o.querySelector('.fd-b'),keep=ob?ob.scrollTop:0;if(!fresh)o.classList.remove('anim');
-  o.innerHTML=fdHtml();var nb=o.querySelector('.fd-b');if(nb)nb.scrollTop=keep;}
+  o.innerHTML=fdHtml();var nb=o.querySelector('.fd-b');if(nb)nb.scrollTop=keep;if(window.fdFit)fdFit();}
 function fdHtml(){var f=SC.f,n=filtered().length,nat=distinct(function(p){return natList(p).map(natName);}),lg=distinct(function(p){return lgsOf(p);}),cl=distinct(function(p){return(!f.lg||inLg(p,f.lg))?[clubOf(p)]:[];}),tg=distinct(function(p){return p.tags||[];});
   var inp=function(k,ph){return'<input class="sc-in" placeholder="'+ph+'" value="'+E(f[k]||'')+'" onchange="scFv(\''+k+'\',this.value)">';};
   var rg=function(l,a,b,u){return'<div class="fd-rg"><span>'+l+'</span>'+inp(a,'min')+inp(b,'max')+'<span>'+u+'</span></div>';};
@@ -34470,16 +34470,16 @@ function fdHtml(){var f=SC.f,n=filtered().length,q=norm(SC.fq||''),nat=distinct(
   var pf=function(x){var v=parseFloat(String(x==null?'':x).replace(',','.'));return isNaN(v)?null:v;},ph=function(x){var v=pf(x);return v!=null&&v>3?v/100:v;};
   var posH='<div class="fd-pos">'+POS.map(function(p,i){var on=f.pos.indexOf(p[0])>=0;return'<button style="border:2px solid '+(on?p[2]:'rgba(255,255,255,.08)')+';background:'+p[2]+(on?'33':'12')+';" onclick="scTg(\'pos\',\''+p[0]+'\')"><b style="color:'+p[2]+'">'+(i+1)+'</b><span>'+p[1]+'</span></button>';}).join('')+'</div>';
   var RL=prList(),rolH=RL.length?'<div class="sc-row" style="gap:8px;">'+RL.map(function(r){var on=(f.roles||[]).indexOf(String(r.id))>=0;return'<button type="button" style="'+prChipCss(r,on)+'padding:8px 16px;font-size:13px;" onclick="scRoleTg(\''+r.id+'\')">'+prEsc(r.name)+'</button>';}).join('')+'</div><div style="font-size:11.5px;color:var(--txt3);margin-top:8px;">Plusieurs rôles possibles : le joueur doit en avoir au moins un.</div>':'<div style="font-size:12.5px;color:var(--txt3);line-height:1.5;">Aucun rôle créé pour l’instant.<br>Crée-les dans <b>Paramètres → Rôles des joueurs</b> : ils apparaîtront ici (et dans la page Besoins).</div>';
-  var NMAX=60,natL=(SC.natAll||q)?nat:nat.slice(0,NMAX);
-  var natH=(nat.length?chips(natL,'nat',function(o){return flag(ctOf(o[0]))+' '+E(o[0])+' <small style="opacity:.6">'+o[1]+'</small>';}):'<span style="color:var(--txt3);font-size:13px;">Aucune nationalité</span>')+(!q&&nat.length>NMAX?' <button class="sc-chip" style="border-style:dashed;" onclick="scNatAll()">'+(SC.natAll?'− Réduire':'＋ '+(nat.length-NMAX)+' autres…')+'</button>':'');
+  var natL=nat;
+  var natH=(nat.length?chips(natL,'nat',function(o){return flag(ctOf(o[0]))+' '+E(o[0])+' <small style="opacity:.6">'+o[1]+'</small>';}):'<span style="color:var(--txt3);font-size:13px;">Aucune nationalité</span>');
   var lgH=lg.map(function(o){var on=(f.lgs||[]).indexOf(o[0])>=0;return'<button class="sc-chip'+(on?' on':'')+'" style="display:inline-flex;align-items:center;gap:7px;padding:5px 12px 5px 6px;" data-v="'+E(o[0])+'" onclick="scLgTg(this.dataset.v)">'+lgBadge(o[0])+E(lgShort(o[0]))+' <small style="opacity:.6">'+o[1]+'</small></button>';}).join(' ');
   return'<div class="fd-p"><div class="fd-h"><b>⚙️ Filtres</b><span style="flex:1"></span><button class="sc-btn sm" onclick="scFdClose()">✕</button></div><div class="fd-b">'
   +'<div class="fd-s wide" style="padding:10px 14px;"><input class="fd-q" id="fdQ" placeholder="🔍 Rechercher une nationalité, un championnat…" value="'+E(SC.fq||'')+'" oninput="scFq(this.value)"></div>'
   +'<div class="fd-s"><div class="fd-t">Poste</div>'+posH+'</div>'
   +'<div class="fd-s"><div class="fd-t">Rôle</div>'+rolH+'</div>'
   +'<div class="fd-s wide"><div class="fd-t">Physique</div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:30px;">'+fdSlHtml('Taille','hmin','hmax',1.60,2.30,0.01,'m',2,ph)+fdSlHtml('Poids','wmin','wmax',55,150,1,'kg',0,pf)+fdSlHtml('Âge','amin','amax',16,45,1,'ans',0,pf)+'</div></div>'
-  +'<div class="fd-s wide"><div class="fd-t">Nationalité</div><div class="sc-row" style="max-height:190px;overflow:auto;">'+natH+'</div></div>'
-  +(SC.libre?'':'<div class="fd-s wide"><div class="fd-t">Championnat</div><div class="sc-row">'+lgH+'</div><div style="display:flex;gap:10px;align-items:center;margin-top:14px;max-width:520px;"><span style="font-size:13px;color:var(--txt3);">🏟 Club</span><select class="sc-in" onchange="scFv(\'club\',this.value)"><option value="">Tous</option>'+cl.map(function(o){return'<option'+(f.club===o[0]?' selected':'')+' value="'+E(o[0])+'">'+E(o[0])+' ('+o[1]+')</option>';}).join('')+'</select></div></div>')
+  +'<div class="fd-s'+(SC.libre?' wide':'')+'"><div class="fd-t">Nationalité</div><div class="fdc" data-x="nat">'+natH+'</div></div>'
+  +(SC.libre?'':'<div class="fd-s"><div class="fd-t">Championnat</div><div class="fdc" data-x="lg">'+lgH+'</div><div style="display:flex;gap:10px;align-items:center;margin-top:12px;"><span style="font-size:13px;color:var(--txt3);">🏟 Club</span><select class="sc-in" onchange="scFv(\'club\',this.value)"><option value="">Tous</option>'+cl.map(function(o){return'<option'+(f.club===o[0]?' selected':'')+' value="'+E(o[0])+'">'+E(o[0])+' ('+o[1]+')</option>';}).join('')+'</select></div></div>')
   +'<div class="fd-s" style="margin-top:0;">'+sfPanel()+'</div>'
   +'<div class="fd-s" style="margin-top:0;">'+(topPanel()||'<div class="fd-t">Classement dans un championnat</div><div style="font-size:13px;color:var(--txt3);">Disponible quand des stats match par match sont importées.</div>')+'</div>'
   +'<div class="fd-s wide" style="margin-top:14px;"><div class="fd-t">Autres</div><div class="sc-row"><button class="sc-chip'+(f.fav?' on':'')+'" onclick="scFavF()">★ Favoris seulement</button><button class="sc-chip'+(f.vid?' on':'')+'" onclick="scFv(\'vid\','+(f.vid?'false':'true')+')">▶ Avec vidéo</button></div></div>'
@@ -34553,19 +34553,20 @@ window.scBbGo=function(){if(BB.busy)return;if(!navigator.onLine){toast('Pas de c
   var L=bbLeagueSlugs(document.getElementById('bbLg').value);if(!L.length)return;db();DB.scMeta=DB.scMeta||{};DB.scMeta.bbLeagues=uq((DB.scMeta.bbLeagues||[]).concat(L));saveDB();
   BB.busy=1;BB.stop=0;var st={add:0,upd:0,fail:0,n:0,tot:0,errs:[]};
   var p0=Promise.resolve();L.forEach(function(lg){p0=p0.then(function(){return bbLeague(lg,st);});});
-  p0.then(function(){bbSay((BB.stop?'⏹ Arrêté':'✓ Terminé')+' · '+st.add+' ajouté'+(st.add>1?'s':'')+' · '+st.upd+' mis à jour'+(st.fail?' · '+st.fail+' échec'+(st.fail>1?'s':'')+'\n'+st.errs.slice(0,5).join('\n'):''));},function(e){bbSay('✗ '+((e&&e.message)||e));}).then(function(){BB.busy=0;saveDB();if(document.getElementById('pageArea'))renderScoutPage();});};
+  p0.then(function(){bbSay((BB.stop?'⏹ Arrêté':'✓ Terminé')+' · '+st.add+' ajouté'+(st.add>1?'s':'')+' · '+st.upd+' mis à jour'+(st.skip?' · '+st.skip+' ignoré'+(st.skip>1?'s':'')+' (pas de saison '+BB_SEA+')':'')+(st.fail?' · '+st.fail+' échec'+(st.fail>1?'s':'')+'\n'+st.errs.slice(0,5).join('\n'):''));},function(e){bbSay('✗ '+((e&&e.message)||e));}).then(function(){BB.busy=0;saveDB();if(document.getElementById('pageArea'))renderScoutPage();});};
 function bbLeague(lg,st){bbSay('⏳ Championnat '+lg+' : lecture des équipes…');
   return bbCall('action=teams&league='+encodeURIComponent(lg)).then(function(j){var T=j.teams||[];if(!T.length)throw new Error('Aucune équipe trouvée pour « '+lg+' ».');bbLgInfo(lg,j.leagueName,j.leagueLogo);
     var ch=Promise.resolve();T.forEach(function(t,ti){ch=ch.then(function(){if(BB.stop)return;
       return bbCall('action=roster&team='+encodeURIComponent(t.slug)).then(function(r){var P=r.players||[];st.tot+=P.length;var c2=Promise.resolve();
         P.forEach(function(pp){c2=c2.then(function(){if(BB.stop)return;bbSay('⏳ '+lg+' · '+t.name+' ('+(ti+1)+'/'+T.length+') · '+pp.name+'\n'+st.n+' joueurs lus · '+st.add+' ajoutés');
-          return bbCall('action=player&slug='+encodeURIComponent(pp.slug)+'&league='+encodeURIComponent(lg)+'&year='+BB_YEAR).then(function(j2){bbApply(j2,lg,t,st);st.n++;if(st.n%10===0)saveDB();}).catch(function(e){st.fail++;st.errs.push(pp.name+' : '+e.message);}).then(function(){return bbWait(900);});});});
+          return bbCall('action=player&slug='+encodeURIComponent(pp.slug)+'&league='+encodeURIComponent(lg)+'&year='+BB_YEAR).then(function(j2){if(!bbHasCur(j2)){st.skip=(st.skip||0)+1;st.n++;return;}bbApply(j2,lg,t,st);st.n++;if(st.n%10===0)saveDB();}).catch(function(e){st.fail++;st.errs.push(pp.name+' : '+e.message);}).then(function(){return bbWait(900);});});});
         return c2;}).catch(function(e){st.fail++;st.errs.push(t.name+' : '+e.message);});});});
     return ch;});}
+function bbHasCur(j){return(j.seasons||[]).some(function(x){return x.season===BB_SEA&&(parseFloat(x.gp)||0)>0;})||(j.games||[]).length>0;}
 function bbDate(s){var m=String(s||'').match(/(\d{1,2})\/(\d{1,2})(?:\/(\d{2,4}))?/);if(!m)return 0;var y=m[3]?(m[3].length===2?2000+ +m[3]:+m[3]):(+m[2]>=8?BB_YEAR:BB_YEAR+1);return y*10000+(+m[2])*100+(+m[1]);}
 function bbRows(j,comp,sea){var G=(j.games||[]).slice().sort(function(a,b){return bbDate(a.date)-bbDate(b.date);});
   return G.map(function(g,i){return[bbHash(j.slug+'|'+comp+'|'+sea+'|'+(g.id||g.date||i)),i+1,g.home?1:0,g.opp||'?',g.sec||0,g.pts,g.m2,g.a2,g.m3,g.a3,g.mft,g.aft,g.o,g.d,g.ast,g.stl,g.to,g.blk,g.bs,g.pf,g.fd,g.ev,g.pm,g.win?(g.s1||1):(g.s2||0),g.win?(g.s2||0):(g.s1||1),'RS',comp,0,sea,g.p2p==null?null:g.p2p,g.p3p==null?null:g.p3p,g.ftp==null?null:g.ftp,g.pmRaw==null?null:g.pmRaw,g.pfRaw==null?null:g.pfRaw];});}
-function bbApply(j,lg,team,st){db();BB._lgd=1;DB.scGames=DB.scGames||{};DB.scMeta=DB.scMeta||{};if(!String(j.first||'').trim()&&!String(j.last||'').trim())throw new Error('fiche illisible (nom introuvable)');if(team&&team.name){j.club=team.name;j.clubLogo=team.logo||j.clubLogo;if(team.slug&&!j.clubSlug)j.clubSlug=team.slug;}
+function bbApply0(j,lg,team,st){db();BB._lgd=1;DB.scGames=DB.scGames||{};DB.scMeta=DB.scMeta||{};if(!String(j.first||'').trim()&&!String(j.last||'').trim())throw new Error('fiche illisible (nom introuvable)');if(team&&team.name){j.club=team.name;j.clubLogo=team.logo||j.clubLogo;if(team.slug&&!j.clubSlug)j.clubSlug=team.slug;}
   var p=DB.scPlayers.filter(function(x){return x.bbSlug===j.slug;})[0],isNew=!p;
   if(!p){p={id:uid(),status:'new',rating:0,notes:'',added:Date.now(),src:'bebasket',tags:[],videos:[],stats:[]};DB.scPlayers.push(p);p._k=1;}
   if(p._k){delete p._k;var KK=(DB.scMeta.bbKeep||{}),kk=bbKeepKey(j),ko=kk&&(KK[kk]||KK[kk.split('|')[0]+'|']);if(ko&&!KK[kk])kk=kk.split('|')[0]+'|';if(ko){Object.keys(ko).forEach(function(f){if(p[f]==null||p[f]===''||p[f]==='new'||p[f]===0||(Array.isArray(p[f])&&!p[f].length))p[f]=ko[f];});delete KK[kk];}}
@@ -34852,13 +34853,20 @@ function bbCompsOf(p,r){var out=[],k2=function(x){return norm(x||'').replace(/[^
 window.scRefreshAll=function(){db();var L=((DB.scMeta||{}).bbLeagues||[]),has=DB.scPlayers.some(function(p){return p.bbSlug;});
   if(BB.busy)return;if(!navigator.onLine){toast('Pas de connexion','red');return;}if(!has||!L.length){toast('Importe d\'abord des championnats : rien à actualiser pour l\'instant','red');return;}
   var b=document.getElementById('scRfB'),say=function(t){if(b){b.disabled=true;b.textContent=t;}};say('⏳ Recherche des nouveaux matchs…');BB.busy=1;BB.stop=0;rfPanel({phase:'Recherche des nouveaux matchs…'});window.onbeforeunload=function(){return'Actualisation en cours';};
-  var st={add:0,upd:0,fail:0,n:0,tot:0,errs:[]},chg={},all=false,seen={};DB.scMeta.bbDone=DB.scMeta.bbDone||{};
+  var st={add:0,upd:0,fail:0,n:0,tot:0,errs:[]},chg={},all=false,seen={},teamLg={},newS={};DB.scMeta.bbDone=DB.scMeta.bbDone||{};
   var ch=Promise.resolve();
   L.forEach(function(lg){ch=ch.then(function(){return bbCall('action=played&league='+encodeURIComponent(lg)).then(function(j){var prev=DB.scMeta.bbDone[lg],ds=j.done||[];seen[lg]=ds.map(function(g){return g.id;});
-      if(!prev){all=true;}else{ds.forEach(function(g){if(prev.indexOf(g.id)<0)(g.teams||[]).forEach(function(t){chg[t]=1;});});}}).catch(function(){all=true;}).then(function(){return bbWait(400);});});});
+      if(!prev){all=true;}else{ds.forEach(function(g){if(prev.indexOf(g.id)<0)(g.teams||[]).forEach(function(t){chg[t]=1;teamLg[t]=lg;});});}}).catch(function(){all=true;}).then(function(){return bbWait(400);});});});
+  /* nouveaux joueurs : une équipe a de nouveaux matchs → on relit son effectif et on importe ceux qui ont une ligne 2026-27 */
+  ch=ch.then(function(){if(all||BB.stop)return;var ts=Object.keys(chg),c2=Promise.resolve();
+    ts.forEach(function(t){c2=c2.then(function(){if(BB.stop)return;rfPanel({phase:'Recherche de nouveaux joueurs…'});var lg=teamLg[t]||L[0];
+      return bbCall('action=roster&team='+encodeURIComponent(t)).then(function(r){var P=(r.players||[]).filter(function(pp){return pp.slug&&!DB.scPlayers.some(function(x){return x.bbSlug===pp.slug;});}),c3=Promise.resolve();
+        P.forEach(function(pp){c3=c3.then(function(){if(BB.stop)return;return bbCall('action=player&slug='+encodeURIComponent(pp.slug)+'&league='+encodeURIComponent(lg)+'&year='+BB_YEAR).then(function(j2){if(!bbHasCur(j2))return;bbApply(j2,lg,null,st);var q=DB.scPlayers.filter(function(x){return x.bbSlug===pp.slug;})[0];if(q){q.bbEp='351';q.bbSeen=Date.now();if(!q.clubSlug)q.clubSlug=t;newS[pp.slug]=1;}}).catch(function(){st.fail++;}).then(function(){return bbWait(300);});});});
+        return c3;}).catch(function(){st.fail++;}).then(function(){return bbWait(300);});});});
+    return c2;});
   ch=ch.then(function(){
     var ps=DB.scPlayers.filter(function(p){return p.bbSlug;});
-    var EP='351';var todo=all?ps.filter(function(p){return p.bbEp!==EP;}):ps.filter(function(p){if(isLibre(p))return false;if(p.bbEp!==EP)return true;if(!p.clubSlug)return !p.bbSeen||(Date.now()-p.bbSeen>3*864e5);return !!chg[p.clubSlug];});
+    var EP='351';var todo=all?ps.filter(function(p){return p.bbEp!==EP;}):ps.filter(function(p){return!newS[p.bbSlug];}).filter(function(p){if(isLibre(p))return false;if(p.bbEp!==EP)return true;if(!p.clubSlug)return !p.bbSeen||(Date.now()-p.bbSeen>3*864e5);return !!chg[p.clubSlug];});
     st.tot=todo.length;rfPanel({done:0,total:todo.length,st:st});if(!todo.length){return 0;}
     var idx=0,done=0;
     var worker=function(){return new Promise(function(res){(function next(){if(BB.stop||idx>=todo.length)return res();var p=todo[idx++];
@@ -34866,7 +34874,7 @@ window.scRefreshAll=function(){db();var L=((DB.scMeta||{}).bbLeagues||[]),has=DB
       bbCall('action=player&slug='+encodeURIComponent(p.bbSlug)+'&league='+encodeURIComponent(lg)+'&year='+BB_YEAR).then(function(j){bbApply(j,lg,null,st);var q=DB.scPlayers.filter(function(x){return x.bbSlug===p.bbSlug;})[0];if(q){q.bbEp=EP;q.bbSeen=Date.now();if(!q.clubSlug){var rr=(q.bbs||[]).filter(function(x){return x.teamSlug;});if(rr.length)q.clubSlug=rr[0].teamSlug;}}}).catch(function(){st.fail++;}).then(function(){done++;say('⏳ '+done+'/'+todo.length);st.dn=done;rfPanel({done:done,total:todo.length,st:st});if(done%10===0){try{saveDB();}catch(e){}}return bbWait(250);}).then(next);})();});};
     return Promise.all([worker(),worker(),worker()]);});
   ch.then(function(){BB.busy=0;window.onbeforeunload=null;rfPanel({fin:true,st:st,total:st.tot,done:st.dn||0,stopped:!!BB.stop});if(!st.fail&&!BB.stop){Object.keys(seen).forEach(function(lg){DB.scMeta.bbDone[lg]=seen[lg].slice(0,600);});}saveDB();
-    toast(st.tot?('✓ Actualisation : '+st.upd+' joueur'+(st.upd>1?'s':'')+' mis à jour sur '+st.tot+(st.fail?' · '+st.fail+' échec(s)':'')):'✓ Rien de nouveau : tous les joueurs sont à jour','acc');}).then(function(){if(b){b.disabled=false;b.textContent='🔄 Actualiser les stats';}renderScoutPage();});};
+    toast((st.tot||st.add)?('✓ Actualisation : '+st.upd+' joueur'+(st.upd>1?'s':'')+' mis à jour sur '+st.tot+(st.add?' · '+st.add+' nouveau'+(st.add>1?'x':'')+' joueur'+(st.add>1?'s':'')+' importé'+(st.add>1?'s':''):'')+(st.fail?' · '+st.fail+' échec(s)':'')):'✓ Rien de nouveau : tous les joueurs sont à jour','acc');}).then(function(){if(b){b.disabled=false;b.textContent='🔄 Actualiser les stats';}renderScoutPage();});};
 
 /* ── v352 : panneau de progression de l'actualisation ── */
 var _rfT0=0;
@@ -34877,7 +34885,7 @@ function rfPanel(o){var el=document.getElementById('scRfPanel');
   var st=o.st||{upd:0,fail:0},tot=o.total||0,dn=o.done||0,pc=tot?Math.round(dn/tot*100):0;
   var el_s=(Date.now()-_rfT0)/1000,eta='';if(dn>3&&tot>dn){var r=Math.round(el_s/dn*(tot-dn)/60);eta=r<1?'moins d\'1 min restante':('≈ '+r+' min restantes');}
   var title,sub,bar;
-  if(o.fin){title=o.stopped?'⏸ Actualisation arrêtée':'✓ Actualisation terminée';sub=(tot?(dn+' joueur'+(dn>1?'s':'')+' traité'+(dn>1?'s':'')+' · '+st.upd+' mis à jour'+(st.fail?' · '+st.fail+' échec(s)':'')):'Rien de nouveau : tous les joueurs sont à jour');bar=tot?100:100;}
+  if(o.fin){title=o.stopped?'⏸ Actualisation arrêtée':'✓ Actualisation terminée';sub=(!tot&&st.add?(st.add+' nouveau'+(st.add>1?'x':'')+' joueur'+(st.add>1?'s':'')+' importé'+(st.add>1?'s':'')):tot?(dn+' joueur'+(dn>1?'s':'')+' traité'+(dn>1?'s':'')+' · '+st.upd+' mis à jour'+(st.fail?' · '+st.fail+' échec(s)':'')):'Rien de nouveau : tous les joueurs sont à jour');bar=tot?100:100;}
   else if(!tot){title='🔄 Actualisation en cours';sub=o.phase||'Préparation…';bar=null;}
   else{title='🔄 Actualisation des joueurs';sub=dn+' / '+tot+' · '+pc+' %'+(eta?' · '+eta:'');bar=pc;}
   el.innerHTML='<div class="rfp-h"><b>'+title+'</b>'+(o.fin?'<button class="rfp-x" onclick="document.getElementById(\'scRfPanel\').remove()">✕</button>':'')+'</div>'
@@ -34975,6 +34983,46 @@ window.scFLive=function(){var g=function(k){var e=document.getElementById('scf_'
 window.scFPm=function(ev){ev.stopPropagation();var m=document.getElementById('scfPm');if(!m)return;var show=m.style.display==='none';m.style.display=show?'block':'none';if(show)setTimeout(function(){document.addEventListener('click',function f(){var x=document.getElementById('scfPm');if(x)x.style.display='none';document.removeEventListener('click',f);});},0);};
 window.scFPmGo=function(a){var m=document.getElementById('scfPm');if(m)m.style.display='none';if(a==='file'){document.getElementById('scfFile').click();}else if(a==='link'){var r=document.getElementById('scfLinkRow');if(r){r.style.display='block';var i=document.getElementById('scf_photo');if(i)i.focus();}}else{scFPhoto('');var i2=document.getElementById('scf_photo');if(i2)i2.value='';}};
 window.scFDel=function(){if(!SCF||!SCF.id)return;if(typeof scDel==='function'){var id=SCF.id;scFClose();scDel(id);}else toast('Suppression indisponible','red');};
+
+/* ═══ v359 : filtres compacts — tout visible sans défiler ═══ */
+window.fdX=window.fdX||{};
+window.fdMore=function(k){fdX[k]=!fdX[k];fdDraw();};
+window.fdFit=function(){var a=document.querySelectorAll('#scFD .fdc');for(var i=0;i<a.length;i++){var c=a[i],k=c.getAttribute('data-x'),ch=[].slice.call(c.children).filter(function(e){return!e.classList.contains('fdmore');});
+    var old=c.querySelector('.fdmore');if(old)old.remove();ch.forEach(function(e){e.style.display='';});
+    var first=ch[0];if(!first)continue;
+    var rh=Math.max.apply(null,ch.map(function(e){return e.offsetHeight;})),rows=k==='lg'?2:3,maxH=rows*rh+(rows-1)*8+2,base=first.offsetTop;
+    var bot=function(e){return e.offsetTop-base+e.offsetHeight;};
+    var mk=function(t){var b=document.createElement('button');b.className='sc-chip fdmore';b.style.borderStyle='dashed';b.onclick=function(){fdMore(k);};b.textContent=t;return b;};
+    if(fdX[k]){c.appendChild(mk('− Réduire'));continue;}
+    var over=ch.filter(function(e){return bot(e)>maxH;});if(!over.length)continue;
+    var btn=mk('');c.appendChild(btn);
+    for(var t=over.length;t<=ch.length;t++){var cut=ch.length-t;ch.forEach(function(e,ix){e.style.display=ix>=cut?'none':'';});btn.textContent='＋ '+t+' autres…';
+      if(bot(btn)<=maxH)break;}
+  }};
+var _s359=document.createElement('style');_s359.textContent='.fdc{display:flex;flex-wrap:wrap;gap:8px;align-content:flex-start;}'
++'.fd-b{gap:12px!important;padding:10px 22px 14px!important;}.fd-s{padding:12px 16px!important;border-radius:16px!important;}.fd-s .fd-t{margin-bottom:8px!important;}'
++'.fd-b .fd-sl{margin-bottom:4px!important;}';document.head.appendChild(_s359);
+
+/* ═══ v360 : un joueur ne reçoit plus un championnat où il n'a aucune ligne de stats ═══ */
+function lgPrune(p){if(!p)return false;var nk=function(x){return norm(x||'').replace(/[^a-z0-9]/g,'');},ev=[];
+  ((DB.scGames||{})[p.id]||[]).forEach(function(r){var l=gLg(r);if(l&&ev.indexOf(nk(l))<0)ev.push(nk(l));});
+  var cur0=bbCur(p);(p.bbs||[]).forEach(function(s){if(s.season!==cur0)return;if(s.comp)ev.push(nk(s.comp));(s.comps||[]).forEach(function(c){if(c&&c.name)ev.push(nk(c.name));});});
+  ev=ev.filter(Boolean);if(!ev.length)return false;
+  var ok=function(x){var k=nk(x);return ev.some(function(e){return e===k||e.indexOf(k)>=0||k.indexOf(e)>=0;});},ch=false;
+  if(p.lgs&&p.lgs.length){var n=p.lgs.filter(ok);if(n.length!==p.lgs.length){p.lgs=n;ch=true;}}
+  if(p.lg&&!ok(p.lg)){var cur=bbCur(p),c0=null;((DB.scGames||{})[p.id]||[]).forEach(function(r){if(!c0&&r[28]===cur)c0=gLg(r);});if(!c0){var rw=(p.bbs||[]).filter(function(x){return x.season===cur&&x.comp;})[0]||(p.bbs||[]).filter(function(x){return x.comp;})[0];if(rw)c0=rw.comp;}
+    if(c0){p.lg=c0;ch=true;}}
+  return ch;}
+function bbApply(j,lg,team,st){var r=bbApply0(j,lg,team,st);try{var p=DB.scPlayers.filter(function(x){return x.bbSlug===j.slug;})[0];lgPrune(p);if(p){p.bbEp='351';p.bbSeen=Date.now();}}catch(e){}return r;}
+var _rs360=window.renderScoutPage;
+window.renderScoutPage=function(){try{db();if((DB.scMeta||{}).lgFix!=='360'){var n=0;DB.scPlayers.forEach(function(p){if(lgPrune(p))n++;});DB.scMeta=DB.scMeta||{};DB.scMeta.lgFix='361';if(n)saveDB();}}catch(e){}return _rs360.apply(this,arguments);};
+
+/* ═══ v362 : les championnats affichés = ceux de la saison en cours (2026-27) uniquement ═══ */
+function lgsOf(p){if(!p||!p.bbs||!p.bbs.length)return lgsOf0(p);
+  var out=[],add=function(x){x=String(x||'').trim();if(x&&out.indexOf(x)<0)out.push(x);};
+  p.bbs.forEach(function(s){if(s.season!==BB_SEA)return;if(s.comps&&s.comps.length)s.comps.forEach(function(c){add(c.name);});else add(s.comp);});
+  ((DB.scGames||{})[p.id]||[]).forEach(function(r){if(r[28]===BB_SEA)add(gLg(r));});
+  return out;}
 
 })();
 
