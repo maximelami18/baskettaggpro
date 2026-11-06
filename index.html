@@ -460,7 +460,7 @@ document.addEventListener('DOMContentLoaded', function(){
 var _SB_URL="https://umuvirwbtpflizxupwbr.supabase.co";
 // Version de ce fichier — à incrémenter à chaque déploiement, en cohérence avec la valeur
 // mise à jour dans la table Supabase `app_version` (voir _checkAppVersion ci-dessous).
-var APP_VERSION="2026-11-06-350";
+var APP_VERSION="2026-11-06-352";
 var _SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtdXZpcndidHBmbGl6eHVwd2JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3MTI1MDEsImV4cCI6MjA5MDI4ODUwMX0.fFQaF-zP9dzcWITJDf6GBmvu0pdcuvlaUz0A0qW0kfo";
 var _LICENCE_KEY='btp_licence';
 var _MACHINE_KEY='btp_machine';
@@ -34851,22 +34851,47 @@ function bbCompsOf(p,r){var out=[],k2=function(x){return norm(x||'').replace(/[^
 /* ── v349 : actualisation intelligente (seulement les équipes qui ont joué du nouveau) ── */
 window.scRefreshAll=function(){db();var L=((DB.scMeta||{}).bbLeagues||[]),has=DB.scPlayers.some(function(p){return p.bbSlug;});
   if(BB.busy)return;if(!navigator.onLine){toast('Pas de connexion','red');return;}if(!has||!L.length){toast('Importe d\'abord des championnats : rien à actualiser pour l\'instant','red');return;}
-  var b=document.getElementById('scRfB'),say=function(t){if(b){b.disabled=true;b.textContent=t;}};say('⏳ Recherche des nouveaux matchs…');BB.busy=1;BB.stop=0;
+  var b=document.getElementById('scRfB'),say=function(t){if(b){b.disabled=true;b.textContent=t;}};say('⏳ Recherche des nouveaux matchs…');BB.busy=1;BB.stop=0;rfPanel({phase:'Recherche des nouveaux matchs…'});window.onbeforeunload=function(){return'Actualisation en cours';};
   var st={add:0,upd:0,fail:0,n:0,tot:0,errs:[]},chg={},all=false,seen={};DB.scMeta.bbDone=DB.scMeta.bbDone||{};
   var ch=Promise.resolve();
   L.forEach(function(lg){ch=ch.then(function(){return bbCall('action=played&league='+encodeURIComponent(lg)).then(function(j){var prev=DB.scMeta.bbDone[lg],ds=j.done||[];seen[lg]=ds.map(function(g){return g.id;});
       if(!prev){all=true;}else{ds.forEach(function(g){if(prev.indexOf(g.id)<0)(g.teams||[]).forEach(function(t){chg[t]=1;});});}}).catch(function(){all=true;}).then(function(){return bbWait(400);});});});
   ch=ch.then(function(){
     var ps=DB.scPlayers.filter(function(p){return p.bbSlug;});
-    var todo=all?ps:ps.filter(function(p){if(isLibre(p))return false;if(!p.clubSlug)return true;return !!chg[p.clubSlug];});
-    st.tot=todo.length;if(!todo.length){return 0;}
+    var EP='351';var todo=all?ps.filter(function(p){return p.bbEp!==EP;}):ps.filter(function(p){if(isLibre(p))return false;if(!p.clubSlug)return true;return !!chg[p.clubSlug];});
+    st.tot=todo.length;rfPanel({done:0,total:todo.length,st:st});if(!todo.length){return 0;}
     var idx=0,done=0;
     var worker=function(){return new Promise(function(res){(function next(){if(BB.stop||idx>=todo.length)return res();var p=todo[idx++];
       var lg=(p.bbs||[]).map(function(s){return s.compSlug;}).filter(Boolean).pop()||L[0];
-      bbCall('action=player&slug='+encodeURIComponent(p.bbSlug)+'&league='+encodeURIComponent(lg)+'&year='+BB_YEAR).then(function(j){bbApply(j,lg,null,st);}).catch(function(){st.fail++;}).then(function(){done++;say('⏳ '+done+'/'+todo.length);if(done%10===0){try{saveDB();}catch(e){}}return bbWait(250);}).then(next);})();});};
+      bbCall('action=player&slug='+encodeURIComponent(p.bbSlug)+'&league='+encodeURIComponent(lg)+'&year='+BB_YEAR).then(function(j){bbApply(j,lg,null,st);var q=DB.scPlayers.filter(function(x){return x.bbSlug===p.bbSlug;})[0];if(q)q.bbEp=EP;}).catch(function(){st.fail++;}).then(function(){done++;say('⏳ '+done+'/'+todo.length);st.dn=done;rfPanel({done:done,total:todo.length,st:st});if(done%10===0){try{saveDB();}catch(e){}}return bbWait(250);}).then(next);})();});};
     return Promise.all([worker(),worker(),worker()]);});
-  ch.then(function(){BB.busy=0;if(!st.fail){Object.keys(seen).forEach(function(lg){DB.scMeta.bbDone[lg]=seen[lg].slice(0,600);});}saveDB();
+  ch.then(function(){BB.busy=0;window.onbeforeunload=null;rfPanel({fin:true,st:st,total:st.tot,done:st.dn||0,stopped:!!BB.stop});if(!st.fail&&!BB.stop){Object.keys(seen).forEach(function(lg){DB.scMeta.bbDone[lg]=seen[lg].slice(0,600);});}saveDB();
     toast(st.tot?('✓ Actualisation : '+st.upd+' joueur'+(st.upd>1?'s':'')+' mis à jour sur '+st.tot+(st.fail?' · '+st.fail+' échec(s)':'')):'✓ Rien de nouveau : tous les joueurs sont à jour','acc');}).then(function(){if(b){b.disabled=false;b.textContent='🔄 Actualiser les stats';}renderScoutPage();});};
+
+/* ── v352 : panneau de progression de l'actualisation ── */
+var _rfT0=0;
+window.rfStop=function(){BB.stop=1;var b=document.getElementById('rfStopB');if(b){b.disabled=true;b.textContent='Arrêt en cours…';}};
+function rfPanel(o){var el=document.getElementById('scRfPanel');
+  if(!el){el=document.createElement('div');el.id='scRfPanel';document.body.appendChild(el);}
+  if(!_rfT0||o.phase)_rfT0=_rfT0||Date.now();
+  var st=o.st||{upd:0,fail:0},tot=o.total||0,dn=o.done||0,pc=tot?Math.round(dn/tot*100):0;
+  var el_s=(Date.now()-_rfT0)/1000,eta='';if(dn>3&&tot>dn){var r=Math.round(el_s/dn*(tot-dn)/60);eta=r<1?'moins d\'1 min restante':('≈ '+r+' min restantes');}
+  var title,sub,bar;
+  if(o.fin){title=o.stopped?'⏸ Actualisation arrêtée':'✓ Actualisation terminée';sub=(tot?(dn+' joueur'+(dn>1?'s':'')+' traité'+(dn>1?'s':'')+' · '+st.upd+' mis à jour'+(st.fail?' · '+st.fail+' échec(s)':'')):'Rien de nouveau : tous les joueurs sont à jour');bar=tot?100:100;}
+  else if(!tot){title='🔄 Actualisation en cours';sub=o.phase||'Préparation…';bar=null;}
+  else{title='🔄 Actualisation des joueurs';sub=dn+' / '+tot+' · '+pc+' %'+(eta?' · '+eta:'');bar=pc;}
+  el.innerHTML='<div class="rfp-h"><b>'+title+'</b>'+(o.fin?'<button class="rfp-x" onclick="document.getElementById(\'scRfPanel\').remove()">✕</button>':'')+'</div>'
+   +'<div class="rfp-bar"><i class="'+(bar==null?'ind':'')+'" style="width:'+(bar==null?35:bar)+'%"></i></div>'
+   +'<div class="rfp-s">'+sub+'</div>'
+   +(o.fin?'':'<div class="rfp-n">Garde cet onglet ouvert. Tu peux continuer à utiliser le logiciel.</div><button class="rfp-b" id="rfStopB" onclick="rfStop()">Arrêter</button>');
+  if(o.fin){_rfT0=0;clearTimeout(el._t);el._t=setTimeout(function(){var e=document.getElementById('scRfPanel');if(e)e.remove();},o.stopped||st.fail?30000:9000);}}
+var _s352=document.createElement('style');_s352.id='scCss352';_s352.textContent='#scRfPanel{position:fixed;right:22px;bottom:22px;width:340px;z-index:99999;background:#1b1a17;border:1px solid rgba(212,170,106,.4);border-radius:16px;padding:14px 16px 14px;box-shadow:0 14px 40px rgba(0,0,0,.6);color:#F0E6D6;font-family:inherit;}'
++'.rfp-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;font-size:14px;}.rfp-x{background:none;border:0;color:#9a8f7c;font-size:14px;cursor:pointer;}'
++'.rfp-bar{height:9px;border-radius:6px;background:rgba(255,255,255,.08);overflow:hidden;}.rfp-bar i{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,#B8893F,#D4AA6A);transition:width .4s;}'
++'.rfp-bar i.ind{animation:rfind 1.2s ease-in-out infinite alternate;}@keyframes rfind{from{margin-left:0}to{margin-left:65%}}'
++'.rfp-s{margin-top:9px;font-size:13px;font-weight:700;color:#D4AA6A;}.rfp-n{margin-top:6px;font-size:11.5px;color:#9a8f7c;line-height:1.35;}'
++'.rfp-b{margin-top:10px;width:100%;padding:7px;border-radius:10px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.05);color:#F0E6D6;font-weight:700;cursor:pointer;}';
+document.head.appendChild(_s352);
 
 })();
 
