@@ -460,7 +460,7 @@ document.addEventListener('DOMContentLoaded', function(){
 var _SB_URL="https://umuvirwbtpflizxupwbr.supabase.co";
 // Version de ce fichier — à incrémenter à chaque déploiement, en cohérence avec la valeur
 // mise à jour dans la table Supabase `app_version` (voir _checkAppVersion ci-dessous).
-var APP_VERSION="2026-11-06-322";
+var APP_VERSION="2026-11-06-324";
 var _SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtdXZpcndidHBmbGl6eHVwd2JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3MTI1MDEsImV4cCI6MjA5MDI4ODUwMX0.fFQaF-zP9dzcWITJDf6GBmvu0pdcuvlaUz0A0qW0kfo";
 var _LICENCE_KEY='btp_licence';
 var _MACHINE_KEY='btp_machine';
@@ -34540,10 +34540,10 @@ window.scBbDlg=function(){var o=document.getElementById('scIc');if(!o){o=documen
   o.innerHTML='<div class="sc-fb" style="width:min(640px,100%);"><div class="sc-row" style="justify-content:space-between;margin-bottom:12px;"><div style="font-size:24px;font-weight:900;">🏀 Insérer les championnats</div><div class="sc-row" style="gap:6px;"><button class="sc-btn sm" onclick="scImp()">← Retour</button><button class="sc-btn sm" onclick="document.getElementById(\'scIc\').remove()">✕</button></div></div>'
   +'<div style="font-size:13px;color:var(--txt2);margin-bottom:8px;">Un championnat par ligne : le nom dans l\'adresse BeBasket (ex. <b>aba-liga</b>) ou l\'adresse complète <i>bebasket.fr/ligue/aba-liga</i>.</div>'
   +'<textarea id="bbLg" class="sc-ta" style="min-height:90px;" '+(BB.busy?'disabled':'')+'>'+E(cur)+'</textarea>'
-  +'<div class="sc-row" style="margin-top:12px;gap:8px;"><button class="sc-btn p" id="bbGo" onclick="scBbGo()" '+(BB.busy?'disabled':'')+'>▶ Lancer l\'import</button><button class="sc-btn" onclick="BB.stop=1;">⏹ Arrêter</button><button class="sc-btn" onclick="scBbProbe()">🔎 Tester la connexion</button></div>'
+  +'<div class="sc-row" style="margin-top:12px;gap:8px;"><button class="sc-btn p" id="bbGo" onclick="scBbGo()" '+(BB.busy?'disabled':'')+'>▶ Lancer l\'import</button><button class="sc-btn" onclick="BB.stop=1;">⏹ Arrêter</button><button class="sc-btn" onclick="scBbProbe()">🔎 Tester la connexion</button><span style="flex:1"></span><button class="sc-btn" style="color:#ef6b6b;" onclick="scBbPurge()">🗑 Retirer les joueurs importés</button></div>'
   +'<pre id="bbMsg" style="white-space:pre-wrap;font-size:12.5px;color:var(--txt2);margin:12px 0 0;max-height:260px;overflow:auto;">'+E(BB.msg||'')+'</pre></div>';};
 function bbSay(m){BB.msg=m;var e=document.getElementById('bbMsg');if(e)e.textContent=m;}
-window.scBbProbe=function(){bbSay('⏳ Test…');bbCall('action=teams&league='+encodeURIComponent((document.getElementById('bbLg').value.split(/\n/)[0]||'aba-liga').replace(/.*ligue\//,'').trim())).then(function(j){bbSay('✓ Connexion OK : '+(j.teams||[]).length+' équipes trouvées dans « '+j.league+' ».'+((j.teams||[]).length?'\n'+j.teams.slice(0,5).map(function(t){return'· '+t.name;}).join('\n')+'…':'\n⚠ Aucune équipe : la page a peut-être changé (on regarde ensemble avec « probe »).'));}).catch(function(e){bbSay('✗ '+e.message+'\n(La fonction « bb-import » est-elle déployée ?)');});};
+window.scBbProbe=function(){bbSay('⏳ Test…');bbCall('action=teams&league='+encodeURIComponent((document.getElementById('bbLg').value.split(/\n/)[0]||'aba-liga').replace(/.*ligue\//,'').trim())).then(function(j){bbSay('✓ Connexion OK : '+(j.teams||[]).length+' équipes trouvées dans « '+j.league+' ».'+((j.dropped||[]).length?' ('+j.dropped.length+' liens écartés : menu, colonne, équipes nationales)':'')+((j.teams||[]).length?'\n'+j.teams.slice(0,5).map(function(t){return'· '+t.name;}).join('\n')+'…':'\n⚠ Aucune équipe : la page a peut-être changé (on regarde ensemble avec « probe »).'));}).catch(function(e){bbSay('✗ '+e.message+'\n(La fonction « bb-import » est-elle déployée ?)');});};
 function bbLeagueSlugs(txt){return String(txt||'').split(/[\n,;]+/).map(function(x){var m=x.match(/ligue\/([^\/?#\s]+)/);return(m?m[1]:x).trim().toLowerCase();}).filter(Boolean);}
 window.scBbGo=function(){if(BB.busy)return;if(!navigator.onLine){toast('Pas de connexion','red');return;}
   var L=bbLeagueSlugs(document.getElementById('bbLg').value);if(!L.length)return;db();DB.scMeta=DB.scMeta||{};DB.scMeta.bbLeagues=L;saveDB();
@@ -34561,7 +34561,7 @@ function bbLeague(lg,st){bbSay('⏳ Championnat '+lg+' : lecture des équipes…
 function bbDate(s){var m=String(s||'').match(/(\d{1,2})\/(\d{1,2})(?:\/(\d{2,4}))?/);if(!m)return 0;var y=m[3]?(m[3].length===2?2000+ +m[3]:+m[3]):(+m[2]>=8?BB_YEAR:BB_YEAR+1);return y*10000+(+m[2])*100+(+m[1]);}
 function bbRows(j,comp,sea){var G=(j.games||[]).slice().sort(function(a,b){return bbDate(a.date)-bbDate(b.date);});
   return G.map(function(g,i){return[bbHash(j.slug+'|'+comp+'|'+sea+'|'+(g.id||g.date||i)),i+1,g.home?1:0,g.opp||'?',g.sec||0,g.pts,g.m2,g.a2,g.m3,g.a3,g.mft,g.aft,g.o,g.d,g.ast,g.stl,g.to,g.blk,g.bs,g.pf,g.fd,g.ev,g.pm,g.win?(g.s1||1):(g.s2||0),g.win?(g.s2||0):(g.s1||1),'RS',comp,0,sea];});}
-function bbApply(j,lg,team,st){db();DB.scGames=DB.scGames||{};DB.scMeta=DB.scMeta||{};
+function bbApply(j,lg,team,st){db();DB.scGames=DB.scGames||{};DB.scMeta=DB.scMeta||{};if(!String(j.first||'').trim()&&!String(j.last||'').trim())throw new Error('fiche illisible (nom introuvable)');if(team&&team.name){j.club=team.name;j.clubLogo=team.logo||j.clubLogo;}
   var p=DB.scPlayers.filter(function(x){return x.bbSlug===j.slug;})[0],isNew=!p;
   if(!p){p={id:uid(),status:'new',rating:0,notes:'',added:Date.now(),src:'bebasket',tags:[],videos:[],stats:[]};DB.scPlayers.push(p);}
   p.bbSlug=j.slug;p.elCode=p.elCode||('bb:'+j.slug);p.upd=Date.now();p.bbAt=Date.now();
@@ -34657,6 +34657,12 @@ window.scRefreshAll=function(){db();var L=((DB.scMeta||{}).bbLeagues||[]),has=DB
 .sc-dr2 .rk-hd .sc-pl button{padding:3px 10px!important;}
 .sc-dr2 .rk-hd .sc-btn{padding:4px 9px!important;font-size:11.5px!important;white-space:nowrap;margin-left:2px;}.sc-dr2 .rk-hd{gap:8px;}.sc-dr2 #scSzB{margin-bottom:14px;}.sc-dr2 .rk-mini input{width:40px!important;}
 `;document.head.appendChild(s);})();
+
+window.scBbPurge=function(){db();var cand=DB.scPlayers.filter(function(p){return p.src==='bebasket'&&p.bbSlug;});if(!cand.length){toast('Aucun joueur importé depuis BeBasket','acc');return;}
+  var untouched=function(p){return !p.notes&&!(p.videos||[]).length&&!p.rating&&!p.fav&&sn(p)==='new'&&!(p.tags||[]).length&&!(p.roles||[]).length;};
+  var del=cand.filter(untouched),keep=cand.length-del.length;if(!del.length){toast('Tous ont été modifiés par toi : rien supprimé','acc');return;}
+  if(!confirm('Retirer '+del.length+' joueur'+(del.length>1?'s':'')+' importé'+(del.length>1?'s':'')+' depuis BeBasket ?'+(keep?'\n'+keep+' joueur'+(keep>1?'s':'')+' que tu as modifié'+(keep>1?'s':'')+' (note, favori, vidéo, tag, rôle…) '+(keep>1?'seront conservés':'sera conservé')+'.':'')+'\nTes autres joueurs ne sont pas touchés.'))return;
+  var ids={};del.forEach(function(p){ids[p.id]=1;});DB.scPlayers=DB.scPlayers.filter(function(p){return!ids[p.id];});SC.sel=SC.sel.filter(function(x){return!ids[x];});Object.keys(ids).forEach(function(i){delete DB.scGames[i];});saveDB();renderScoutPage();bbSay('✓ '+del.length+' joueur'+(del.length>1?'s':'')+' retiré'+(del.length>1?'s':'')+'.');};
 
 })();
 
