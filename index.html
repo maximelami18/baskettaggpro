@@ -460,7 +460,7 @@ document.addEventListener('DOMContentLoaded', function(){
 var _SB_URL="https://umuvirwbtpflizxupwbr.supabase.co";
 // Version de ce fichier — à incrémenter à chaque déploiement, en cohérence avec la valeur
 // mise à jour dans la table Supabase `app_version` (voir _checkAppVersion ci-dessous).
-var APP_VERSION="2026-11-06-325";
+var APP_VERSION="2026-11-06-329";
 var _SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtdXZpcndidHBmbGl6eHVwd2JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3MTI1MDEsImV4cCI6MjA5MDI4ODUwMX0.fFQaF-zP9dzcWITJDf6GBmvu0pdcuvlaUz0A0qW0kfo";
 var _LICENCE_KEY='btp_licence';
 var _MACHINE_KEY='btp_machine';
@@ -34099,9 +34099,9 @@ function seasonTbl(p){db();var all=((DB.scGames||{})[p.id]||[]);var h='';
 function rowIssues(r){var o=[];if(r[5]!==2*r[6]+3*r[8]+r[10])o.push('points ≠ 2×2PM + 3×3PM + LF réussis');if(r[6]>r[7]||r[8]>r[9]||r[10]>r[11])o.push('tirs réussis > tentés');if(r[4]>3600)o.push('minutes > 60');return o;}
 function matchTbl(p){db();var all=((DB.scGames||{})[p.id]||[]).slice().sort(gCmp);if(!all.length)return'';var lgs=uq(all.map(gLg)),f=(SC.mf&&lgs.indexOf(SC.mf)>=0)?SC.mf:'',R=f?all.filter(function(r){return gLg(r)===f;}):all,cl=(DB.scMeta&&DB.scMeta.clubs)||{},bad=0;
   var pills='<div class="sc-pl"><button class="'+(!f?'on':'')+'" onclick="scMf(\'\')">Tout</button>'+lgs.map(function(l){return'<button class="'+(f===l?'on':'')+'" onclick="scMf(\''+lgQ(l)+'\')">'+lgBadge(l)+E(lgShort(l))+'</button>';}).join('')+'</div>';
-  var h=pills+'<div style="overflow-x:auto;"><table class="sc-gt mt2"><thead><tr>'+['MATCH','MIN','PTS','2PM','2PT','3PM','3PT','LFM','LFT','REB DÉF','REB OFF','REB TOT','AST','STL','BLK','TO','FAUTES','EVAL'].map(function(t,i){return'<th'+(i===0?' style="text-align:left;"':'')+'>'+t+'</th>';}).join('')+'</tr></thead><tbody>';
+  var h=pills+'<div style="overflow-x:auto;"><table class="sc-gt mt2"><thead><tr>'+['MATCH','MIN','PTS','2PM','2PT','%2PTS','3PM','3PT','%3PTS','LFM','LFT','%LF','REB DÉF','REB OFF','REB TOT','AST','STL','BLK','TO','FAUTES','EVAL','+/-'].map(function(t,i){return'<th'+(i===0?' style="text-align:left;"':'')+'>'+t+'</th>';}).join('')+'</tr></thead><tbody>';
   R.forEach(function(r){var win=r[23]>r[24],is=rowIssues(r);if(is.length)bad++;
-    h+='<tr><td style="text-align:left;white-space:nowrap;">'+(lgs.length>1?lgBadge(gLg(r))+' ':'')+'<span style="color:var(--txt3);display:inline-block;min-width:26px;">J'+r[1]+'</span> <span style="font-size:11px;color:var(--txt3);">'+(r[2]?'vs':'at')+'</span> '+oppBadge(r[3],cl[r[3]])+'<b>'+E(r[3])+'</b> <span class="'+(win?'w':'l')+'" title="'+(r[27]?'':r[23]+'-'+r[24])+'" style="margin-left:4px;font-size:11px;">'+(win?'V':'D')+'</span>'+(is.length?' <span title="Données à vérifier : '+E(is.join(' · '))+'" style="color:#f0b450;cursor:help;">⚠</span>':'')+'</td><td>'+mmss(r[4])+'</td><td><b>'+r[5]+'</b></td><td>'+r[6]+'</td><td>'+r[7]+'</td><td>'+r[8]+'</td><td>'+r[9]+'</td><td>'+r[10]+'</td><td>'+r[11]+'</td><td>'+r[13]+'</td><td>'+r[12]+'</td><td>'+(r[12]+r[13])+'</td><td>'+r[14]+'</td><td>'+r[15]+'</td><td>'+r[17]+'</td><td>'+r[16]+'</td><td>'+r[19]+'</td><td><b>'+r[21]+'</b></td></tr>';});
+    h+='<tr><td style="text-align:left;white-space:nowrap;">'+(lgs.length>1?lgBadge(gLg(r))+' ':'')+'<span style="color:var(--txt3);display:inline-block;min-width:26px;">J'+r[1]+'</span> <span style="font-size:11px;color:var(--txt3);">'+(r[2]?'vs':'at')+'</span> '+oppBadge(r[3],cl[r[3]])+'<b>'+E(r[3])+'</b> <span class="'+(win?'w':'l')+'" title="'+(r[27]?'':r[23]+'-'+r[24])+'" style="margin-left:4px;font-size:11px;">'+(win?'V':'D')+'</span>'+(is.length?' <span title="Données à vérifier : '+E(is.join(' · '))+'" style="color:#f0b450;cursor:help;">⚠</span>':'')+'</td><td>'+mmss(r[4])+'</td><td><b>'+r[5]+'</b></td><td>'+r[6]+'</td><td>'+r[7]+'</td><td>'+bbSp(r,29,r[6],r[7])+'</td><td>'+r[8]+'</td><td>'+r[9]+'</td><td>'+bbSp(r,30,r[8],r[9])+'</td><td>'+r[10]+'</td><td>'+r[11]+'</td><td>'+bbSp(r,31,r[10],r[11])+'</td><td>'+r[13]+'</td><td>'+r[12]+'</td><td>'+(r[12]+r[13])+'</td><td>'+r[14]+'</td><td>'+r[15]+'</td><td>'+r[17]+'</td><td>'+r[16]+'</td><td>'+(r.length>32?bbFo(r[33]):r[19])+'</td><td><b>'+r[21]+'</b></td><td>'+bbPm(r.length>32?r[32]:r[22])+'</td></tr>';});
   h+='</tbody></table></div><div style="font-size:11px;color:var(--txt3);margin-top:8px;">'+R.length+' match'+(R.length>1?'s':'')+' · données officielles de la ligue · V/D = résultat de l\'équipe du joueur.'+(bad?' <span style="color:#f0b450;">⚠ '+bad+' match'+(bad>1?'s':'')+' avec des chiffres incohérents (points ≠ tirs, tirs réussis > tentés…) : vérifie la source.</span>':'')+'</div>';
   return h;}
 
@@ -34563,23 +34563,23 @@ function bbLeague(lg,st){bbSay('⏳ Championnat '+lg+' : lecture des équipes…
     return ch;});}
 function bbDate(s){var m=String(s||'').match(/(\d{1,2})\/(\d{1,2})(?:\/(\d{2,4}))?/);if(!m)return 0;var y=m[3]?(m[3].length===2?2000+ +m[3]:+m[3]):(+m[2]>=8?BB_YEAR:BB_YEAR+1);return y*10000+(+m[2])*100+(+m[1]);}
 function bbRows(j,comp,sea){var G=(j.games||[]).slice().sort(function(a,b){return bbDate(a.date)-bbDate(b.date);});
-  return G.map(function(g,i){return[bbHash(j.slug+'|'+comp+'|'+sea+'|'+(g.id||g.date||i)),i+1,g.home?1:0,g.opp||'?',g.sec||0,g.pts,g.m2,g.a2,g.m3,g.a3,g.mft,g.aft,g.o,g.d,g.ast,g.stl,g.to,g.blk,g.bs,g.pf,g.fd,g.ev,g.pm,g.win?(g.s1||1):(g.s2||0),g.win?(g.s2||0):(g.s1||1),'RS',comp,0,sea];});}
+  return G.map(function(g,i){return[bbHash(j.slug+'|'+comp+'|'+sea+'|'+(g.id||g.date||i)),i+1,g.home?1:0,g.opp||'?',g.sec||0,g.pts,g.m2,g.a2,g.m3,g.a3,g.mft,g.aft,g.o,g.d,g.ast,g.stl,g.to,g.blk,g.bs,g.pf,g.fd,g.ev,g.pm,g.win?(g.s1||1):(g.s2||0),g.win?(g.s2||0):(g.s1||1),'RS',comp,0,sea,g.p2p==null?null:g.p2p,g.p3p==null?null:g.p3p,g.ftp==null?null:g.ftp,g.pmRaw==null?null:g.pmRaw,g.pfRaw==null?null:g.pfRaw];});}
 function bbApply(j,lg,team,st){db();DB.scGames=DB.scGames||{};DB.scMeta=DB.scMeta||{};if(!String(j.first||'').trim()&&!String(j.last||'').trim())throw new Error('fiche illisible (nom introuvable)');if(team&&team.name){j.club=team.name;j.clubLogo=team.logo||j.clubLogo;}
   var p=DB.scPlayers.filter(function(x){return x.bbSlug===j.slug;})[0],isNew=!p;
   if(!p){p={id:uid(),status:'new',rating:0,notes:'',added:Date.now(),src:'bebasket',tags:[],videos:[],stats:[]};DB.scPlayers.push(p);}
   p.bbSlug=j.slug;p.elCode=p.elCode||('bb:'+j.slug);p.upd=Date.now();p.bbAt=Date.now();
   ['first','last','born','h','w','nat','photo'].forEach(function(k){if(j[k]&&(isNew||!p[k]||p.src==='bebasket'))p[k]=j[k];});
   if(j.pos){var ep=elPos(j.pos);if(ep[0]&&(!p.pos||p.src==='bebasket')){p.pos=ep[0];if(ep[1])p.pos2=ep[1];}}
-  var comp=bbLgName(lg),cLogo=((DB.scMeta.lgInfo||{})[lg]||{}).logo||(j.comps&&j.comps[0]&&j.comps[0].logo)||'';if(cLogo){DB.scMeta.lgLogos=DB.scMeta.lgLogos||{};if(!DB.scMeta.lgLogos[comp])DB.scMeta.lgLogos[comp]=cLogo;}
+  var comp=bbLgName(lg),cLogo=((DB.scMeta.lgInfo||{})[lg]||{}).logo||(j.comps&&j.comps[0]&&j.comps[0].logo)||'';var nk=function(x){return norm(x||'').replace(/[^a-z0-9]/g,'');};if(cLogo){DB.scMeta.lgLogos=DB.scMeta.lgLogos||{};Object.keys(DB.scMeta.lgLogos).forEach(function(k){if(k!==comp&&nk(k)===nk(comp))delete DB.scMeta.lgLogos[k];});DB.scMeta.lgLogos[comp]=cLogo;}
   if(j.club){p.club=j.club;p.clubLogo=j.clubLogo||p.clubLogo||'';}
-  p.lg=p.lg||comp;p.lgs=uq((p.lgs||[]).filter(function(x){return x!==String(lg).replace(/-/g,' ');}).concat([comp]));p.clubBy=p.clubBy||{};p.logoBy=p.logoBy||{};if(j.club)p.clubBy[comp]=j.club;if(j.clubLogo)p.logoBy[comp]=j.clubLogo;
+  p.lg=p.lg||comp;p.lgs=uq((p.lgs||[]).filter(function(x){return nk(x)!==nk(comp)&&x!==String(lg).replace(/-/g,' ');}).concat([comp]));p.clubBy=p.clubBy||{};p.logoBy=p.logoBy||{};if(j.club)p.clubBy[comp]=j.club;if(j.clubLogo)p.logoBy[comp]=j.clubLogo;
   (j.seasons||[]).forEach(function(s){if(s.comp&&s.compLogo){DB.scMeta.lgLogos=DB.scMeta.lgLogos||{};DB.scMeta.lgLogos[s.comp]=s.compLogo;}});
   /* le parcours : on garde les compétitions déjà connues */
   var old=p.bbs||[];(j.seasons||[]).forEach(function(s){var o=old.filter(function(x){return x.season===s.season&&x.team===s.team;})[0];if(o){['comp','compSlug','compLogo'].forEach(function(k){if(!s[k]&&o[k])s[k]=o[k];});}});
   p.bbs=j.seasons||[];
-  p.bbs.forEach(function(r){if(r.season===BB_SEA&&team&&team.name){if(!r.teamLogo&&team.logo)r.teamLogo=team.logo;if(!r.comp){r.comp=comp;r.compSlug=lg;r.compLogo=cLogo;}}else if(r.comp&&/^[a-z0-9 -]+$/.test(r.comp)&&r.compSlug){r.comp=bbLgName(r.compSlug);}});
+  p.bbs.forEach(function(r){if(r.season===BB_SEA&&team&&team.name){if(!r.teamLogo&&team.logo)r.teamLogo=team.logo;if(!r.comp){r.comp=comp;r.compSlug=lg;r.compLogo=cLogo;}}else if(r.compSlug){r.comp=bbLgName(r.compSlug);var li=(DB.scMeta.lgInfo||{})[r.compSlug];if(li&&li.logo)r.compLogo=li.logo;}});
   /* matchs de la saison courante pour cette compétition */
-  var oldNm=String(lg).replace(/-/g,' '),rows=bbRows(j,comp,BB_SEA);if(rows.length){var keep=(DB.scGames[p.id]||[]).filter(function(r){var g=gLg(r);return g!==comp&&g!==oldNm&&g!==oldNm.toLowerCase();});DB.scGames[p.id]=keep.concat(rows).sort(gCmp);}
+  var oldNm=String(lg).replace(/-/g,' '),rows=bbRows(j,comp,BB_SEA);if(rows.length){var keep=(DB.scGames[p.id]||[]).filter(function(r){var g=gLg(r);return g!==comp&&g!==oldNm&&g!==oldNm.toLowerCase()&&nk(g)!==nk(comp);});DB.scGames[p.id]=keep.concat(rows).sort(gCmp);}
   DB.scMeta.clubs=DB.scMeta.clubs||{};(j.games||[]).forEach(function(g){if(g.opp&&g.oppLogo)DB.scMeta.clubs[g.opp]=g.oppLogo;});if(team&&team.name&&team.logo)DB.scMeta.clubs[team.name]=team.logo;
   recalc(p);if(isNew)st.add++;else st.upd++;}
 
@@ -34588,7 +34588,7 @@ function bbSeasons(p){var m={};(p.bbs||[]).forEach(function(s){if(s.season)m[s.s
 function bbCur(p){var ss=bbSeasons(p);return ss.indexOf(BB_SEA)>=0?BB_SEA:(ss[0]||'');}
 function bbSel(p){var s=SC.ssn;if(s==='all')return'all';return(s&&bbSeasons(p).indexOf(s)>=0)?s:bbCur(p);}
 function bbRowsOf(p,sel){return(p.bbs||[]).filter(function(r){return sel==='all'||r.season===sel;});}
-function bbAgg(R){var W=0,S={},M={p2:[0,0],p3:[0,0],ft:[0,0]},K=['min','pts','reb','d','o','ast','stl','blk','to','eval'],X={p2:['m2','a2'],p3:['m3','a3'],ft:['mf','af']},Q={p2:[0,0],p3:[0,0],ft:[0,0]};K.forEach(function(k){S[k]=0;});
+function bbAgg(R){var W=0,S={},M={p2:[0,0],p3:[0,0],ft:[0,0]},K=['min','pts','reb','d','o','ast','stl','blk','to','eval','m2','a2','m3','a3','mf','af'],X={p2:['m2','a2'],p3:['m3','a3'],ft:['mf','af']},Q={p2:[0,0],p3:[0,0],ft:[0,0]};K.forEach(function(k){S[k]=0;});
   R.forEach(function(r){var g=r.gp||0;if(!g)return;W+=g;K.forEach(function(k){if(r[k]!=null)S[k]+=r[k]*g;});['p2','p3','ft'].forEach(function(k){var m=r[X[k][0]],a=r[X[k][1]];if(m!=null&&a!=null){Q[k][0]+=m*g;Q[k][1]+=a*g;}else if(r[k]!=null){M[k][0]+=r[k]*g;M[k][1]+=g;}});});
   if(!W)return null;var o={gp:W};K.forEach(function(k){o[k]=S[k]/W;});['p2','p3','ft'].forEach(function(k){o[k]=Q[k][1]>0?Q[k][0]/Q[k][1]*100:(M[k][1]?M[k][0]/M[k][1]:null);});return o;}
 function bbStat(p,k){if(!(p.bbs&&p.bbs.length))return getStat(p,k,'avg',true);var a=bbAgg(bbRowsOf(p,bbSel(p)));if(!a)return getStat(p,k,'avg',true);return k==='pir'?a.eval:a[k];}
@@ -34599,17 +34599,19 @@ function bbFillComps(p){if(p.bbCompDone||!navigator.onLine||BB.busy)return;p.bbC
   var ch=Promise.resolve();todo.forEach(function(x){ch=ch.then(function(){return bbLoadSeasonQ(p,x);});});}
 function bbBar(p){var ss=bbSeasons(p);if(!ss.length)return'';bbFillComps(p);var sel=bbSel(p);
   var pill=function(k,l,lg){return'<button class="bb-sp'+(sel===k?' on':'')+'" onclick="scSsn(\''+k+'\')">'+lg+l+'</button>';};
-  return'<div class="bb-sea">'+pill('all','Toutes les saisons','')+ss.map(function(s){var r=bbRowsOf(p,s)[0]||{};return pill(s,s,bbClubLogo(r)?'<img src="'+E(bbClubLogo(r))+'" referrerpolicy="no-referrer" onerror="this.style.display=\'none\'">':'');}).join('')+'</div>';}
+  return'<div class="bb-sea">'+pill('all','Toutes les saisons','')+ss.map(function(s){var r=bbRowsOf(p,s)[0]||{};return pill(s,s,bbClubLogo(r)?'<img src="'+E(bbClubLogo(r))+'" referrerpolicy="no-referrer" onerror="this.outerHTML=\'<span class=bb-ph></span>\'">':'<span class="bb-ph"></span>');}).join('')+'</div>';}
 window.scSsn=function(k){SC.ssn=k;SC.mf='';drawer();};
 function bbCompsCell(p,r){var L=bbCompsOf(p,r);if(!L.length)return bbCompCell(r);return'<span class="bb-cs">'+L.map(function(l){return lgBadge(l);}).join('')+'</span>';}
 function bbCompCell(r){return r.compLogo?'<img class="bb-cl" src="'+E(r.compLogo)+'" referrerpolicy="no-referrer" title="'+E(r.comp||'')+'" onerror="this.outerHTML=\''+(r.comp?'':'')+'—\'">':(r.comp?lgBadge(r.comp):'<span style="color:var(--txt3)">—</span>');}
 function bbSeasonTbl(p){if(!(p.bbs&&p.bbs.length))return seasonTbl(p);var sel=bbSel(p),R=p.bbs.slice().sort(function(a,b){return String(b.season).localeCompare(String(a.season))||((b.gp||0)-(a.gp||0));});
   var f=function(v){return v==null?'—':f1b(v);},pc=function(v){return v==null?'—':pcb(v);};
-  var cell=function(r){return[r.gp==null?'—':Math.round(r.gp),f(r.min),'<b>'+f(r.pts)+'</b>',f(r.d),f(r.o),f(r.reb),f(r.ast),f(r.stl),f(r.blk),f(r.to),pc(r.p2),pc(r.p3),pc(r.ft),'<b style="color:#3ecf8e;">'+f(r.eval)+'</b>'].map(function(v){return'<td>'+v+'</td>';}).join('');};
-  var a=bbAgg(R),ns=bbSeasons(p).length;
-  return'<div class="bb-pt"><table class="sc-gt"><thead><tr>'+['SAISON','CLUB','COMPÉTITION','MJ','MIN','PTS','REB DÉF','REB OFF','REB TOT','AST','STL','BLK','TO','%2PTS','%3PTS','%LF','EVAL'].map(function(t,i){return'<th'+(i<3?' style="text-align:left;"':'')+'>'+t+'</th>';}).join('')+'</tr></thead><tbody>'
-   +R.map(function(r){var on=(sel==='all'||r.season===sel)&&sel!=='all';return'<tr class="'+(on?'bb-on':'')+'"><td style="text-align:left;white-space:nowrap;">'+E(r.season)+'</td><td style="text-align:left;white-space:nowrap;"><span class="bb-tm">'+(bbClubLogo(r)?'<img src="'+E(bbClubLogo(r))+'" referrerpolicy="no-referrer" onerror="this.style.display=\'none\'">':'')+'<b>'+E(r.team||'—')+'</b></span></td><td style="text-align:left;">'+bbCompsCell(p,r)+'</td>'+cell(r)+'</tr>';}).join('')
-   +(a?'<tr class="tot"><td colspan="3" style="text-align:left;white-space:nowrap;"><b>MOYENNE · '+ns+' SAISON'+(ns>1?'S':'')+' · '+Math.round(a.gp)+' MATCH'+(a.gp>1?'S':'')+'</b></td>'+cell(a)+'</tr>':'')
+  var ex=function(r){return{fo:r.fo==null?null:r.fo,pm:r.pm==null?null:r.pm};};
+  var cell=function(r,e){e=e||{};var pm=e.pm==null?'—':((e.pm>0?'+':'')+f1b(e.pm));return[r.gp==null?'—':Math.round(r.gp),f(r.min),'<b>'+f(r.pts)+'</b>',f(r.m2),f(r.a2),pc(r.p2),f(r.m3),f(r.a3),pc(r.p3),f(r.mf),f(r.af),pc(r.ft),f(r.d),f(r.o),f(r.reb),f(r.ast),f(r.stl),f(r.blk),f(r.to),f(e.fo),'<b style="color:#3ecf8e;">'+f(r.eval)+'</b>',pm].map(function(v){return'<td>'+v+'</td>';}).join('');};
+  var aex=function(){var sf=0,wf=0,sp=0,wp=0;R.forEach(function(r){var e=ex(r),g=r.gp||0;if(e.fo!=null){sf+=e.fo*g;wf+=g;}if(e.pm!=null){sp+=e.pm*g;wp+=g;}});return{fo:wf?sf/wf:null,pm:wp?sp/wp:null};};
+  var a=bbAgg(R),ns=bbSeasons(p).length;if(a)['m2','a2','m3','a3','mf','af'].forEach(function(k){if(!R.some(function(r){return r[k]!=null;}))a[k]=null;});
+  return'<div class="bb-pt"><table class="sc-gt"><thead><tr>'+['SAISON','CLUB','COMPÉTITION','MJ','MIN','PTS','2PM','2PT','%2PTS','3PM','3PT','%3PTS','LFM','LFT','%LF','REB DÉF','REB OFF','REB TOT','AST','STL','BLK','TO','FAUTES','EVAL','+/-'].map(function(t,i){return'<th'+(i<3?' style="text-align:left;"':'')+'>'+t+'</th>';}).join('')+'</tr></thead><tbody>'
+   +R.map(function(r){var on=(sel==='all'||r.season===sel)&&sel!=='all';return'<tr class="'+(on?'bb-on':'')+'"><td style="text-align:left;white-space:nowrap;">'+E(r.season)+'</td><td style="text-align:left;white-space:nowrap;"><span class="bb-tm">'+(bbClubLogo(r)?'<img src="'+E(bbClubLogo(r))+'" referrerpolicy="no-referrer" onerror="this.outerHTML=\'<span class=bb-sp0></span>\'">':'<span class="bb-sp0"></span>')+'<b>'+E(r.team||'—')+'</b></span></td><td style="text-align:left;">'+bbCompsCell(p,r)+'</td>'+cell(r,ex(r))+'</tr>';}).join('')
+   +(a?'<tr class="tot"><td colspan="3" style="text-align:left;white-space:nowrap;"><b>MOYENNE · '+ns+' SAISON'+(ns>1?'S':'')+' · '+Math.round(a.gp)+' MATCH'+(a.gp>1?'S':'')+'</b></td>'+cell(a,aex())+'</tr>':'')
    +'</tbody></table></div>';}
 function bbMatchTbl(p){if(!(p.bbs&&p.bbs.length))return matchTbl(p);var sel=bbSel(p),cur=bbCur(p),M=function(t){return'<div class="bb-msg">'+t+'</div>';};
   if(sel==='all')return M('Choisis une saison dans la barre du haut pour voir les matchs un par un.');
@@ -34626,12 +34628,16 @@ function bbLoadSeason(p,sea,q){var key=p.id+'|'+sea;if(BB.loading[key]||!navigat
   return ch.then(function(){if(found.length===1){var R=bbRowsOf(p,sea);if(R.length===1&&!R[0].comp){R[0].comp=found[0].nm;R[0].compSlug=found[0].sl;R[0].compLogo=bbLgLogo(found[0].nm);}}p.bbg=p.bbg||{};p.bbg[sea]=all.sort(gCmp);delete BB.loading[key];try{saveDB();}catch(e){}if(SC.open===p.id&&!q)drawer();else if(SC.open===p.id)drawer();});}
 
 /* ── colonne de droite : réglages en petit à côté des titres ── */
-function rankInner(p){var ls=rkLeaguesOf(p);if(!ls.length)return'';var mg=rkMinGp();ls.sort(function(a,b){return b[1]-a[1];});
-  var cur=ls.filter(function(x){return x[0]===SC.rf;})[0]||ls[0],lg=cur[0],gp=cur[1];
-  var pills=ls.length>1?ls.map(function(x){return'<button class="'+(x[0]===lg?'on':'')+'" onclick="scRf(\''+lgQ(x[0])+'\')">'+lgBadge(x[0])+E(lgShort(x[0]))+'</button>';}).join(''):'<button class="on">'+lgBadge(lg)+E(lgShort(lg))+'</button>';
-  var body;if(gp<mg)body='<div style="font-size:13px;color:var(--txt3);">Pas classé : '+gp+' match'+(gp>1?'s':'')+' joué'+(gp>1?'s':'')+' dans cette compétition (minimum '+mg+').</div>';
+function rankInner(p){var ls=rkLeaguesOf(p);if(!ls.length)return'';var mg=rkMinGp();
+  var hd=function(lg){return'<div class="rk-hd"><span class="sc-h4">Position dans la ligue</span>'+(lg?'<span class="rk-cur">'+lgBadge(lg)+E(lgShort(lg))+'</span>':'')+'<span class="rk-mini">Min. de matchs <input class="sc-in" type="number" min="1" value="'+mg+'" onchange="scRkMin(this.value)"></span></div>';};
+  var M=function(t){return'<div style="font-size:13px;color:var(--txt3);line-height:1.4;">'+t+'</div>';};
+  if(p.bbs&&p.bbs.length){var sl=bbSel(p);if(sl!==bbCur(p)||sl==='all')return hd('')+M('Le classement est disponible pour la saison en cours : choisis-la dans la barre du haut.');}
+  var names=ls.map(function(x){return x[0];}),lg=(SC.mf&&names.indexOf(SC.mf)>=0)?SC.mf:(ls.length===1?ls[0][0]:'');
+  if(!lg)return hd('')+M('Choisis une compétition dans « Stats par match » pour voir le classement.');
+  var gp=ls.filter(function(x){return x[0]===lg;})[0][1],body;
+  if(gp<mg)body=M('Pas classé : '+gp+' match'+(gp>1?'s':'')+' joué'+(gp>1?'s':'')+' dans cette compétition (minimum '+mg+').');
   else{var x=rk2Of(p,lg);body='<div class="rk-g">'+RK2.map(function(s){var r=x.r[s[0]];if(!r)return'<div><i>'+s[1]+'</i><b>—</b><small>pas assez de tirs</small></div>';var ra=r.rank/r.total,cl=(r.rank<=3||ra<=0.15)?'t1':(ra>=0.75&&r.total>=10?'t3':'');var vv=(s[0]==='p2'||s[0]==='p3'||s[0]==='ft')?pcb(r.val):f1b(r.val);return'<div class="'+cl+'"><i>'+s[1]+(s[2]<0?' (moins = mieux)':'')+'</i><b>'+rkOrd(r.rank)+'</b><small>sur '+r.total+' · '+vv+'</small></div>';}).join('')+'</div>';}
-  return'<div class="rk-hd"><span class="sc-h4">Position dans la ligue</span><span class="sc-pl">'+pills+'</span><span class="rk-mini">Min. de matchs <input class="sc-in" type="number" min="1" value="'+mg+'" onchange="scRkMin(this.value)"></span></div>'+body;}
+  return hd(lg)+body;}
 function simInner(p){var L=simList(p,10),gap=simGap(),more=SC.simMore===p.id,LL=more?L:L.slice(0,3);
   return'<div class="rk-hd" style="margin-top:12px;"><span class="sc-h4">Joueurs qui lui ressemblent</span><span class="rk-mini">Écart max. <input class="sc-in" type="number" min="0" step="1" value="'+gap+'" onchange="scSimGap(this.value)"></span>'+(L.length>3?'<button class="sc-btn sm" onclick="scSimMore(\''+p.id+'\')">'+(more?'− Réduire':'＋ Voir les '+(L.length-3)+' autres')+'</button>':'')+'</div>'
    +(L.length?LL.map(function(x){var q=x.p;return'<div class="sm-r" onclick="scSimCmp(\''+p.id+'\',\''+q.id+'\')"><div class="sm-av" style="background:'+CARDBG+';">'+photo(q)+'</div><div style="min-width:0;flex:1;line-height:1.2;"><b style="font-size:14.5px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+E(full(q))+'</b><span style="font-size:11.5px;color:var(--txt3);">'+E(clubOf(q)||'')+'</span></div><b style="color:var(--acc);font-size:19px;">'+x.pct+'%</b></div>';}).join(''):'<div style="font-size:13px;color:var(--txt3);">Aucun joueur sous contrat avec un temps de jeu proche et assez de matchs ('+rkMinGp()+' min).</div>')
@@ -34674,6 +34680,16 @@ window.scBbPurge=function(){db();var cand=DB.scPlayers.filter(function(p){return
   var del=cand.filter(untouched),keep=cand.length-del.length;if(!del.length){toast('Tous ont été modifiés par toi : rien supprimé','acc');return;}
   if(!confirm('Retirer '+del.length+' joueur'+(del.length>1?'s':'')+' importé'+(del.length>1?'s':'')+' depuis BeBasket ?'+(keep?'\n'+keep+' joueur'+(keep>1?'s':'')+' que tu as modifié'+(keep>1?'s':'')+' (note, favori, vidéo, tag, rôle…) '+(keep>1?'seront conservés':'sera conservé')+'.':'')+'\nTes autres joueurs ne sont pas touchés.'))return;
   var ids={};del.forEach(function(p){ids[p.id]=1;});DB.scPlayers=DB.scPlayers.filter(function(p){return!ids[p.id];});SC.sel=SC.sel.filter(function(x){return!ids[x];});Object.keys(ids).forEach(function(i){delete DB.scGames[i];});saveDB();renderScoutPage();bbSay('✓ '+del.length+' joueur'+(del.length>1?'s':'')+' retiré'+(del.length>1?'s':'')+'.');};
+
+/* ═══════════════ v326 · logos vides, classement lié au filtre des matchs ═══════════════ */
+window.scMf=function(l){SC.mf=l;var p=pl(SC.open);if(!p){drawer();return;}var e=document.getElementById('scMtB');if(e)e.innerHTML=bbMatchTbl(p);var r=document.getElementById('scRkB');if(r)r.innerHTML=rankInner(p);};
+(function(){var st=document.createElement('style');st.id='scCss326';st.textContent='.sc-dr2 #scSzB .sc-gt th,.sc-dr2 #scSzB .sc-gt td,.sc-dr2 #scMtB .sc-gt th,.sc-dr2 #scMtB .sc-gt td{padding-left:4px!important;padding-right:4px!important;font-size:11.5px!important;}.sc-dr2 #scSzB .sc-gt th,.sc-dr2 #scMtB .sc-gt th{letter-spacing:0!important;font-size:10.5px!important;white-space:nowrap;}.sc-dr2 .bb-pt{overflow-x:auto;}.bb-ph{display:inline-block;width:20px;height:20px;border-radius:50%;border:1.5px solid rgba(255,255,255,.28);background:transparent;flex:none;box-sizing:border-box;}.bb-sp.on .bb-ph{border-color:rgba(26,20,8,.5);}.bb-sp0{display:inline-block;width:22px;height:22px;flex:none;}.rk-cur{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:800;color:var(--acc);}';document.head.appendChild(st);})();
+
+/* ═══════════════ v327 · tableaux de stats identiques (parcours + matchs) ═══════════════ */
+function bbPc(m,a){return(a>0)?pcb(m/a*100):'—';}
+function bbSp(r,i,m,a){if(r.length>31)return r[i]==null?'—':pcb(r[i]);return bbPc(m,a);}
+function bbFo(v){return v==null?'—':v;}
+function bbPm(v){if(v==null||v==='')return'—';v=+v;return(v>0?'+':'')+v;}
 
 })();
 
