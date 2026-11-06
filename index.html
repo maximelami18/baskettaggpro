@@ -460,7 +460,7 @@ document.addEventListener('DOMContentLoaded', function(){
 var _SB_URL="https://umuvirwbtpflizxupwbr.supabase.co";
 // Version de ce fichier — à incrémenter à chaque déploiement, en cohérence avec la valeur
 // mise à jour dans la table Supabase `app_version` (voir _checkAppVersion ci-dessous).
-var APP_VERSION = "2026-11-06-365";
+var APP_VERSION = "2026-11-06-368";
 var _SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtdXZpcndidHBmbGl6eHVwd2JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3MTI1MDEsImV4cCI6MjA5MDI4ODUwMX0.fFQaF-zP9dzcWITJDf6GBmvu0pdcuvlaUz0A0qW0kfo";
 var _LICENCE_KEY='btp_licence';
 var _MACHINE_KEY='btp_machine';
@@ -33947,13 +33947,14 @@ function topPanel(){var t=SC.f.top,lgs=rkAllLeagues();if(!lgs.length)return'';
 var SIM_K=['pts','reb','ast','stl','blk','to'];
 var SIM_POS={PG:1,SG:2,SF:3,PF:4,C:5};
 function simPosGap(a,b){var x=[SIM_POS[a.pos],SIM_POS[a.pos2]].filter(Boolean),y=[SIM_POS[b.pos],SIM_POS[b.pos2]].filter(Boolean);if(!x.length||!y.length)return null;var g=9;x.forEach(function(i){y.forEach(function(j){g=Math.min(g,Math.abs(i-j));});});return g;}
+function simRoleGap(a,b){var x=(a.roles||[]).map(String),y=(b.roles||[]).map(String);if(!x.length||!y.length)return null;var c=x.filter(function(r){return y.indexOf(r)>=0;}).length;return 1-c/Math.max(x.length,y.length);}
 function simHGap(a,b){return(a.h&&b.h)?Math.abs(a.h-b.h):null;}
 function simList(p,max){if(isLibre(p))return[];var mg=rkMinGp(),gap=simGap();if(((DB.scGames||{})[p.id]||[]).length<mg)return[];
   var K=CMP_ST.filter(function(x){return x[1]!=='min';}),pool=[];
   DB.scPlayers.forEach(function(q){if(isLibre(q))return;if((((DB.scGames||{})[q.id])||[]).length<mg)return;var a=cmpAgg(q,'s');if(!a||a.min==null)return;pool.push({p:q,m:a.min,a:a,v:[a.pts,a.reb,a.ast]});});
   var me=pool.filter(function(o){return o.p.id===p.id;})[0];if(!me)return[];
   var sd=K.map(function(k){var xs=pool.map(function(o){return o.a[k[1]];}).filter(function(z){return z!=null&&isFinite(z);}),mu=xs.reduce(function(s,z){return s+z;},0)/(xs.length||1),va=xs.reduce(function(s,z){return s+(z-mu)*(z-mu);},0)/(xs.length||1);return Math.sqrt(va)||1;});
-  var out=[];pool.forEach(function(o){if(o.p.id===p.id||likeP(p,o.p))return;if(Math.abs(o.m-me.m)>gap)return;var pg=simPosGap(p,o.p),hg=simHGap(p,o.p);if(pg!=null&&pg>=2)return;if(hg!=null&&hg>10)return;var d=0,wt=0;K.forEach(function(k,i){var x=o.a[k[1]],y=me.a[k[1]];if(x==null||y==null||!isFinite(x)||!isFinite(y))return;d+=Math.abs(x-y)/sd[i];wt++;});if(wt<6)return;if(pg!=null){d+=2*pg;wt+=2;}if(hg!=null){d+=2*hg/8;wt+=2;}d/=wt;out.push({p:o.p,pct:Math.max(0,Math.round(100*(1-d/2))),min:o.m,v:o.v});});
+  var out=[];pool.forEach(function(o){if(o.p.id===p.id||likeP(p,o.p))return;if(Math.abs(o.m-me.m)>gap)return;var pg=simPosGap(p,o.p),hg=simHGap(p,o.p);if(pg!=null&&pg>=2)return;if(hg!=null&&hg>10)return;var d=0,wt=0;K.forEach(function(k,i){var x=o.a[k[1]],y=me.a[k[1]];if(x==null||y==null||!isFinite(x)||!isFinite(y))return;d+=Math.abs(x-y)/sd[i];wt++;});if(wt<6)return;if(pg!=null){d+=2*pg;wt+=2;}if(hg!=null){d+=2*hg/8;wt+=2;}var rg=simRoleGap(p,o.p);if(rg!=null){d+=2*rg;wt+=2;}d/=wt;out.push({p:o.p,pct:Math.max(0,Math.round(100*(1-d/2))),min:o.m,v:o.v});});
   out.sort(function(a,b){return b.pct-a.pct;});return out.slice(0,max||6);}
 function simHtml(p){if(isLibre(p))return'';var L=simList(p,6),gap=simGap();
   return'<div class="sc-sec"><h3>Joueurs qui lui ressemblent</h3>'+(L.length?'<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;">'+L.map(function(x){var q=x.p,ps=posOf(q.pos);return'<div onclick="scSimCmp(\''+p.id+'\',\''+q.id+'\')" style="cursor:pointer;display:flex;gap:10px;align-items:center;padding:8px;border:1px solid var(--bdr2);border-radius:12px;background:var(--surf);"><div style="width:44px;height:54px;border-radius:8px;overflow:hidden;flex:none;background:'+CARDBG+';display:flex;align-items:flex-end;justify-content:center;" class="sc-av-s">'+photo(q).replace('<img ','<img style="width:100%;height:100%;object-fit:cover;object-position:top;" ')+'</div><div style="min-width:0;flex:1;"><div style="font-weight:800;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+E(full(q))+'</div><div style="font-size:11px;color:var(--txt3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+E(q.club||'')+(q.pos?' · '+pn(ps[0]):'')+'</div><div style="font-size:11px;color:var(--txt2);">'+x.v[0].toFixed(1)+' pts · '+x.v[1].toFixed(1)+' reb · '+x.v[2].toFixed(1)+' ast</div></div><div style="font-weight:900;color:var(--acc);font-size:15px;">'+x.pct+'%</div></div>';}).join('')+'</div>':'<div style="font-size:13px;color:var(--txt3);">Aucun joueur sous contrat avec un temps de jeu proche et assez de matchs ('+rkMinGp()+' min).</div>')
@@ -34163,7 +34164,7 @@ window.scSimCmp=function(aId,bId){var a=pl(aId),b=pl(bId);if(!a||!b)return;var p
   var pp=function(q){var s=q.pos?posOf(q.pos):null;return s?pn(s[0])+' · '+s[1]:'—';};
   var pst=a.pos&&a.pos===b.pos?{t:'MÊME POSTE',c:G}:(a.pos&&b.pos&&(a.pos===b.pos2||a.pos2===b.pos)?{t:'POSTE SECONDAIRE COMMUN',c:G}:(a.pos&&b.pos?{t:'POSTES DIFFÉRENTS',c:Rd}:{t:'',c:N}));
   var na=natList(a)[0],nb=natList(b)[0],nt=na&&nb?(norm(natName(na))===norm(natName(nb))?{t:'IDENTIQUE',c:G}:{t:'DIFFÉRENTE',c:N}):{t:'',c:N};
-  var T=[['📏','TAILLE',fmtH(a.h),fmtH(b.h),dn(a.h,b.h,'CM',3,7)],['⚖️','POIDS',a.w?a.w+' kg':'—',b.w?b.w+' kg':'—',dn(a.w,b.w,'KG',4,9)],['🎂','ÂGE',ag==null?'—':ag+' ans',bg==null?'—':bg+' ans',dn(ag,bg,'AN(S)',1,3)],['🏀','POSTE',pp(a),pp(b),pst],['🌍','NATIONALITÉ',natList(a).length?natFlags(a)+' '+E(natName(natList(a)[0])):'—',natList(b).length?natFlags(b)+' '+E(natName(natList(b)[0])):'—',nt]];
+  var T=[['📏','TAILLE',fmtH(a.h),fmtH(b.h),dn(a.h,b.h,'CM',3,7)],['⚖️','POIDS',a.w?a.w+' kg':'—',b.w?b.w+' kg':'—',dn(a.w,b.w,'KG',4,9)],['🎂','ÂGE',ag==null?'—':ag+' ans',bg==null?'—':bg+' ans',dn(ag,bg,'AN(S)',1,3)],['🏀','POSTE',pp(a),pp(b),pst],['🌍','NATIONALITÉ',natList(a).length?natFlags(a)+' '+E(natName(natList(a)[0])):'—',natList(b).length?natFlags(b)+' '+E(natName(natList(b)[0])):'—',nt],['🎯','RÔLES',(a.roles&&a.roles.length)?prNames(a.roles).map(E).join(' · '):'—',(b.roles&&b.roles.length)?prNames(b.roles).map(E).join(' · '):'—',(function(){var g=simRoleGap(a,b);return g==null?{t:'',c:N}:g===0?{t:'MÊMES RÔLES',c:G}:g<1?{t:'RÔLE COMMUN',c:G}:{t:'RÔLES DIFFÉRENTS',c:Rd};})()]];
   var phys='<div class="sc-h4" style="margin-top:24px;">Profil physique</div><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;">'+T.map(function(t){return'<div class="cmp-t" style="background:linear-gradient(180deg,'+t[4].c+'22,var(--surf));border-color:'+t[4].c+'66;"><div style="font-size:20px;">'+t[0]+'</div><i>'+t[1]+'</i><b style="color:var(--acc);">'+t[2]+'</b><small>vs</small><b style="color:#8fb0d8;">'+t[3]+'</b><em style="color:'+t[4].c+';">'+t[4].t+'</em></div>';}).join('')+'</div>';
   var o=document.getElementById('scCmp');if(!o){o=document.createElement('div');o.id='scCmp';o.className='sc-ov';o.style.zIndex=10000;o.onclick=function(e){if(e.target===o)o.remove();};document.body.appendChild(o);}
   o.innerHTML='<div class="sc-dr" style="max-width:1160px;width:100%;margin:auto;align-self:center;height:auto;padding:24px;border-radius:24px;max-height:94vh;overflow:auto;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;"><div class="sc-h4" style="margin:0;">Pourquoi ils se ressemblent</div><button class="sc-btn sm" onclick="document.getElementById(\'scCmp\').remove()">Fermer ✕</button></div>'
@@ -34472,7 +34473,7 @@ function fdHtml(){var f=SC.f,n=filtered().length,q=norm(SC.fq||''),nat=distinct(
   var RL=prList(),rolH=RL.length?'<div class="sc-row" style="gap:8px;">'+RL.map(function(r){var on=(f.roles||[]).indexOf(String(r.id))>=0;return'<button type="button" style="'+prChipCss(r,on)+'padding:8px 16px;font-size:13px;" onclick="scRoleTg(\''+r.id+'\')">'+prEsc(r.name)+'</button>';}).join('')+'</div><div style="font-size:11.5px;color:var(--txt3);margin-top:8px;">Plusieurs rôles possibles : le joueur doit en avoir au moins un.</div>':'<div style="font-size:12.5px;color:var(--txt3);line-height:1.5;">Aucun rôle créé pour l’instant.<br>Crée-les dans <b>Paramètres → Rôles des joueurs</b> : ils apparaîtront ici (et dans la page Besoins).</div>';
   var natL=nat;
   var natH=(nat.length?chips(natL,'nat',function(o){return flag(ctOf(o[0]))+' '+E(o[0])+' <small style="opacity:.6">'+o[1]+'</small>';}):'<span style="color:var(--txt3);font-size:13px;">Aucune nationalité</span>');
-  var lgH=lg.map(function(o){var on=(f.lgs||[]).indexOf(o[0])>=0;return'<button class="sc-chip'+(on?' on':'')+'" style="display:inline-flex;align-items:center;gap:7px;padding:5px 12px 5px 6px;" data-v="'+E(o[0])+'" onclick="scLgTg(this.dataset.v)">'+lgBadge(o[0])+E(lgShort(o[0]))+' <small style="opacity:.6">'+o[1]+'</small></button>';}).join(' ');
+  var lgH=lg.map(function(o){var on=(f.lgs||[]).indexOf(o[0])>=0,u=bbImp(o[0])?bbLgLogo(o[0]):'';return'<button class="sc-chip fdlg'+(on?' on':'')+'" data-v="'+E(o[0])+'" title="'+E(lgShort(o[0]))+'" onclick="scLgTg(this.dataset.v)">'+(u?'<img src="'+E(u)+'" referrerpolicy="no-referrer" alt="">':'')+'<b>'+E(fdCode(o[0]))+'</b><small>'+o[1]+'</small></button>';}).join(' ');
   return'<div class="fd-p"><div class="fd-h"><b>⚙️ Filtres</b><span style="flex:1"></span><button class="sc-btn sm" onclick="scFdClose()">✕</button></div><div class="fd-b">'
   +'<div class="fd-s wide" style="padding:10px 14px;"><input class="fd-q" id="fdQ" placeholder="🔍 Rechercher une nationalité, un championnat…" value="'+E(SC.fq||'')+'" oninput="scFq(this.value)"></div>'
   +'<div class="fd-s"><div class="fd-t">Poste</div>'+posH+'</div>'
@@ -34522,7 +34523,9 @@ function bbStart(sea){return parseInt(String(sea).slice(0,4))||BB_YEAR;}
 function bbLgInfo(lg,name,logo){db();DB.scMeta=DB.scMeta||{};DB.scMeta.lgInfo=DB.scMeta.lgInfo||{};var o=DB.scMeta.lgInfo[lg]||{};if(name)o.name=name;if(logo)o.logo=logo;DB.scMeta.lgInfo[lg]=o;if(o.name&&o.logo){DB.scMeta.lgLogos=DB.scMeta.lgLogos||{};DB.scMeta.lgLogos[o.name]=o.logo;}}
 function bbLgName(lg){var o=((DB.scMeta||{}).lgInfo||{})[lg];return(o&&o.name)||String(lg).replace(/-/g,' ').replace(/\b\w/g,function(c){return c.toUpperCase();});}
 function bbLgLogo(l){return((DB.scMeta||{}).lgLogos||{})[l]||'';}
-function lgBadge(l){var u=bbLgLogo(l);if(u)return'<span class="lgb img" title="'+E(l)+'"><img src="'+E(u)+'" referrerpolicy="no-referrer" alt="'+E(lgShort(l))+'"></span>';
+function bbImp(l){var m=DB.scMeta||{},L=m.bbLeagues||[],info=m.lgInfo||{},k=function(x){return norm(x||'').replace(/[^a-z0-9]/g,'');},t=k(l);if(!t)return false;
+  return L.some(function(g){return k(g)===t||k(bbLgName(g))===t||k((info[g]||{}).name)===t;});}
+function lgBadge(l){if(!bbImp(l))return'';var u=bbLgLogo(l);if(u)return'<span class="lgb img" title="'+E(l)+'"><img src="'+E(u)+'" referrerpolicy="no-referrer" alt="'+E(lgShort(l))+'"></span>';
   var k=l==='Euroleague'?'EL':l==='EuroCup'?'EC':l==='Basketball Champions League'?'BCL':'';
   if(k)return'<span class="lgb img" title="'+E(l)+'"><img src="'+LGIMG[k]+'" alt="'+E(lgShort(l))+'"></span>';
   if(l==='NBA'||l==='NBA G League'){var us=ctOf('États-Unis');return'<span class="lgb fl" title="'+E(l)+'">'+(us?flag(us):'🇺🇸')+'</span>';}
@@ -34605,7 +34608,7 @@ function bbBar(p){var ss=bbSeasons(p);if(!ss.length)return'';bbFillComps(p);var 
   return'<div class="bb-sea">'+pill('all','Toutes les saisons','')+ss.map(function(s){var r=bbRowsOf(p,s)[0]||{};return pill(s,s,bbClubLogo(r)?cl2(bbClubLogo(r),24,"this.parentNode.outerHTML=\'<span class=bb-ph></span>\'"):'<span class="bb-ph"></span>');}).join('')+'</div>';}
 window.scSsn=function(k){SC.ssn=k;SC.mf='';drawer();};
 function bbCompsCell(p,r){var L=bbCompsOf(p,r);if(!L.length)return bbCompCell(r);return'<span class="bb-cs">'+L.map(function(l){return lgBadge(l);}).join('')+'</span>';}
-function bbCompCell(r){return r.compLogo?'<img class="bb-cl" src="'+E(r.compLogo)+'" referrerpolicy="no-referrer" title="'+E(r.comp||'')+'" onerror="this.outerHTML=\''+(r.comp?'':'')+'—\'">':(r.comp?lgBadge(r.comp):'<span style="color:var(--txt3)">—</span>');}
+function bbCompCell(r){return (r.compLogo&&bbImp(r.comp))?'<img class="bb-cl" src="'+E(r.compLogo)+'" referrerpolicy="no-referrer" title="'+E(r.comp||'')+'" onerror="this.outerHTML=\''+(r.comp?'':'')+'—\'">':(r.comp?(lgBadge(r.comp)||'<span style="color:var(--txt3)">—</span>'):'<span style="color:var(--txt3)">—</span>');}
 function bbSeasonTbl(p){if(!(p.bbs&&p.bbs.length))return seasonTbl(p);var sel=bbSel(p),R=p.bbs.slice().sort(function(a,b){return String(b.season).localeCompare(String(a.season))||((b.gp||0)-(a.gp||0));});
   var f=function(v){return v==null?'—':f1b(v);},pc=function(v){return v==null?'—':pcb(v);};
   var ex=function(r){return{fo:r.fo==null?null:r.fo,pm:r.pm==null?null:r.pm};};
@@ -34744,7 +34747,7 @@ window.scSimCmp=function(aId,bId){var a=pl(aId),b=pl(bId);if(!a||!b)return;var p
   var pp=function(q){var s=q.pos?posOf(q.pos):null;return s?pn(s[0])+' · '+s[1]:'—';};
   var pst=a.pos&&a.pos===b.pos?{t:'MÊME POSTE',c:G}:(a.pos&&b.pos&&(a.pos===b.pos2||a.pos2===b.pos)?{t:'POSTE SECONDAIRE COMMUN',c:G}:(a.pos&&b.pos?{t:'POSTES DIFFÉRENTS',c:Rd}:{t:'',c:N}));
   var na=natList(a)[0],nb=natList(b)[0],nt=na&&nb?(norm(natName(na))===norm(natName(nb))?{t:'IDENTIQUE',c:G}:{t:'DIFFÉRENTE',c:N}):{t:'',c:N};
-  var T=[['📏','TAILLE',fmtH(a.h),fmtH(b.h),dn(a.h,b.h,'CM',3,7)],['⚖️','POIDS',a.w?a.w+' kg':'—',b.w?b.w+' kg':'—',dn(a.w,b.w,'KG',4,9)],['🎂','ÂGE',ag==null?'—':ag+' ans',bg==null?'—':bg+' ans',dn(ag,bg,'AN(S)',1,3)],['🏀','POSTE',pp(a),pp(b),pst],['🌍','NATIONALITÉ',natList(a).length?natFlags(a)+' '+E(natName(natList(a)[0])):'—',natList(b).length?natFlags(b)+' '+E(natName(natList(b)[0])):'—',nt]];
+  var T=[['📏','TAILLE',fmtH(a.h),fmtH(b.h),dn(a.h,b.h,'CM',3,7)],['⚖️','POIDS',a.w?a.w+' kg':'—',b.w?b.w+' kg':'—',dn(a.w,b.w,'KG',4,9)],['🎂','ÂGE',ag==null?'—':ag+' ans',bg==null?'—':bg+' ans',dn(ag,bg,'AN(S)',1,3)],['🏀','POSTE',pp(a),pp(b),pst],['🌍','NATIONALITÉ',natList(a).length?natFlags(a)+' '+E(natName(natList(a)[0])):'—',natList(b).length?natFlags(b)+' '+E(natName(natList(b)[0])):'—',nt],['🎯','RÔLES',(a.roles&&a.roles.length)?prNames(a.roles).map(E).join(' · '):'—',(b.roles&&b.roles.length)?prNames(b.roles).map(E).join(' · '):'—',(function(){var g=simRoleGap(a,b);return g==null?{t:'',c:N}:g===0?{t:'MÊMES RÔLES',c:G}:g<1?{t:'RÔLE COMMUN',c:G}:{t:'RÔLES DIFFÉRENTS',c:Rd};})()]];
   var phys='<div class="sc-h4" style="margin-top:24px;">Profil physique</div><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;">'+T.map(function(t){return'<div class="cmp-t" style="background:linear-gradient(180deg,'+t[4].c+'22,var(--surf));border-color:'+t[4].c+'66;"><div style="font-size:20px;">'+t[0]+'</div><i>'+t[1]+'</i><b style="color:var(--acc);">'+t[2]+'</b><small>vs</small><b style="color:#8fb0d8;">'+t[3]+'</b><em style="color:'+t[4].c+';">'+t[4].t+'</em></div>';}).join('')+'</div>';
   var o=document.getElementById('scCmp');if(!o){o=document.createElement('div');o.id='scCmp';o.className='sc-ov';o.style.zIndex=10000;o.onclick=function(e){if(e.target===o)o.remove();};document.body.appendChild(o);}
   o.innerHTML='<div class="sc-dr" style="max-width:1160px;width:100%;margin:auto;align-self:center;height:auto;padding:24px;border-radius:24px;max-height:94vh;overflow:auto;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;"><div class="sc-h4" style="margin:0;">Pourquoi ils se ressemblent</div><button class="sc-btn sm" onclick="document.getElementById(\'scCmp\').remove()">Fermer ✕</button></div>'
@@ -34990,7 +34993,7 @@ window.fdMore=function(k){fdX[k]=!fdX[k];fdDraw();};
 window.fdFit=function(){var a=document.querySelectorAll('#scFD .fdc');for(var i=0;i<a.length;i++){var c=a[i],k=c.getAttribute('data-x'),ch=[].slice.call(c.children).filter(function(e){return!e.classList.contains('fdmore');});
     var old=c.querySelector('.fdmore');if(old)old.remove();ch.forEach(function(e){e.style.display='';});
     var first=ch[0];if(!first)continue;
-    var rh=Math.max.apply(null,ch.map(function(e){return e.offsetHeight;})),rows=k==='lg'?2:3,maxH=rows*rh+(rows-1)*8+2,base=first.offsetTop;
+    var rh=Math.max.apply(null,ch.map(function(e){return e.offsetHeight;})),rows=k==='lg'?1:3,maxH=rows*rh+(rows-1)*8+2,base=first.offsetTop;
     var bot=function(e){return e.offsetTop-base+e.offsetHeight;};
     var mk=function(t){var b=document.createElement('button');b.className='sc-chip fdmore';b.style.borderStyle='dashed';b.onclick=function(){fdMore(k);};b.textContent=t;return b;};
     if(fdX[k]){c.appendChild(mk('− Réduire'));continue;}
@@ -35023,6 +35026,11 @@ function lgsOf(p){if(!p||!p.bbs||!p.bbs.length)return lgsOf0(p);
   p.bbs.forEach(function(s){if(s.season!==BB_SEA)return;if(s.comps&&s.comps.length)s.comps.forEach(function(c){add(c.name);});else add(s.comp);});
   ((DB.scGames||{})[p.id]||[]).forEach(function(r){if(r[28]===BB_SEA)add(gLg(r));});
   return out;}
+
+/* ═══ v367 : filtre Championnat — logo + code court + nombre, sur une ligne, puis « ＋ N autres » ═══ */
+function fdCode(l){var k=norm(l||'').replace(/[^a-z0-9]/g,''),M={euroleague:'EL',eurocup:'EC',ligaendesa:'ACB',abaliga:'ABA',basketballchampionsleague:'BCL',betclicelite:'ELITE',espoirselite:'ESP',espoirselite2:'ESP 2',elite2:'ÉLITE 2',bbl:'BBL',easycreditbbl:'BBL',lba:'LBA',legabasketseriea:'LBA',nba:'NBA',nbapreseason:'NBA PS',basketbolsuperligi:'BSL',israelbsl:'BSL',probb:'PRO B',nm1:'NM1'};
+  if(M[k])return M[k];var t=String(l||'').replace(/\s*\(.*\)\s*/,'').trim();if(t.length<=4)return t.toUpperCase();var w=t.split(/[\s\-]+/).filter(Boolean);return(w.length>1?w.map(function(x){return x[0];}).join('').slice(0,4):t.slice(0,4)).toUpperCase();}
+(function(){var st=document.createElement('style');st.textContent='.fdlg{display:inline-flex!important;align-items:center;gap:8px;padding:4px 12px 4px 5px!important;border-radius:24px!important;white-space:nowrap;}.fdlg img{width:28px;height:28px;border-radius:9px;background:#fff;padding:3px;object-fit:contain;flex-shrink:0;}.fdlg b{font-weight:800;font-size:13px;}.fdlg small{opacity:.6;font-size:12px;}.fdlg:not(:has(img)){padding:7px 14px!important;}';document.head.appendChild(st);})();
 
 })();
 
