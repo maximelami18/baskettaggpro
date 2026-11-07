@@ -460,7 +460,7 @@ document.addEventListener('DOMContentLoaded', function(){
 var _SB_URL="https://umuvirwbtpflizxupwbr.supabase.co";
 // Version de ce fichier — à incrémenter à chaque déploiement, en cohérence avec la valeur
 // mise à jour dans la table Supabase `app_version` (voir _checkAppVersion ci-dessous).
-var APP_VERSION = "2026-11-07-388";
+var APP_VERSION = "2026-11-07-389";
 var _SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtdXZpcndidHBmbGl6eHVwd2JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3MTI1MDEsImV4cCI6MjA5MDI4ODUwMX0.fFQaF-zP9dzcWITJDf6GBmvu0pdcuvlaUz0A0qW0kfo";
 var _LICENCE_KEY='btp_licence';
 var _MACHINE_KEY='btp_machine';
@@ -37519,11 +37519,17 @@ var XV_LIMIT=20;
 
 function xvFmt(sec){sec=Math.max(0,Math.round(sec));var m=Math.floor(sec/60),s=sec%60;return(m?m+' min ':'')+(m&&s<10?'0':'')+s+' s';}
 function xvJobDur(j){return j.items.reduce(function(a,i){return a+(i.d||0);},0);}
-function xvReadyN(){return XQ.jobs.filter(function(j){return j.state==='ready';}).length;}
+/* la file est conservée (réglages synchronisés) : un export ne disparaît qu'une fois téléchargé */
+function xvQSave(){try{var S=xvSettings();S.xvQueue=XQ.jobs.filter(function(j){return j.state==='ready'||j.state==='wait'||j.state==='run';}).map(function(j){return{id:j.id,name:j.name,n:j.n,zip:!!j.zip,ok:!!j.ok,band:j.band,items:j.items.map(function(i){return i.t==='s'?{t:'s',sid:i.s.id,d:i.d,label:i.label}:i;})};});saveDB();}catch(e){}}
+function xvQLoad(){if(XQ.loaded)return;XQ.loaded=true;try{var L=(xvSettings().xvQueue||[]),have={};XQ.jobs.forEach(function(j){have[j.id]=1;});
+  L.forEach(function(r){if(have[r.id])return;var it=[];r.items.forEach(function(i){if(i.t==='s'){var q=xvSeqById(i.sid);if(q)it.push({t:'s',s:q,d:i.d,label:i.label});}else it.push(i);});if(!it.length)return;
+    XQ.jobs.push({id:r.id,name:r.name,n:it.length,zip:!!r.zip,ok:!!r.ok,items:it,band:r.band,pct:0,detail:'Prêt',state:'ready'});});}catch(e){}}
+function xvReadyN(){xvQLoad();return XQ.jobs.filter(function(j){return j.state==='ready';}).length;}
 function xvUniqName(base,ext){var names=XQ.jobs.map(function(j){return j.name.replace(/\.(mp4|webm|zip)$/i,'');}),n=base,k=2;while(names.indexOf(n)>=0){n=base+' ('+k+')';k++;}return n+'.'+ext;}
 
 /* ── « Ajouter à la file » : met le montage de côté puis le vide ── */
 window.xvEnqueue=function(){
+  xvQLoad();
   var mt=xvSyncAll(),items=mt.map(xvItem).filter(Boolean);
   if(!items.length){toast('Montage vide','red');return;}
   var live=items.some(function(i){if(i.t!=='s')return false;var m=gM(i.s.matchId);return m&&m.liveMode&&m.liveUrl;});
@@ -37537,13 +37543,14 @@ window.xvEnqueue=function(){
   var S=xvSettings(),ex=S.exportExcludedSeqIds||(S.exportExcludedSeqIds=[]),have={};ex.forEach(function(x){have[x]=1;});
   (DB.sequences||[]).forEach(function(s){if(s.mode!=='instats'&&!have[s.id]){ex.push(s.id);have[s.id]=1;}});
   S.xvMt=[];_cmpList().forEach(function(c){c.inc=false;});XV.pvI=null;XV.pb=null;XV.scrX=0;
-  saveDB();renderPage();toast('✓ Ajouté à la file ('+xvReadyN()+') — le montage est vide, prépare le suivant','acc');
+  xvQSave();renderPage();toast('✓ Ajouté à la file ('+xvReadyN()+') — le montage est vide, prépare le suivant','acc');
 };
 
 /* ── panneau « File d'export » ── */
 window.xvFileOpen=function(){xvFilePaint();};
 window.xvFileClose=function(){var o=document.getElementById('xvFl');if(o)o.remove();renderPage();};
 function xvFilePaint(){
+  xvQLoad();
   var old=document.getElementById('xvFl'),sc=old?(old.querySelector('.xvk-card')||{}).scrollTop:0;if(old)old.remove();
   var J=XQ.jobs.filter(function(j){return j.state==='ready';}),tot=0,totC=0,blocked=0;
   var rows=J.map(function(j){
@@ -37566,13 +37573,13 @@ function xvFilePaint(){
   document.body.appendChild(o);var c=o.querySelector('.xvk-card');if(c&&sc)c.scrollTop=sc;
 }
 function xvJobById(id){return XQ.jobs.filter(function(j){return j.id===id;})[0];}
-window.xvJobName=function(id,v){var j=xvJobById(id);if(!j)return;v=String(v||'').replace(/[\\/:*?"<>|]/g,'-').trim()||'Export';j.name=v+'.'+(j.zip?'zip':'mp4');};
-window.xvJobZip=function(id){var j=xvJobById(id);if(!j)return;j.zip=!j.zip;j.name=j.name.replace(/\.(mp4|webm|zip)$/i,'')+'.'+(j.zip?'zip':'mp4');xvFilePaint();};
-window.xvJobDel=function(id){XQ.jobs=XQ.jobs.filter(function(j){return j.id!==id;});xvFilePaint();};
-window.xvJobOk=function(id){var j=xvJobById(id);if(j)j.ok=true;xvFilePaint();};
+window.xvJobName=function(id,v){var j=xvJobById(id);if(!j)return;v=String(v||'').replace(/[\\/:*?"<>|]/g,'-').trim()||'Export';j.name=v+'.'+(j.zip?'zip':'mp4');xvQSave();};
+window.xvJobZip=function(id){var j=xvJobById(id);if(!j)return;j.zip=!j.zip;j.name=j.name.replace(/\.(mp4|webm|zip)$/i,'')+'.'+(j.zip?'zip':'mp4');xvQSave();xvFilePaint();};
+window.xvJobDel=function(id){XQ.jobs=XQ.jobs.filter(function(j){return j.id!==id;});xvQSave();xvFilePaint();};
+window.xvJobOk=function(id){var j=xvJobById(id);if(j)j.ok=true;xvQSave();xvFilePaint();};
 window.xvJobSplit=function(id){var j=xvJobById(id);if(!j)return;var n=Math.ceil(j.items.length/XV_LIMIT),per=Math.ceil(j.items.length/n),base=j.name.replace(/\.(mp4|webm|zip)$/i,''),ext=j.zip?'zip':'mp4',parts=[];
   for(var k=0;k<n;k++){var it=j.items.slice(k*per,(k+1)*per);if(!it.length)continue;parts.push({id:nid(),name:base+' - partie '+(k+1)+'.'+ext,n:it.length,zip:j.zip,ok:false,items:it,band:j.band,pct:0,detail:'Prêt',state:'ready'});}
-  var i=XQ.jobs.indexOf(j);XQ.jobs.splice.apply(XQ.jobs,[i,1].concat(parts));xvFilePaint();};
+  var i=XQ.jobs.indexOf(j);XQ.jobs.splice.apply(XQ.jobs,[i,1].concat(parts));xvQSave();xvFilePaint();};
 
 /* ── lancement : verrouillage complet jusqu'à la fin de la file ── */
 window.xvFileLaunch=function(){
@@ -37592,8 +37599,9 @@ function xvRunNext(){
   if(!j){if(XQ.lockOn)xvLockFinish();return;}
   XQ.cur=j;j.state='run';j.t0=Date.now();j.detail='Chargement des vidéos…';xvLockPaint();
   xvRunJob(j).catch(function(e){j.state='err';j.detail='Erreur : '+(e&&e.message||e);}).then(function(){
-    XQ.cur=null;XQ.jobs=XQ.jobs.filter(function(x){return x!==j;});
-    (XQ.results=XQ.results||[]).push({name:j.name,state:j.state,cancel:!!j.cancel,miss:j.miss||0,detail:j.detail});
+    XQ.cur=null;var res={name:j.name,state:j.state,cancel:!!j.cancel,miss:j.miss||0,detail:j.detail};
+    if(j.state==='ok')XQ.jobs=XQ.jobs.filter(function(x){return x!==j;});else{j.state='ready';j.pct=0;j.detail='Prêt';}
+    xvQSave();(XQ.results=XQ.results||[]).push(res);
     if(j.cancel||XQ.cancelAll){XQ.jobs.forEach(function(x){if(x.state==='wait'){x.state='ready';x.detail='Prêt';}});}
     xvRunNext();});
 }
