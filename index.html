@@ -460,7 +460,7 @@ document.addEventListener('DOMContentLoaded', function(){
 var _SB_URL="https://umuvirwbtpflizxupwbr.supabase.co";
 // Version de ce fichier — à incrémenter à chaque déploiement, en cohérence avec la valeur
 // mise à jour dans la table Supabase `app_version` (voir _checkAppVersion ci-dessous).
-var APP_VERSION = "2026-11-07-384";
+var APP_VERSION = "2026-11-07-385";
 var _SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtdXZpcndidHBmbGl6eHVwd2JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3MTI1MDEsImV4cCI6MjA5MDI4ODUwMX0.fFQaF-zP9dzcWITJDf6GBmvu0pdcuvlaUz0A0qW0kfo";
 var _LICENCE_KEY='btp_licence';
 var _MACHINE_KEY='btp_machine';
@@ -36922,7 +36922,7 @@ function xvWinRender(){
     +'<span class="xrow" style="margin-left:auto;gap:10px"><span class="xchip'+(W.fav?' on':'')+'" onclick="window._xvWin.fav=!window._xvWin.fav;xvWinRender()">★ Favoris seulement</span><span class="xbtn" style="padding:9px 16px" onclick="xvWinClose()">✕</span></span></div>'
     +'<div id="xvWt" class="xcard" style="flex:1;min-height:0;overflow:auto">'+th+(body||'<div style="padding:28px;text-align:center;color:var(--t3)">Aucune séquence.</div>')+'</div>'
     +'<div class="xrow" style="gap:16px;align-items:center;margin-top:14px"><span class="xmut" style="font-size:14px">'+nSel+' coché'+(nSel>1?'s':'')+' sur '+list.length+'</span><span class="xbtn gold" style="margin-left:auto;padding:12px 24px" onclick="xvWinAdd()">+ Ajouter '+nSel+' clip'+(nSel>1?'s':'')+' au montage</span></div></div>';
-  document.body.appendChild(o);var nt=document.getElementById('xvWt');if(nt)nt.scrollTop=sc;
+  (document.fullscreenElement&&document.fullscreenElement!==document.documentElement?document.fullscreenElement:document.body).appendChild(o);var nt=document.getElementById('xvWt');if(nt)nt.scrollTop=sc;
 }
 
 /* ── montage conservé entre les pages + suppression du montage ── */
@@ -36977,15 +36977,15 @@ function xvMontageHtml(){
   var mins=Math.floor(tot/60),secs=Math.round(tot%60),cnt=nS+' clip'+(nS>1?'s':'')+(nT?' · '+nT+' titre'+(nT>1?'s':''):'')+(nC?' · '+nC+' compar.':''),bandOn=_expState.showBandeau;
   return'<div class="xv-sticky"><div class="xcard" style="background:linear-gradient(180deg,#232323,#161616);border-color:rgba(212,170,106,.35);box-shadow:0 -10px 40px #000a;padding:8px 16px"><div style="display:flex;gap:14px;align-items:flex-start">'
     +'<div class="xvid" style="width:192px;height:108px;flex:none;align-self:flex-start;cursor:pointer" onclick="xvPbToggle()"><video id="xvPv" muted playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:transparent"></video><div id="xvPvO" style="position:absolute;inset:0;display:none"></div><span id="xvPvP" style="position:absolute;inset:0;display:grid;place-items:center;font-size:28px;opacity:.8;pointer-events:none">▶</span><span id="xvPvT" style="position:absolute;left:6px;bottom:4px;font-size:10px;font-weight:700;color:var(--g);text-shadow:0 0 4px #000;pointer-events:none">'+(items.length?'Fais défiler le montage':'Montage vide')+'</span></div>'
-    +'<div style="flex:1;min-width:0"><div class="xvmh"><span class="xlab">Montage</span><b class="xcnt">'+cnt+'</b><span class="xmut" style="font-size:12px">≈ '+(mins?mins+' min ':'')+secs+' s</span>'
+    +'<div style="flex:1;min-width:0"><div class="xvmh"><span class="xlab">Montage</span><span class="xrow xzc" style="gap:4px"><span class="xzb" title="Dézoomer" onclick="xvZoomStep(-1)">−</span><input type="range" class="xzr" id="xvZr" min="2" max="16" value="'+XV.zoom+'" oninput="xvZoomSet(this.value)"><span class="xzb" title="Zoomer" onclick="xvZoomStep(1)">+</span></span><b class="xcnt">'+cnt+'</b><span class="xmut" style="font-size:12px">≈ '+(mins?mins+' min ':'')+secs+' s</span>'
     +'<span class="xchip" onclick="xvBandModal()" style="margin-left:2px">🎞 Bandeau : '+(bandOn?'activé':'désactivé')+' ▾</span>'
     +'<span class="xrow" style="gap:8px;border:1px solid var(--bd);border-radius:12px;padding:3px 10px 3px 12px;background:#141414;margin-left:2px"><span class="xmut" style="font-size:11px">Fichier</span><input id="xvFn" value="'+xe(_expState.filename||'')+'" placeholder="Nom du fichier" oninput="_expState.filename=this.value" style="width:64px;background:transparent;border:0;outline:0;color:#eee;font-weight:800;font-size:12.5px;font-family:inherit"><span class="xmut">.mp4</span><span style="color:var(--g)">✎</span><span title="Supprimer ce montage (décoche tout)" onclick="xvClearMontage()" style="cursor:pointer;color:#ff7b7b;font-weight:900;font-size:13px;line-height:1;margin-left:4px;padding:3px 7px;border-radius:8px;background:rgba(255,107,107,.12)">✕</span></span>'
     +'<span class="xbtn" style="margin-left:auto;padding:7px 10px" onclick="xvNewTitle()">＋ Titre</span><span class="xbtn" style="padding:7px 10px" onclick="xvInstant()">▶ Lecture instantanée</span><span class="xbtn gold" style="padding:7px 10px" onclick="xvEnqueue()">⬇ Exporter MP4 · HD</span></div>'
     +'<div style="position:relative"><div id="xvTlS" onscroll="xvTlScroll()"><div id="xvTlIn" style="position:relative;padding:2px 0 0 '+XV_PAD+'px">'
-    +'<div style="display:flex;align-items:stretch"><div id="xvBlks" style="position:relative;display:flex;gap:6px;align-items:stretch;height:44px;flex:none;min-width:'+(blocks?0:400)+'px" ondragover="xvDragOver(event)" ondrop="xvDrop(event)">'+(blocks||'<span class="xmut" style="font-size:12px;line-height:44px">Coche des séquences dans la liste pour construire le montage.</span>')+'<span id="xvIns"></span></div><span id="xvSpR" style="flex:none;display:block;width:400px;height:1px"></span></div>'
-    +'<div id="xvRul" style="position:relative;height:20px;margin-top:3px;border-top:1px solid #444;width:'+Math.max(x,1)+'px">'+labels+'</div></div></div>'
+    +'<div style="display:flex;align-items:stretch"><div id="xvBlks" style="position:relative;display:flex;gap:6px;align-items:stretch;height:60px;flex:none;min-width:'+(blocks?0:400)+'px" ondragover="xvDragOver(event)" ondrop="xvDrop(event)">'+(blocks||'<span class="xmut" style="font-size:12px;line-height:60px">Coche des séquences dans la liste pour construire le montage.</span>')+'<span id="xvIns"></span></div><span id="xvSpR" style="flex:none;display:block;width:400px;height:1px"></span></div>'
+    +'<div id="xvRul" style="display:none;width:'+Math.max(x,1)+'px"></div></div></div>'
     +'<div id="xvPh" style="position:absolute;left:'+XV_PAD+'px;top:-2px;bottom:0;width:2px;background:rgba(255,255,255,.85);box-shadow:0 0 8px rgba(255,255,255,.4);z-index:5;pointer-events:none;display:'+(items.length?'block':'none')+'"></div></div>'
-    +'<div class="xrow" style="justify-content:flex-end;gap:10px;margin-top:2px"><span class="xzb" title="Dézoomer" onclick="xvZoomStep(-1)">−</span><input type="range" class="xzr" id="xvZr" min="2" max="16" value="'+XV.zoom+'" oninput="xvZoomSet(this.value)"><span class="xzb" title="Zoomer" onclick="xvZoomStep(1)">+</span></div></div></div></div></div>';
+    +'</div></div></div></div>';
 }
 window.xvZoomStep=function(d){var z=Math.max(2,Math.min(16,XV.zoom+d));var r=document.getElementById('xvZr');if(r)r.value=z;xvZoomSet(z);};
 window.xvZoomSet=function(v){
@@ -36994,7 +36994,7 @@ window.xvZoomSet=function(v){
   var lay0=XV.lay||[],L=S.scrollLeft,i=lay0.length?xvLayIdx(L):0,f=lay0.length?Math.max(0,Math.min(1,(L-lay0[i].x)/lay0[i].w)):0;
   var items=xvItems(),B=xvBuildBlocks(items),bl=document.getElementById('xvBlks'),ru=document.getElementById('xvRul');
   if(!bl||!ru||!items.length)return;
-  bl.innerHTML=B.blocks+'<span id="xvIns"></span>';ru.innerHTML=B.labels;ru.style.width=Math.max(B.x,1)+'px';XV.lay=B.lay;XV.W=B.x;
+  bl.innerHTML=B.blocks+'<span id="xvIns"></span>';ru.innerHTML='';ru.style.width=Math.max(B.x,1)+'px';XV.lay=B.lay;XV.W=B.x;
   var x=Math.round(B.lay[i].x+f*B.lay[i].w);XV.selfScr=x;S.scrollLeft=x;XV.selfScr=S.scrollLeft;XV.scrX=S.scrollLeft;
 };
 /* molette verticale → défilement horizontal des timelines */
@@ -37341,6 +37341,8 @@ window.xvMxFull=function(){
   try{if(document.fullscreenElement){document.exitFullscreen();}else{b.style.background='#121212';b.style.overflow='auto';(b.requestFullscreen||b.webkitRequestFullscreen).call(b);}}catch(e){}
 };
 document.addEventListener('fullscreenchange',function(){var b=document.getElementById('xvMxBox');if(b&&!document.fullscreenElement){b.style.background='';b.style.overflow='';}});
+
+(function(){var st=document.createElement('style');st.textContent='.xzc .xzr{width:90px!important;height:20px!important}.xzc .xzr::-webkit-slider-thumb{width:14px;height:14px;margin-top:-5px}.xzc .xzb{width:20px;height:20px;font-size:13px}.xzc{margin-left:4px}';document.head.appendChild(st);})();
 
 /*XV_END*/
 </script>
