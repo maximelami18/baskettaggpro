@@ -460,7 +460,7 @@ document.addEventListener('DOMContentLoaded', function(){
 var _SB_URL="https://umuvirwbtpflizxupwbr.supabase.co";
 // Version de ce fichier — à incrémenter à chaque déploiement, en cohérence avec la valeur
 // mise à jour dans la table Supabase `app_version` (voir _checkAppVersion ci-dessous).
-var APP_VERSION = "2026-11-07-385";
+var APP_VERSION = "2026-11-07-387";
 var _SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtdXZpcndidHBmbGl6eHVwd2JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3MTI1MDEsImV4cCI6MjA5MDI4ODUwMX0.fFQaF-zP9dzcWITJDf6GBmvu0pdcuvlaUz0A0qW0kfo";
 var _LICENCE_KEY='btp_licence';
 var _MACHINE_KEY='btp_machine';
@@ -36086,7 +36086,7 @@ function renderExportPage(){
   var seqs=getFilteredSeqs(),mt=xvSyncAll(),sel=seqs.filter(function(s){return !_isSeqExcludedFromExport(s.id);}).length;
   var matches=xvMatchesList(),eff=xvEffMatches(matches),nc=_cmpList().length;
   var h='<div class="xv-wrap"><div style="flex:none"><div class="xrow" style="padding:4px 0 14px;gap:14px"><b style="font-size:24px;font-weight:900;white-space:nowrap">Export vidéo</b>'
-    +'<span class="xseg">'+[['liste','☰ Liste'],['matrix','▦ Matrix'],['cmp','⚖ Comparaisons'+(nc?' <b style="color:var(--g)">'+nc+'</b>':'')]].map(function(t){return'<span class="xchip'+(XV.tab===t[0]?' on':'')+'" onclick="XV.tab=\''+t[0]+'\';_expViewMode=\''+(t[0]==='matrix'?'matrix':'filtres')+'\';renderPage()">'+t[1]+'</span>';}).join('')+'</span>'
+    +'<span class="xseg">'+[['liste','☰ Liste'],['cmp','⚖ Comparaisons'+(nc?' <b style="color:var(--g)">'+nc+'</b>':'')]].map(function(t){return'<span class="xchip'+(XV.tab===t[0]?' on':'')+'" onclick="XV.tab=\''+t[0]+'\';_expViewMode=\''+(t[0]==='matrix'?'matrix':'filtres')+'\';renderPage()">'+t[1]+'</span>';}).join('')+'</span>'
     +'<div class="xrow" style="flex:1;gap:10px;background:#141414;border:1px solid var(--bd);border-radius:14px;padding:6px 8px 6px 14px;margin:0 8px;min-width:0"><span id="vsMic" onclick="vsListen()" style="width:34px;height:34px;border-radius:50%;background:rgba(212,170,106,.18);display:grid;place-items:center;border:1px solid var(--g);cursor:pointer;flex:none">🎙</span>'
     +'<input id="vsIn" value="'+xe(typeof _vsLast!=='undefined'?_vsLast:'')+'" placeholder="Dis ou tape : « défense step out du #3 au QT4 »…" onkeydown="if(event.key===\'Enter\')vsRun(this.value)" style="flex:1;min-width:0;background:transparent;border:0;outline:0;color:#eee;font-size:14px;font-family:inherit"><span title="Effacer la recherche" onclick="xvVsClear()" style="color:#fff;cursor:pointer;font-size:17px;font-weight:700;padding:0 8px;line-height:1">✕</span><span class="xbtn" style="padding:7px 16px" onclick="vsRun(document.getElementById(\'vsIn\').value)">Chercher</span></div>'
     +'<span class="xmut" style="white-space:nowrap"><b style="font-size:20px;color:#fff">'+seqs.length+'</b> séq. · <b style="color:var(--ok)">'+sel+'</b> cochées</span></div>'
@@ -36094,7 +36094,7 @@ function renderExportPage(){
     +'<div class="xrow" style="padding:0 0 6px;gap:10px">'+xvTeamsDd()+'<span class="xlab" style="margin-left:6px">Matchs · '+eff.filter(function(id){return matches.some(function(x){return x.m.id===id;});}).length+' sur '+matches.length+'</span></div>'
     +'<div id="xvMs">'+matches.map(function(x){return xvMatchCard(x.m,x.n,eff.indexOf(x.m.id)>=0);}).join('')+(matches.length?'':'<div class="xmut" style="padding:10px">Aucun match.</div>')+'</div></div>'
     +xvCmpBanner()+(XV.tab==='cmp'?'':'<div style="flex:none">'+xvFilterBar()+'</div>')
-    +'<div id="xvBody">'+(XV.tab==='cmp'?_cmpCard():XV.tab==='matrix'?xvMatrixHtml():xvListHtml())+'</div>'
+    +'<div id="xvBody">'+(XV.tab==='cmp'?_cmpCard():xvListHtml())+'</div>'
     +xvMontageHtml()+'</div>';
   setTimeout(xvPost,0);
   return h;
@@ -36664,8 +36664,8 @@ function xvCmpDialog(a,b){
   var nm=function(s){return s?(xvVals(s,'act')[0]||(xvIsCounter(s)?xvVals(s,'sub')[0]:'')||s.family||'Clip'):'?';};
   var o=document.createElement('div');o.id='xvCD';o.className='xv-ov';o.style.cssText=xvOvRect()+'z-index:2350';
   o.innerHTML='<div class="xv-dim" onclick="xvCDClose()"></div><div class="xv-ovcard" style="left:50%;top:50%;transform:translate(-50%,-50%);width:min(860px,94%);padding:26px 30px;max-height:94%;overflow:auto"><b style="font-size:22px">⚖ Nouvelle comparaison</b>'
-    +'<div class="xrow" style="gap:16px;margin:18px 0"><div class="xvid" style="flex:1;height:180px"><video id="xvCva" muted playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:transparent"></video><span class="xtag" style="position:absolute;left:10px;top:10px;background:var(--g);color:#111">A</span><span style="position:absolute;left:10px;bottom:8px;font-weight:700;font-size:12px;text-shadow:0 0 4px #000">'+xe(xvCmpLab(sa))+'</span></div>'
-    +'<div class="xvid" style="flex:1;height:180px;background:linear-gradient(135deg,#2e1a0c,#3a2416)"><video id="xvCvb" muted playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:transparent"></video><span class="xtag" style="position:absolute;left:10px;top:10px;background:#3b82f6;color:#fff">B</span><span style="position:absolute;left:10px;bottom:8px;font-weight:700;font-size:12px;text-shadow:0 0 4px #000">'+xe(xvCmpLab(sb))+'</span></div></div>'
+    +'<div class="xrow" style="gap:16px;margin:18px 0"><div class="xvid" style="flex:1;height:180px"><video id="xvCva" muted playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:transparent"></video><span class="xtag" style="position:absolute;left:10px;top:10px;background:var(--g);color:#111">A</span></div>'
+    +'<div class="xvid" style="flex:1;height:180px;background:linear-gradient(135deg,#2e1a0c,#3a2416)"><video id="xvCvb" muted playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:transparent"></video><span class="xtag" style="position:absolute;left:10px;top:10px;background:#3b82f6;color:#fff">B</span></div></div>'
     +'<input id="xvCT" class="xinp" style="width:100%;box-sizing:border-box;margin-bottom:14px" value="'+xe(nm(sa)+' vs '+nm(sb))+'">'
     +'<div class="xrow" style="gap:20px;margin-bottom:22px;flex-wrap:wrap"><span class="xseg"><span class="xchip" id="xvC_mode_sim" onclick="xvCmpSet(\'mode\',\'sim\')">Côte à côte</span><span class="xchip" id="xvC_mode_seq" onclick="xvCmpSet(\'mode\',\'seq\')">À la suite</span></span><span class="xseg"><span class="xchip" id="xvC_speed_1" onclick="xvCmpSet(\'speed\',\'1\')">Vitesse normale</span><span class="xchip" id="xvC_speed_05" onclick="xvCmpSet(\'speed\',\'0.5\')">Ralenti 0.5×</span></span></div>'
     +'<div class="xrow" style="gap:12px;flex-wrap:wrap"><span class="xbtn gold" style="padding:13px 26px" onclick="xvCmpMake(true)">＋ Créer et ajouter au montage</span><span class="xbtn" style="padding:13px 26px" onclick="xvCmpMake(false)">Créer seulement</span><span class="xbtn" style="margin-left:auto" onclick="xvCDClose()">Annuler</span></div></div>';
@@ -36838,8 +36838,8 @@ function xvCmpTab(){
       +'<div class="xcmpt" style="background:linear-gradient(135deg,#0f1c33,#16294a)"><b style="background:var(--g);color:#111">A</b><span>'+xe(xvCmpLab(a))+'</span></div>'
       +'<div class="xcmpt" style="background:linear-gradient(135deg,#2e1a0c,#3a2416)"><b style="background:#3b82f6;color:#fff">B</b><span>'+xe(xvCmpLab(b))+'</span></div>'
       +'<div style="flex:1;min-width:220px"><input class="xinp" style="width:100%;box-sizing:border-box;font-weight:800" value="'+xe(c.title||(nm(a)+' vs '+nm(b)))+'" onchange="cmpSetT('+c.id+',this.value)">'
-      +'<div class="xrow" style="gap:12px;margin-top:10px;flex-wrap:wrap">'+seg('mode',[['sim','Côte à côte'],['seq','À la suite']],c.mode==='seq'?'seq':'sim')+seg('speed',[['1','Vitesse normale'],['0.5','Ralenti 0.5×'],['0.25','Ralenti 0.25×']],String(c.speed||1))
-      +'<span class="xchip'+(c.draw?' on':'')+'" onclick="cmpSet('+c.id+',\'draw\',!'+(c.draw?'true':'false')+');renderPage()">✏ Dessins</span></div></div>'
+      +'<div class="xrow" style="gap:12px;margin-top:10px;flex-wrap:wrap">'+seg('mode',[['sim','Côte à côte'],['seq','À la suite']],c.mode==='seq'?'seq':'sim')+seg('speed',[['1','Vitesse normale'],['0.5','Ralenti 0.5×']],String(c.speed||1))
+      +'</div></div>'
       +'<div class="xrow" style="gap:10px"><span class="xchip'+(inc?' on':'')+'" onclick="xvCmpInc('+c.id+')">'+(inc?'✓ Dans le montage':'＋ Ajouter au montage')+'</span><span class="xbtn" onclick="cmpPreview('+c.id+')">▶ Aperçu</span><span class="xbtn" style="padding:9px 13px" onclick="cmpDel('+c.id+')" title="Supprimer">✕</span></div></div>';
   });
   return h;
@@ -36976,7 +36976,7 @@ function xvMontageHtml(){
   var B=xvBuildBlocks(items),blocks=B.blocks,labels=B.labels,x=B.x;XV.lay=B.lay;XV.W=x;
   var mins=Math.floor(tot/60),secs=Math.round(tot%60),cnt=nS+' clip'+(nS>1?'s':'')+(nT?' · '+nT+' titre'+(nT>1?'s':''):'')+(nC?' · '+nC+' compar.':''),bandOn=_expState.showBandeau;
   return'<div class="xv-sticky"><div class="xcard" style="background:linear-gradient(180deg,#232323,#161616);border-color:rgba(212,170,106,.35);box-shadow:0 -10px 40px #000a;padding:8px 16px"><div style="display:flex;gap:14px;align-items:flex-start">'
-    +'<div class="xvid" style="width:192px;height:108px;flex:none;align-self:flex-start;cursor:pointer" onclick="xvPbToggle()"><video id="xvPv" muted playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:transparent"></video><div id="xvPvO" style="position:absolute;inset:0;display:none"></div><span id="xvPvP" style="position:absolute;inset:0;display:grid;place-items:center;font-size:28px;opacity:.8;pointer-events:none">▶</span><span id="xvPvT" style="position:absolute;left:6px;bottom:4px;font-size:10px;font-weight:700;color:var(--g);text-shadow:0 0 4px #000;pointer-events:none">'+(items.length?'Fais défiler le montage':'Montage vide')+'</span></div>'
+    +'<div class="xvid" style="width:192px;height:108px;flex:none;align-self:flex-start;cursor:pointer" onclick="xvPbToggle()"><video id="xvPv" muted playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:transparent"></video><div id="xvPvO" style="position:absolute;inset:0;display:none"></div><span id="xvPvP" style="position:absolute;inset:0;display:grid;place-items:center;font-size:28px;opacity:.8;pointer-events:none">▶</span></div>'
     +'<div style="flex:1;min-width:0"><div class="xvmh"><span class="xlab">Montage</span><span class="xrow xzc" style="gap:4px"><span class="xzb" title="Dézoomer" onclick="xvZoomStep(-1)">−</span><input type="range" class="xzr" id="xvZr" min="2" max="16" value="'+XV.zoom+'" oninput="xvZoomSet(this.value)"><span class="xzb" title="Zoomer" onclick="xvZoomStep(1)">+</span></span><b class="xcnt">'+cnt+'</b><span class="xmut" style="font-size:12px">≈ '+(mins?mins+' min ':'')+secs+' s</span>'
     +'<span class="xchip" onclick="xvBandModal()" style="margin-left:2px">🎞 Bandeau : '+(bandOn?'activé':'désactivé')+' ▾</span>'
     +'<span class="xrow" style="gap:8px;border:1px solid var(--bd);border-radius:12px;padding:3px 10px 3px 12px;background:#141414;margin-left:2px"><span class="xmut" style="font-size:11px">Fichier</span><input id="xvFn" value="'+xe(_expState.filename||'')+'" placeholder="Nom du fichier" oninput="_expState.filename=this.value" style="width:64px;background:transparent;border:0;outline:0;color:#eee;font-weight:800;font-size:12.5px;font-family:inherit"><span class="xmut">.mp4</span><span style="color:var(--g)">✎</span><span title="Supprimer ce montage (décoche tout)" onclick="xvClearMontage()" style="cursor:pointer;color:#ff7b7b;font-weight:900;font-size:13px;line-height:1;margin-left:4px;padding:3px 7px;border-radius:8px;background:rgba(255,107,107,.12)">✕</span></span>'
@@ -37144,8 +37144,8 @@ function xvCmpBand(ctx,R,s,v){
 }
 function xvCmpPlay(ctx,item,which){ // which : [0,1] côte à côte, [0] ou [1] plein écran
   return new Promise(function(resolve){
-    var sp=item.c.speed||1,useDraw=!!item.c.draw;
-    var vids=which.map(function(i){var v=document.createElement('video');v.muted=true;v.playsInline=true;v.preload='auto';v.playbackRate=sp;v._i=i;v._clip=item.r[i];v._seq=i?item.sb:item.sa;v._layers=useDraw?(i?item.db:item.da)||[]:[];v._fired=[];v._R=null;return v;});
+    var sp=item.c.speed||1,useDraw=true;
+    var vids=which.map(function(i){var v=document.createElement('video');v.muted=true;v.playsInline=true;v.preload='auto';v.playbackRate=sp;v._i=i;v._clip=item.r[i];v._seq=i?item.sb:item.sa;v._layers=(useDraw&&v._seq&&typeof _expDrawIds!=='undefined'&&_expDrawIds&&_expDrawIds.indexOf(v._seq.id)>=0)?((i?item.db:item.da)||[]):[];v._fired=[];v._R=null;return v;});
     var ready=0,raf=null,fin=false,frz=null,myGen=window._cmpGen||0;
     var cleanup=function(){cancelAnimationFrame(raf);vids.forEach(function(v){try{v.pause();}catch(e){}v.removeAttribute('src');v.load();});};
     var box=function(v,x,w){var vw=v.videoWidth||1280,vh=v.videoHeight||720,s=Math.min(w/vw,720/vh),dw=vw*s,dh=vh*s,dx=x+(w-dw)/2,dy=(720-dh)/2;v._R={x:dx,y:dy,w:dw,h:dh};try{ctx.drawImage(v,dx,dy,dw,dh);}catch(e){}};
@@ -37343,6 +37343,165 @@ window.xvMxFull=function(){
 document.addEventListener('fullscreenchange',function(){var b=document.getElementById('xvMxBox');if(b&&!document.fullscreenElement){b.style.background='';b.style.overflow='';}});
 
 (function(){var st=document.createElement('style');st.textContent='.xzc .xzr{width:90px!important;height:20px!important}.xzc .xzr::-webkit-slider-thumb{width:14px;height:14px;margin-top:-5px}.xzc .xzb{width:20px;height:20px;font-size:13px}.xzc{margin-left:4px}';document.head.appendChild(st);})();
+
+/* ── Aperçu d'une comparaison : même design que le reste (sombre / or), sans ×0,25 ── */
+window.cmpPreview=function(id){
+  var c=_cmpList().filter(function(x){return x.id===id;})[0];if(!c)return;
+  Promise.all([_cmpResolve(_cmpSeq(c.a)),_cmpResolve(_cmpSeq(c.b))]).then(function(r){
+    if(!r[0]||!r[1]){toast('Vidéo introuvable (match en lien live, ou vidéo non chargée)','red');return;}
+    window._cmpPv={c:c,r:r};var seq=c.mode==='seq';
+    var ex=document.getElementById('xvCP');if(ex)ex.remove();
+    var o=document.createElement('div');o.id='xvCP';o.className='xv-ov';o.style.cssText=xvOvRect()+'z-index:2400';
+    var tile=function(i){return'<div id="cmpBox'+i+'" class="xvid" style="flex:1;min-width:0;height:300px;'+(seq&&i===1?'display:none;':'')+(i?'background:linear-gradient(135deg,#2e1a0c,#3a2416)':'')+'"><video id="cmpV'+i+'" muted playsinline src="'+r[i].url+'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:transparent"></video><span class="xtag" style="position:absolute;left:10px;top:10px;'+(i?'background:#3b82f6;color:#fff':'background:var(--g);color:#111')+'">'+(i?'B':'A')+'</span></div>';};
+    var sp=c.speed||1;
+    o.innerHTML='<div class="xv-dim" onclick="cmpPvClose()"></div><div class="xv-ovcard" style="left:50%;top:50%;transform:translate(-50%,-50%);width:min(1100px,94%);padding:24px 28px;max-height:94%;overflow:auto">'
+      +'<div class="xrow" style="margin-bottom:16px"><b style="font-size:20px">⚖ '+xe(c.title||'Comparaison')+'</b><span class="xbtn" style="margin-left:auto;padding:8px 13px" onclick="cmpPvClose()">✕</span></div>'
+      +'<div class="xrow" style="gap:16px;align-items:stretch">'+tile(0)+tile(1)+'</div>'
+      +'<div class="xrow" style="gap:12px;margin-top:18px;flex-wrap:wrap"><span class="xbtn gold" style="padding:12px 22px" onclick="cmpPvPlay()">▶ Lancer</span><span class="xbtn" style="padding:12px 20px" onclick="cmpPvPause()">⏸ Pause / reprise</span>'
+      +'<span class="xseg" style="margin-left:auto"><span class="xchip'+(sp===1?' on':'')+'" id="xvCPs1" onclick="cmpPvSpeed(1)">×1</span><span class="xchip'+(sp===0.5?' on':'')+'" id="xvCPs05" onclick="cmpPvSpeed(0.5)">×0,5</span></span></div></div>';
+    document.body.appendChild(o);cmpPvPlay();
+  });
+};
+(function(){var _sp=window.cmpPvSpeed;window.cmpPvSpeed=function(v){_sp(v);var a=document.getElementById('xvCPs1'),b=document.getElementById('xvCPs05');if(a)a.classList.toggle('on',v===1);if(b)b.classList.toggle('on',v===0.5);};
+var _cl=window.cmpPvClose;window.cmpPvClose=function(){_cl();var o=document.getElementById('xvCP');if(o)o.remove();};})();
+
+/* ===== xv13 : recherche vocale renforcée (v387) ===== */
+var XV13_STOP=('je veux voudrais voudrait aimerais aimerai peux peut tu me moi montre montres montrer affiche afficher donne donnes mets mettre met sors sort trouve cherche recherche fais fait faits vois voir regarde regarder toutes tous tout toute les des du de la le l un une et ou puis ensuite aussi avec qui que qu dans sur pour par chez est sont etait ai as au aux en y il ils elle on ca ce cet cette ces mon ma mes son sa ses leur leurs notre nos donc alors bah euh ben bon ok voila genre vraiment juste peu plus tres bien faire faut faudrait stp svp merci s lors pendant durant partie moment fois cas truc trucs chose choses action actions sequence sequences clip clips video videos joueur joueurs joueuse implique impliques impliquee impliquees quand lorsque comme mais aussi egalement concernant concerne ceux celles celui celle et puis d l c j m n t qu').split(' ').reduce(function(o,w){if(w)o[w]=1;return o;},{});
+var XV13_GEN={jeu:1,principe:1,phase:1,type:1};
+function xvPhon(w){return String(w).replace(/ck/g,'k').replace(/qu/g,'k').replace(/c(?=[aouklr])/g,'k').replace(/ph/g,'f').replace(/y/g,'i').replace(/h/g,'').replace(/w/g,'v').replace(/ou/g,'u').replace(/ei|ai/g,'e').replace(/(.)\1+/g,'$1').replace(/(?<=.{3})[sxtdzp]+$/,'');}
+function xvTokEq(a,b){
+  if(a===b)return true;if(/\d/.test(a)||/\d/.test(b))return false;
+  if(vsEq(a,b))return true;
+  var l=Math.min(a.length,b.length);if(l<4)return false;
+  var pa=xvPhon(a),pb=xvPhon(b);if(pa===pb)return true;
+  return Math.max(pa.length,pb.length)>=5&&vsLev(pa,pb)<=1;
+}
+function xvV13Vocab(){
+  var seqs=(DB.sequences||[]).filter(function(s){return s.mode!=='instats';}),voc=[],seen={},fams={};
+  function add(f,v,label){var k=f+'|'+v+'|'+(label||'');if(!v||seen[k])return;seen[k]=1;var tk=vsNorm(label||v).split(' ').filter(function(w){return w&&!VS_STOP[w];}).map(vsStem).filter(Boolean);if(tk.length)voc.push({f:f,v:v,n:vsNorm(label||v),toks:tk,label:label||v});}
+  seqs.forEach(function(s){add('fam',s.family);add('sub',s.sub);add('act',s.action);add('res',s.result);if(s.family)fams[s.family]=1;(s.subActions||[]).forEach(function(x){add('sa',x);});
+    (s.seqPlayers||[]).forEach(function(sp){var pid=String(sp.pid);if(pid.indexOf('adv#')===0||seen['pl|'+pid])return;seen['pl|'+pid]=1;var o=xvPlayerLbl(sp,s),nm=vsNorm(o.name||'');var tk=nm.split(' ').filter(function(w){return w&&!VS_STOP[w];}).map(vsStem);var dg=String(o.num||'').replace(/\D/g,'');if(dg)tk.push('num'+dg);
+      if(tk.length)voc.push({f:'pl',v:pid,n:nm||('num'+dg),toks:tk,label:(o.num&&o.num!=='?'?'#'+dg+' ':'')+(o.name||''),num:dg,nameToks:nm.split(' ').filter(Boolean).map(vsStem)});});});
+  VS_ROLES.forEach(function(r){if(r[0]==='implique')return;r[1].forEach(function(a){add('role',r[0],a);voc[voc.length-1]&&(voc[voc.length-1].label=r[1][0]);});});
+  var mids={};seqs.forEach(function(s){mids[s.matchId]=1;});
+  Object.keys(mids).forEach(function(id){var mm=gM(isNaN(+id)?id:+id);if(!mm)return;if(mm.opp)add('mt',mm.id,mm.opp);if(mm.round!=null&&mm.round!=='')add('mt',mm.id,'j'+mm.round);});
+  voc.fams=Object.keys(fams);return voc;
+}
+function xvV13Qt(T){
+  var qts=[],ord={premier:1,'1er':1,'1ere':1,'1e':1,deuxieme:2,second:2,seconde:2,'2e':2,'2eme':2,troisieme:3,'3e':3,'3eme':3,quatrieme:4,'4e':4,'4eme':4,dernier:4},O='premier|1er|1ere|1e|deuxieme|second|seconde|2e|2eme|troisieme|3e|3eme|quatrieme|4e|4eme|dernier';
+  var add=function(n){n=+n;if(n>=1&&n<=4&&qts.indexOf(n)<0)qts.push(n);};
+  T=T.replace(new RegExp(' ((?:(?:'+O+')(?: (?:et|ou|puis))? ?)+) (?:quarts? temps|quarts?|qt) ','g'),function(m,a){a.split(' ').forEach(function(w){if(ord[w])add(ord[w]);});return ' ';});
+  T=T.replace(/ (?:quarts? temps|quarts?|qt) ?((?:[1-4](?: (?:et|ou|puis|a))? ?)+) /g,function(m,a){a.split(/[^1-4]+/).forEach(function(d){if(d)add(d);});return ' ';});
+  T=T.replace(/ qt ?([1-4]) /g,function(m,d){add(d);return ' ';});
+  T=T.replace(/ qt([1-4]) /g,function(m,d){add(d);return ' ';});
+  return{T:T,qts:qts};
+}
+function xvV13Parse(txt,voc){
+  var T=' '+vsNorm(txt)+' ',fav=false;
+  T=T.replace(/ joueu[rs]e? (\d{1,2}) /g,' num$1 ').replace(/ numero (\d{1,2}) /g,' num$1 ');
+  var Q=xvV13Qt(T);T=Q.T;
+  var m;if(m=T.match(/ favoris? /)){fav=true;T=T.replace(m[0],' ');}
+  var vtok={};voc.forEach(function(e){e.toks.forEach(function(t){vtok[t]=1;});});
+  var W=T.trim().split(' ').filter(function(w){return w&&!(XV13_STOP[w]&&!vtok[vsStem(w)]);}),P=W.map(vsStem),used=P.map(function(){return false;}),hits=[];
+  var find=function(toks){var pos=[],ok=true;toks.forEach(function(tk){if(!ok)return;var f=-1;for(var i=0;i<P.length&&f<0;i++)if(!used[i]&&pos.indexOf(i)<0&&xvTokEq(P[i],tk))f=i;if(f<0)ok=false;else pos.push(f);});return ok?pos:null;};
+  var groups={};voc.forEach(function(e){if(e.f==='pl')return;(groups[e.n]=groups[e.n]||[]).push(e);});
+  var names=Object.keys(groups).sort(function(a,b){var x=groups[a][0].toks,y=groups[b][0].toks;return y.length-x.length||b.length-a.length;});
+  names.forEach(function(n){var g=groups[n],toks=g[0].toks;if(toks.length===1&&toks[0].length<2)return;
+    var pos=find(toks);
+    if(!pos&&toks.length>=2){var d=toks.filter(function(t){return !XV13_GEN[t];});if(d.length&&d.length<toks.length)pos=find(d);}
+    if(pos){pos.forEach(function(i){used[i]=true;});hits.push({n:n,entries:g});}});
+  // joueurs : numéro, nom complet, ou un nom unique (3 lettres mini), tolérant aux erreurs de dictée
+  var pl=voc.filter(function(e){return e.f==='pl';}),cnt={};pl.forEach(function(e){(e.nameToks||[]).forEach(function(t){cnt[t]=(cnt[t]||0)+1;});});
+  pl.forEach(function(e){var pos=null;
+    var nt=e.nameToks||[];
+    if(nt.length)pos=find(nt);
+    if(!pos&&e.num){var k=P.indexOf('num'+e.num);if(k>=0&&!used[k])pos=[k];}
+    if(!pos){var one=nt.filter(function(t){return t.length>=3&&cnt[t]===1;});for(var k2=0;k2<one.length&&!pos;k2++)pos=find([one[k2]]);}
+    if(pos){pos.forEach(function(i){used[i]=true;});hits.push({n:e.n,entries:[e]});}});
+  // synonymes
+  var syn=function(stem,fn){var i=P.indexOf(stem);if(i>=0&&!used[i]){var es=fn();if(es.length){used[i]=true;hits.push({n:W[i],entries:es,multi:true,label:W[i]});}}};
+  syn('attaqu',function(){return(voc.fams||[]).filter(function(f){return !/defen|compteur/.test(vsNorm(f));}).map(function(f){return{f:'fam',v:f,n:f};});});
+  syn('offensi',function(){var r=[];return r;});
+  return{qts:Q.qts,fav:fav,hits:hits,rest:W.filter(function(w,i){return !used[i]&&!XV13_STOP[w];}),W:W};
+}
+function xvV13Sugg(word,voc){
+  var s=vsStem(word),out=[],seen={};if(s.length<3||/\d/.test(s))return out;
+  voc.forEach(function(e){if(e.f==='mt')return;var sc=0;e.toks.forEach(function(t){if(xvTokEq(s,t))sc=Math.max(sc,3);else if(t.length>=4&&s.length>=3&&(t.indexOf(s.slice(0,3))===0))sc=Math.max(sc,1.5);else if(s.length>=4&&xvTokEq(s,t.slice(0,s.length)))sc=Math.max(sc,2);});
+    if(sc>0){var k=e.f+'|'+e.v;if(!seen[k]){seen[k]=1;out.push({e:e,sc:sc});}}});
+  out.sort(function(a,b){return b.sc-a.sc;});return out.slice(0,3).map(function(x){return x.e;});
+}
+window.vsPick=function(f,v){
+  v=decodeURIComponent(v);if(!XV.f[f])return;if(XV.f[f].indexOf(v)<0)XV.f[f].push(v);
+  var n=getFilteredSeqs().length;if(!n){XV.f[f].pop();toast('Aucune séquence avec ça','red');return;}
+  try{_vsMsg='<span style="display:inline-block;padding:2px 9px;border-radius:9px;background:rgba(61,201,122,.18);font-weight:700">Ajouté</span> → <b>'+n+' séquence'+(n>1?'s':'')+'</b>';}catch(e){}
+  _expSelectedIds=null;_customSeqOrder=null;renderPage();
+};
+window.vsRun=function(txt){
+  txt=String(txt||'').trim();if(!txt)return;_vsLast=txt;
+  var seqs=(DB.sequences||[]).filter(function(s){return s.mode!=='instats';}),voc=xvV13Vocab(),P=xvV13Parse(txt,voc);
+  var E=_expState;
+  if(_vsPrevM&&E.matchIds.join()===_vsSetM){E.matchIds=_vsPrevM.slice();}_vsPrevM=null;
+  var saveF=JSON.parse(JSON.stringify(XV.f)),saveM=E.matchIds.slice(),saveFav=E.favOnly;
+  XV.f={fam:[],sub:[],act:[],sa:[],res:[],pl:[],role:[],qt:[]};E.favOnly=false;E.family=E.sub=E.action=E.result=E.player=E.qt='Tous';E.role=E.rolePlayer='Tous';E.subActionFilter=[];
+  var applied=[],ignored=[],mt=[],order=['fam','sub','act','sa','res','role','pl'],chip=function(t,c){return'<span style="display:inline-block;padding:2px 9px;margin:2px 4px 2px 0;border-radius:9px;background:'+c+';font-weight:700;">'+String(t).replace(/</g,'&lt;')+'</span>';};
+  P.hits.forEach(function(h){h.entries.forEach(function(e){if(e.f==='mt'&&mt.indexOf(e.v)<0)mt.push(e.v);});});
+  if(mt.length){_vsPrevM=E.matchIds.slice();E.matchIds=mt.slice();_vsSetM=E.matchIds.join();
+    if(getFilteredSeqs().length){mt.forEach(function(id){var mm=gM(id);applied.push(mm?'J'+mm.round+' '+(mm.opp||''):'match');});}
+    else{E.matchIds=_vsPrevM.slice();_vsPrevM=null;ignored.push('match');}}
+  P.hits.forEach(function(h){
+    var cand=h.entries.filter(function(e){return e.f!=='mt';});if(!cand.length)return;
+    if(h.multi){var okM=0;cand.forEach(function(e){XV.f[e.f].push(e.v);});if(getFilteredSeqs().length){applied.push(h.label||h.n);}else{cand.forEach(function(e){XV.f[e.f].pop();});ignored.push(h.label||h.n);}return;}
+    cand.sort(function(a,b){return order.indexOf(a.f)-order.indexOf(b.f);});
+    var ok=false;
+    for(var i=0;i<cand.length&&!ok;i++){var e=cand[i],arr=XV.f[e.f];if(!arr)continue;arr.push(e.v);if(getFilteredSeqs().length)ok=true;else arr.pop();
+      if(ok)applied.push(e.f==='role'?'rôle : '+e.label:(e.f==='pl'?(e.label||e.v):e.v));}
+    if(!ok)ignored.push(cand[0].f==='pl'?(cand[0].label||cand[0].v):cand[0].label||cand[0].v);});
+  if(P.qts.length){var q=P.qts.map(function(n){return'QT'+n;});XV.f.qt=q.slice();if(getFilteredSeqs().length)applied.push(q.join(' + '));else{XV.f.qt=[];ignored.push(q.join(' + '));}}
+  if(P.fav){E.favOnly=true;if(getFilteredSeqs().length)applied.push('favoris');else{E.favOnly=false;ignored.push('favoris');}}
+  var sugg='';
+  var sg=[];P.rest.forEach(function(w){xvV13Sugg(w,voc).forEach(function(e){if(!sg.some(function(x){return x.f===e.f&&x.v===e.v;}))sg.push(e);});});
+  if(sg.length){sugg='<br><span style="color:var(--t3)">Tu voulais dire : </span>'+sg.slice(0,6).map(function(e){return'<span class="xchip" style="margin:2px 4px 2px 0" onclick="vsPick(\''+e.f+'\',\''+encodeURIComponent(e.v)+'\')">'+String(e.label||e.v).replace(/</g,'&lt;')+(e.f==='pl'?' (joueur)':'')+'</span>';}).join('');}
+  if(!applied.length){XV.f=saveF;E.matchIds=saveM;E.favOnly=saveFav;
+    _vsMsg='<span style="color:#E05252;">Rien reconnu dans « '+String(txt).replace(/</g,'&lt;')+' ». Dis les mots de tes boards (famille, action, résultat, joueur, QT…).</span>'+sugg;
+    renderPage();toast('Je n’ai rien reconnu','red');return;}
+  var n=getFilteredSeqs().length;_expSelectedIds=null;_customSeqOrder=null;
+  _vsMsg='Compris : '+applied.map(function(x){return chip(x,'rgba(61,201,122,.18)');}).join('')+' → <b>'+n+' séquence'+(n>1?'s':'')+'</b>'
+    +(P.rest.length?'<br><span style="color:var(--t3)">Mots non compris : '+P.rest.join(', ')+'</span>':'')
+    +(ignored.length?'<br>Sans résultat avec le reste : '+ignored.map(function(x){return chip(x,'rgba(224,82,82,.18)');}).join(''):'')+sugg;
+  renderPage();toast('🎙 '+n+' séquence'+(n>1?'s':''),ignored.length?'red':'acc');
+};
+/* dictée : parle librement, plusieurs alternatives de transcription, la meilleure est retenue */
+window.vsListen=function(){
+  var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){toast('Dictée non disponible sur ce navigateur : tape ta demande dans la barre','red');return;}
+  var rec;try{rec=new SR();}catch(e){return;}
+  rec.lang='fr-FR';rec.interimResults=true;rec.continuous=true;rec.maxAlternatives=5;
+  var inp=document.getElementById('vsIn'),btn=document.getElementById('vsMic'),finals=[],it='',tm=null,stopped=false;if(btn)btn.textContent='🔴';
+  var arm=function(ms){clearTimeout(tm);tm=setTimeout(function(){try{rec.stop();}catch(e){}},ms||1800);};
+  rec.onresult=function(e){it='';finals=[];for(var i=0;i<e.results.length;i++){var r=e.results[i];if(r.isFinal){var alts=[];for(var k=0;k<r.length;k++)alts.push(r[k].transcript);finals.push(alts);}else it+=r[0].transcript;}
+    var i2=document.getElementById('vsIn');if(i2)i2.value=(finals.map(function(a){return a[0];}).join(' ')+' '+it).trim();arm();};
+  rec.onerror=function(ev){if(ev&&(ev.error==='no-speech'||ev.error==='aborted'))return;toast('Micro indisponible ou refusé : tape ta demande dans la barre','red');};
+  rec.onend=function(){clearTimeout(tm);var b=document.getElementById('vsMic');if(b)b.textContent='🎙';
+    var i2=document.getElementById('vsIn'),t=(finals.map(function(a){return a[0];}).join(' ')+' '+it).trim()||(i2&&i2.value||'').trim();
+    if(finals.length){ // meilleure combinaison d'alternatives : celle qui fait reconnaître le plus de mots-clés
+      try{var voc=xvV13Vocab(),best=t,bs=-1,maxA=Math.max.apply(null,finals.map(function(a){return a.length;}));
+        for(var k=0;k<maxA;k++){var cand=finals.map(function(a){return a[k]||a[0];}).join(' ');var P=xvV13Parse(cand,voc),sc=P.hits.length*2+P.qts.length+(P.fav?1:0)-P.rest.length*0.5;if(sc>bs){bs=sc;best=cand;}}
+        var P0=xvV13Parse(t,voc),s0=P0.hits.length*2+P0.qts.length+(P0.fav?1:0)-P0.rest.length*0.5;if(s0>=bs)best=t;t=best.trim();}catch(e){}}
+    if(i2)i2.value=t;if(t)vsRun(t);};
+  try{rec.start();arm(6000);}catch(e){}
+};
+
+/* joueur + rôle : « Karim passeur » = Karim lui-même a eu ce rôle (et pas un autre joueur passeur) */
+function xvPass(s,skip){
+  var F=XV.f;
+  for(var i=0;i<XV_DIMS.length;i++){var d=XV_DIMS[i][0];if(d===skip)continue;var sel=F[d];if(!sel.length)continue;
+    var v=xvVals(s,d);if(!sel.some(function(x){return v.indexOf(x)>=0;}))return false;}
+  if(F.pl.length&&F.role.length&&skip!=='pl'&&skip!=='role'){
+    if(!(s.seqPlayers||[]).some(function(sp){return F.pl.indexOf(String(sp.pid))>=0&&F.role.indexOf(seqPlayerRoleKey(sp,s))>=0;}))return false;}
+  if(_expState.favOnly&&!s.fav)return false;
+  if(_expState.player&&_expState.player!=='Tous'&&s.player!==_expState.player)return false;
+  return true;
+}
 
 /*XV_END*/
 </script>
