@@ -460,7 +460,7 @@ document.addEventListener('DOMContentLoaded', function(){
 var _SB_URL="https://umuvirwbtpflizxupwbr.supabase.co";
 // Version de ce fichier — à incrémenter à chaque déploiement, en cohérence avec la valeur
 // mise à jour dans la table Supabase `app_version` (voir _checkAppVersion ci-dessous).
-var APP_VERSION = "2026-11-07-387";
+var APP_VERSION = "2026-11-07-388";
 var _SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtdXZpcndidHBmbGl6eHVwd2JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3MTI1MDEsImV4cCI6MjA5MDI4ODUwMX0.fFQaF-zP9dzcWITJDf6GBmvu0pdcuvlaUz0A0qW0kfo";
 var _LICENCE_KEY='btp_licence';
 var _MACHINE_KEY='btp_machine';
@@ -36980,7 +36980,7 @@ function xvMontageHtml(){
     +'<div style="flex:1;min-width:0"><div class="xvmh"><span class="xlab">Montage</span><span class="xrow xzc" style="gap:4px"><span class="xzb" title="Dézoomer" onclick="xvZoomStep(-1)">−</span><input type="range" class="xzr" id="xvZr" min="2" max="16" value="'+XV.zoom+'" oninput="xvZoomSet(this.value)"><span class="xzb" title="Zoomer" onclick="xvZoomStep(1)">+</span></span><b class="xcnt">'+cnt+'</b><span class="xmut" style="font-size:12px">≈ '+(mins?mins+' min ':'')+secs+' s</span>'
     +'<span class="xchip" onclick="xvBandModal()" style="margin-left:2px">🎞 Bandeau : '+(bandOn?'activé':'désactivé')+' ▾</span>'
     +'<span class="xrow" style="gap:8px;border:1px solid var(--bd);border-radius:12px;padding:3px 10px 3px 12px;background:#141414;margin-left:2px"><span class="xmut" style="font-size:11px">Fichier</span><input id="xvFn" value="'+xe(_expState.filename||'')+'" placeholder="Nom du fichier" oninput="_expState.filename=this.value" style="width:64px;background:transparent;border:0;outline:0;color:#eee;font-weight:800;font-size:12.5px;font-family:inherit"><span class="xmut">.mp4</span><span style="color:var(--g)">✎</span><span title="Supprimer ce montage (décoche tout)" onclick="xvClearMontage()" style="cursor:pointer;color:#ff7b7b;font-weight:900;font-size:13px;line-height:1;margin-left:4px;padding:3px 7px;border-radius:8px;background:rgba(255,107,107,.12)">✕</span></span>'
-    +'<span class="xbtn" style="margin-left:auto;padding:7px 10px" onclick="xvNewTitle()">＋ Titre</span><span class="xbtn" style="padding:7px 10px" onclick="xvInstant()">▶ Lecture instantanée</span><span class="xbtn gold" style="padding:7px 10px" onclick="xvEnqueue()">⬇ Exporter MP4 · HD</span></div>'
+    +'<span class="xbtn" style="margin-left:auto;padding:7px 10px" onclick="xvNewTitle()">＋ Titre</span><span class="xbtn" style="padding:7px 10px" onclick="xvInstant()">▶ Lecture instantanée</span><span class="xbtn gold" style="padding:7px 10px" onclick="xvEnqueue()">＋ Ajouter à la file</span><span class="xbtn" style="padding:7px 10px" onclick="xvFileOpen()">📤 File d\'export'+(typeof xvReadyN==='function'&&xvReadyN()?' ('+xvReadyN()+')':'')+'</span></div>'
     +'<div style="position:relative"><div id="xvTlS" onscroll="xvTlScroll()"><div id="xvTlIn" style="position:relative;padding:2px 0 0 '+XV_PAD+'px">'
     +'<div style="display:flex;align-items:stretch"><div id="xvBlks" style="position:relative;display:flex;gap:6px;align-items:stretch;height:60px;flex:none;min-width:'+(blocks?0:400)+'px" ondragover="xvDragOver(event)" ondrop="xvDrop(event)">'+(blocks||'<span class="xmut" style="font-size:12px;line-height:60px">Coche des séquences dans la liste pour construire le montage.</span>')+'<span id="xvIns"></span></div><span id="xvSpR" style="flex:none;display:block;width:400px;height:1px"></span></div>'
     +'<div id="xvRul" style="display:none;width:'+Math.max(x,1)+'px"></div></div></div>'
@@ -37179,6 +37179,7 @@ function xvCmpPlay(ctx,item,which){ // which : [0,1] côte à côte, [0] ou [1] 
 
 
 async function xvRunJob(j){
+  if(j.zip)return xvRunZip(j);
   window._xvBand=j.band;var BIG=j.items.some(function(i){return i.t==='c';}),canvas=document.createElement('canvas');canvas.width=BIG?1920:1280;canvas.height=BIG?1080:720;var ctx=canvas.getContext('2d');if(BIG)ctx.setTransform(1.5,0,0,1.5,0,0);var BR=BIG?14000000:8000000;
   var mime='video/mp4;codecs=avc1',ext='mp4';if(!MediaRecorder.isTypeSupported(mime)){mime='video/mp4';if(!MediaRecorder.isTypeSupported(mime)){mime='video/webm;codecs=vp9';ext='webm';}}
   var rec;try{rec=new MediaRecorder(canvas.captureStream(30),{mimeType:mime,videoBitsPerSecond:BR});}catch(e){rec=new MediaRecorder(canvas.captureStream(30),{videoBitsPerSecond:BR});ext='webm';}
@@ -37501,6 +37502,153 @@ function xvPass(s,skip){
   if(_expState.favOnly&&!s.fav)return false;
   if(_expState.player&&_expState.player!=='Tous'&&s.player!==_expState.player)return false;
   return true;
+}
+
+/* ===== xv14 : file d'export + verrouillage pendant l'export + .zip (v388) ===== */
+var XV_LIMIT=20;
+(function(){var st=document.createElement('style');st.textContent=
+'#xvLk{position:fixed;inset:0;z-index:9000;background:rgba(6,6,6,.94);display:flex;align-items:center;justify-content:center;padding:20px;cursor:default}'
++'.xvk-card{width:min(760px,96%);max-height:96vh;overflow:auto;background:linear-gradient(180deg,#232323,#161616);border:1px solid rgba(212,170,106,.55);border-radius:22px;padding:28px 34px;box-shadow:0 30px 80px #000c}'
++'.xvk-h{font-size:24px;font-weight:900;color:#D4AA6A;margin:0}.xvk-warn{display:flex;gap:14px;align-items:flex-start;background:rgba(212,170,106,.12);border:1px solid rgba(212,170,106,.6);border-radius:16px;padding:14px 18px;margin:16px 0 18px}'
++'.xvk-warn b{display:block;color:#D4AA6A;font-size:17px;margin-bottom:4px}.xvk-warn span{font-size:14px;line-height:1.5;color:#ddd}.xvk-bar{height:11px;border-radius:8px;background:#2a2a2a;overflow:hidden;margin:9px 0 7px}.xvk-bar i{display:block;height:100%;background:linear-gradient(90deg,#b98f4e,#e2bd80)}'
++'.xvk-q{display:flex;align-items:center;gap:12px;background:#1b1b1b;border:1px solid #333;border-radius:12px;padding:10px 14px;margin:7px 0;font-size:14px}.xvk-q b{font-weight:800}.xvk-q .m{color:#999;font-size:12.5px}.xvk-p{margin-left:auto;font-size:11.5px;font-weight:800;padding:3px 9px;border-radius:9px;white-space:nowrap}'
++'.xvk-run{background:rgba(212,170,106,.2);color:#D4AA6A}.xvk-wait{background:#2a2a2a;color:#aaa}.xvk-ok{background:rgba(61,201,122,.18);color:#3dc97a}.xvk-ko{background:rgba(224,82,82,.18);color:#ff7b7b}'
++'.xvk-nm{background:transparent;border:0;border-bottom:1px dashed #555;color:#eee;font-weight:800;font-size:14px;font-family:inherit;outline:0;width:170px;padding:2px 0}'
++'#xvLk .xbtn{display:inline-block;border:1px solid #555;background:#222;border-radius:12px;font-weight:800;font-size:14.5px;cursor:pointer;color:#eee}#xvLk .xbtn.gold{background:linear-gradient(180deg,#e2bd80,#c9a05c);color:#111;border:0}'
++'.xvk-x{cursor:pointer;color:#ff7b7b;font-weight:900;padding:3px 8px;border-radius:8px;background:rgba(255,107,107,.12)}';document.head.appendChild(st);})();
+
+function xvFmt(sec){sec=Math.max(0,Math.round(sec));var m=Math.floor(sec/60),s=sec%60;return(m?m+' min ':'')+(m&&s<10?'0':'')+s+' s';}
+function xvJobDur(j){return j.items.reduce(function(a,i){return a+(i.d||0);},0);}
+function xvReadyN(){return XQ.jobs.filter(function(j){return j.state==='ready';}).length;}
+function xvUniqName(base,ext){var names=XQ.jobs.map(function(j){return j.name.replace(/\.(mp4|webm|zip)$/i,'');}),n=base,k=2;while(names.indexOf(n)>=0){n=base+' ('+k+')';k++;}return n+'.'+ext;}
+
+/* ── « Ajouter à la file » : met le montage de côté puis le vide ── */
+window.xvEnqueue=function(){
+  var mt=xvSyncAll(),items=mt.map(xvItem).filter(Boolean);
+  if(!items.length){toast('Montage vide','red');return;}
+  var live=items.some(function(i){if(i.t!=='s')return false;var m=gM(i.s.matchId);return m&&m.liveMode&&m.liveUrl;});
+  if(live){toast('⚠️ Export MP4 impossible pour un match en lien live','red');return;}
+  var B=xvBS(),base=(_expFilenameFor(items.length,'mp4')||'').replace(/\.(mp4|webm|zip)$/i,'');
+  var job={id:nid(),name:xvUniqName(base,'mp4'),n:items.length,zip:false,ok:false,
+    items:items.map(function(i){return i.t==='s'?{t:'s',s:i.s,d:i.dur,label:xvBandLabel(i.s)}:i.t==='t'?{t:'t',d:i.dur,T:JSON.parse(JSON.stringify(i.T))}:{t:'c',d:i.dur,c:JSON.parse(JSON.stringify(i.c))};}),
+    band:{show:_expState.showBandeau,pos:_expState.bandeauPos||'bas',y:_expState.bandeauY!=null?_expState.bandeauY:93,style:JSON.parse(JSON.stringify(B))},pct:0,detail:'Prêt',state:'ready'};
+  XQ.jobs.push(job);_expState.filename='';
+  // le montage en cours se vide pour préparer le suivant
+  var S=xvSettings(),ex=S.exportExcludedSeqIds||(S.exportExcludedSeqIds=[]),have={};ex.forEach(function(x){have[x]=1;});
+  (DB.sequences||[]).forEach(function(s){if(s.mode!=='instats'&&!have[s.id]){ex.push(s.id);have[s.id]=1;}});
+  S.xvMt=[];_cmpList().forEach(function(c){c.inc=false;});XV.pvI=null;XV.pb=null;XV.scrX=0;
+  saveDB();renderPage();toast('✓ Ajouté à la file ('+xvReadyN()+') — le montage est vide, prépare le suivant','acc');
+};
+
+/* ── panneau « File d'export » ── */
+window.xvFileOpen=function(){xvFilePaint();};
+window.xvFileClose=function(){var o=document.getElementById('xvFl');if(o)o.remove();renderPage();};
+function xvFilePaint(){
+  var old=document.getElementById('xvFl'),sc=old?(old.querySelector('.xvk-card')||{}).scrollTop:0;if(old)old.remove();
+  var J=XQ.jobs.filter(function(j){return j.state==='ready';}),tot=0,totC=0,blocked=0;
+  var rows=J.map(function(j){
+    var d=xvJobDur(j),nS=j.items.filter(function(i){return i.t==='s';}).length,other=j.items.length-nS,long=j.items.length>XV_LIMIT&&!j.ok;if(long)blocked++;tot+=d;totC+=j.items.length;
+    var h='<div class="xvk-q" style="flex-wrap:wrap;'+(long?'border-color:rgba(212,170,106,.7);background:rgba(212,170,106,.08)':'')+'"><span>'+(j.zip?'📦':'🎬')+'</span>'
+      +'<input class="xvk-nm" value="'+xe(j.name.replace(/\.(mp4|webm|zip)$/i,''))+'" onchange="xvJobName('+j.id+',this.value)"><span class="m">'+(j.zip?'.zip':'.mp4')+'</span>'
+      +'<span class="m">'+j.items.length+' clip'+(j.items.length>1?'s':'')+' · '+xvFmt(d)+' · ≈ '+xvFmt(d)+' d\'export</span>'
+      +'<span class="xchip'+(j.zip?' on':'')+'" style="margin-left:auto" title="Un fichier par clip, regroupés dans une archive .zip" onclick="xvJobZip('+j.id+')">📦 .zip · un fichier par clip</span>'
+      +'<span class="xvk-x" title="Retirer de la file" onclick="xvJobDel('+j.id+')">✕</span>';
+    if(j.zip&&other)h+='<div style="flex-basis:100%;font-size:12px;color:#c9a05c">Le .zip contient uniquement les clips : '+other+' titre(s) / comparaison(s) ne seront pas inclus. Nécessite une connexion internet.</div>';
+    else if(j.zip)h+='<div style="flex-basis:100%;font-size:12px;color:#999">Chaque action sera enregistrée une à une dans l\'archive (pas de montage). Nécessite une connexion internet.</div>';
+    if(long)h+='<div style="flex-basis:100%;margin-top:6px;font-size:13.5px;line-height:1.5;color:#ddd"><b style="color:#D4AA6A">💡 Export long ('+j.items.length+' clips)</b> — au-delà de '+XV_LIMIT+' clips l\'ordinateur reste bloqué longtemps. Conseil : le couper en '+Math.ceil(j.items.length/XV_LIMIT)+' exports. <span class="xchip" onclick="xvJobSplit('+j.id+')">✂ Séparer automatiquement</span> <span class="xchip" onclick="xvJobOk('+j.id+')">Exporter quand même</span></div>';
+    return h+'</div>';}).join('');
+  var o=document.createElement('div');o.id='xvFl';o.className='xv-ov';o.style.cssText=xvOvRect()+'z-index:2300';
+  o.innerHTML='<div class="xv-dim" onclick="xvFileClose()"></div><div class="xv-ovcard xvk-card" style="left:50%;top:50%;transform:translate(-50%,-50%);width:min(860px,94%);max-height:92%;overflow:auto;padding:26px 30px">'
+    +'<div class="xrow"><b style="font-size:22px;color:#D4AA6A">📤 File d\'export</b><span class="xbtn" style="margin-left:auto;padding:7px 12px" onclick="xvFileClose()">✕</span></div>'
+    +'<div class="xmut" style="margin:6px 0 14px;font-size:13px">Prépare tes montages, ajoute-les à la file, puis lance tout en une fois. Ils s\'exportent l\'un après l\'autre.</div>'
+    +(rows||'<div style="padding:26px;text-align:center;color:#888;border:1px dashed #333;border-radius:12px">La file est vide. Construis un montage puis clique sur « ＋ Ajouter à la file ».</div>')
+    +'<div class="xrow" style="gap:12px;margin-top:18px;flex-wrap:wrap"><span class="xbtn gold" style="padding:13px 24px;'+(J.length?'':'opacity:.4;pointer-events:none')+'" onclick="xvFileLaunch()">▶ Lancer '+J.length+' export'+(J.length>1?'s':'')+(J.length?' · ≈ '+xvFmt(tot):'')+'</span><span class="xbtn" style="padding:13px 20px" onclick="xvFileClose()">＋ Préparer un autre montage</span><span class="xmut" style="margin-left:auto">Total : '+totC+' clip'+(totC>1?'s':'')+'</span></div></div>';
+  document.body.appendChild(o);var c=o.querySelector('.xvk-card');if(c&&sc)c.scrollTop=sc;
+}
+function xvJobById(id){return XQ.jobs.filter(function(j){return j.id===id;})[0];}
+window.xvJobName=function(id,v){var j=xvJobById(id);if(!j)return;v=String(v||'').replace(/[\\/:*?"<>|]/g,'-').trim()||'Export';j.name=v+'.'+(j.zip?'zip':'mp4');};
+window.xvJobZip=function(id){var j=xvJobById(id);if(!j)return;j.zip=!j.zip;j.name=j.name.replace(/\.(mp4|webm|zip)$/i,'')+'.'+(j.zip?'zip':'mp4');xvFilePaint();};
+window.xvJobDel=function(id){XQ.jobs=XQ.jobs.filter(function(j){return j.id!==id;});xvFilePaint();};
+window.xvJobOk=function(id){var j=xvJobById(id);if(j)j.ok=true;xvFilePaint();};
+window.xvJobSplit=function(id){var j=xvJobById(id);if(!j)return;var n=Math.ceil(j.items.length/XV_LIMIT),per=Math.ceil(j.items.length/n),base=j.name.replace(/\.(mp4|webm|zip)$/i,''),ext=j.zip?'zip':'mp4',parts=[];
+  for(var k=0;k<n;k++){var it=j.items.slice(k*per,(k+1)*per);if(!it.length)continue;parts.push({id:nid(),name:base+' - partie '+(k+1)+'.'+ext,n:it.length,zip:j.zip,ok:false,items:it,band:j.band,pct:0,detail:'Prêt',state:'ready'});}
+  var i=XQ.jobs.indexOf(j);XQ.jobs.splice.apply(XQ.jobs,[i,1].concat(parts));xvFilePaint();};
+
+/* ── lancement : verrouillage complet jusqu'à la fin de la file ── */
+window.xvFileLaunch=function(){
+  var J=XQ.jobs.filter(function(j){return j.state==='ready';});if(!J.length)return;
+  if(J.some(function(j){return j.items.length>XV_LIMIT&&!j.ok;})){toast('Un export est trop long : sépare-le ou choisis « Exporter quand même »','red');return;}
+  var f=document.getElementById('xvFl');if(f)f.remove();
+  J.forEach(function(j){j.state='wait';j.pct=0;j.detail='En attente';j.cancel=false;});
+  XQ.lockOn=true;XQ.lockT0=Date.now();XQ.results=[];XQ.total=J.length;XQ.stage='run';XQ.cancelAll=false;
+  try{if(navigator.wakeLock&&navigator.wakeLock.request)navigator.wakeLock.request('screen').then(function(w){XQ.wl=w;}).catch(function(){});}catch(e){}
+  window.onbeforeunload=function(){return 'Export en cours';};
+  xvLockPaint();xvRunNext();
+};
+document.addEventListener('keydown',function(e){if(XQ.lockOn){e.preventDefault();e.stopPropagation();}},true);
+document.addEventListener('keyup',function(e){if(XQ.lockOn){e.preventDefault();e.stopPropagation();}},true);
+function xvRunNext(){
+  if(XQ.cur)return;var j=XQ.jobs.filter(function(x){return x.state==='wait';})[0];
+  if(!j){if(XQ.lockOn)xvLockFinish();return;}
+  XQ.cur=j;j.state='run';j.t0=Date.now();j.detail='Chargement des vidéos…';xvLockPaint();
+  xvRunJob(j).catch(function(e){j.state='err';j.detail='Erreur : '+(e&&e.message||e);}).then(function(){
+    XQ.cur=null;XQ.jobs=XQ.jobs.filter(function(x){return x!==j;});
+    (XQ.results=XQ.results||[]).push({name:j.name,state:j.state,cancel:!!j.cancel,miss:j.miss||0,detail:j.detail});
+    if(j.cancel||XQ.cancelAll){XQ.jobs.forEach(function(x){if(x.state==='wait'){x.state='ready';x.detail='Prêt';}});}
+    xvRunNext();});
+}
+window.xvQCancel=function(id){xvLockCancel();};
+window.xvLockCancel=function(){XQ.cancelAll=true;var c=XQ.cur;if(c){c.cancel=true;c.detail='Annulation…';window._cmpGen=(window._cmpGen||0)+1;}else XQ.jobs.forEach(function(x){if(x.state==='wait'){x.state='ready';}});xvLockPaint();};
+function xvQueueUI(){if(XQ.lockOn)xvLockPaint();}
+function xvLockFinish(){
+  XQ.stage='done';try{if(XQ.wl){XQ.wl.release();XQ.wl=null;}}catch(e){}window.onbeforeunload=null;xvLockPaint();
+}
+window.xvLockClose=function(){XQ.lockOn=false;XQ.stage=null;var o=document.getElementById('xvLk');if(o)o.remove();XQ.results=[];renderPage();};
+function xvLockPaint(){
+  if(!XQ.lockOn)return;var o=document.getElementById('xvLk');if(!o){o=document.createElement('div');o.id='xvLk';document.body.appendChild(o);}
+  var R=XQ.results||[],h='';
+  if(XQ.stage==='done'){
+    var ok=R.filter(function(r){return r.state==='ok';}),ko=R.filter(function(r){return r.state==='err';}),cn=R.some(function(r){return r.cancel;}),left=XQ.jobs.filter(function(j){return j.state==='ready';}).length;
+    h='<div class="xvk-card" style="width:min(640px,96%);text-align:center"><div style="font-size:52px">'+(cn?'⏹':ko.length?'⚠️':'✅')+'</div><h2 class="xvk-h" style="margin-top:6px">'+(cn?'Export annulé':ko.length?'Terminé avec une erreur':'Exports terminés')+'</h2>'
+      +'<div style="margin:12px 0 4px;text-align:left">'+R.map(function(r){return'<div class="xvk-q"><span>'+(r.state==='ok'?'✓':r.cancel?'⏹':'⚠️')+'</span><b>'+xe(r.name)+'</b>'+(r.miss?'<span class="m">'+r.miss+' clip(s) sans vidéo ignoré(s)</span>':'')+'<span class="xvk-p '+(r.state==='ok'?'xvk-ok':'xvk-ko')+'">'+(r.state==='ok'?'TÉLÉCHARGÉ':r.cancel?'ANNULÉ':'ÉCHEC')+'</span></div>'+(r.state==='err'?'<div style="font-size:12px;color:#ff7b7b;text-align:left;margin:-3px 0 6px 6px">'+xe(r.detail)+'</div>':'');}).join('')+'</div>'
+      +(cn&&left?'<div class="xmut" style="font-size:13px;margin-top:8px">Les '+left+' export(s) restants sont toujours dans ta file.</div>':'')
+      +'<div style="margin-top:18px"><span class="xbtn gold" style="padding:13px 28px" onclick="xvLockClose()">Fermer et reprendre</span></div></div>';
+  }else{
+    var j=XQ.cur,all=R.length+XQ.jobs.filter(function(x){return x.state==='wait'||x.state==='run';}).length,idx=R.length+1;
+    var dCur=j?xvJobDur(j):0,el=j?(Date.now()-j.t0)/1000:0,wait=XQ.jobs.filter(function(x){return x.state==='wait';}),dW=wait.reduce(function(a,x){return a+xvJobDur(x);},0),rem=Math.max(0,dCur-el)+dW;
+    var pct=j?Math.round(j.pct||0):0;
+    h='<div class="xvk-card"><h2 class="xvk-h">📤 Export en cours…</h2>'
+      +'<div class="xvk-warn"><div style="font-size:32px">⚠️</div><div><b>Reste sur cette page jusqu\'à la fin</b><span>Ne change pas d\'onglet, ne verrouille pas l\'ordinateur, ne ferme pas l\'écran et ne lance rien d\'autre : la vidéo serait saccadée ou l\'export s\'arrêterait. Le logiciel est bloqué volontairement pendant ce temps.</span></div></div>'
+      +'<div style="display:flex;justify-content:space-between;font-weight:800;font-size:17px"><span>Export '+Math.min(idx,all)+' sur '+all+(j&&j.detail?' · '+xe(j.detail):'')+'</span><span style="color:#D4AA6A">'+pct+' %</span></div>'
+      +'<div class="xvk-bar"><i style="width:'+pct+'%"></i></div>'
+      +'<div style="color:#999;font-size:13px">Temps restant estimé : environ '+xvFmt(rem)+' · l\'export se déroule en temps réel</div>'
+      +'<div style="height:1px;background:#333;margin:16px 0 4px"></div>'
+      +R.map(function(r){return'<div class="xvk-q"><span>🎬</span><b>'+xe(r.name)+'</b><span class="xvk-p '+(r.state==='ok'?'xvk-ok':'xvk-ko')+'">'+(r.state==='ok'?'TERMINÉ':'ÉCHEC')+'</span></div>';}).join('')
+      +XQ.jobs.filter(function(x){return x.state==='run'||x.state==='wait';}).map(function(x){return'<div class="xvk-q"><span>'+(x.zip?'📦':'🎬')+'</span><b>'+xe(x.name)+'</b><span class="m">'+x.items.length+' clips · '+xvFmt(xvJobDur(x))+'</span><span class="xvk-p '+(x.state==='run'?'xvk-run':'xvk-wait')+'">'+(x.state==='run'?'EN COURS':'EN ATTENTE')+'</span></div>';}).join('')
+      +'<div style="display:flex;gap:12px;margin-top:16px;align-items:center"><span class="xbtn" style="padding:11px 20px" onclick="xvLockCancel()">Annuler l\'export</span><span class="xmut" style="margin-left:auto;font-size:12.5px">L\'écran se déverrouille tout seul à la fin de la file</span></div></div>';
+  }
+  o.innerHTML=h;
+}
+/* export .zip : chaque action enregistrée une à une (pas de montage) */
+async function xvRunZip(j){
+  window._xvBand=j.band;var its=j.items.filter(function(i){return i.t==='s';});
+  j.total=its.length;j.doneN=0;j.miss=0;j.cb=null;j.detail='Chargement des vidéos…';j.pct=2;xvQueueUI();
+  var seqs=its.map(function(i){return i.s;});await xvRestoreVideos(seqs);var map=xvVideoMap(seqs);
+  try{await _ensureJSZip();}catch(e){window._xvBand=null;throw new Error('Compresseur .zip indisponible (connexion internet ?)');}
+  var zip=new JSZip(),n=0,ext='mp4';
+  for(var k=0;k<its.length;k++){
+    if(j.cancel)break;
+    var c=xvBuildClip(its[k].s,its[k].label,map,j.band);if(!c){j.miss++;j.doneN++;continue;}
+    j.detail='Clip '+(k+1)+'/'+its.length;j.pct=Math.min(96,3+k/its.length*93);xvQueueUI();
+    var r=await _recordOneClip(c,j.band.show,j.band.pos,j.band.y);ext=r.ext;
+    zip.file(_sanitizeClipFilename(c.zipLabel||c.label,n,ext),r.blob);n++;j.doneN++;
+  }
+  window._xvBand=null;
+  if(j.cancel){j.state='cancel';return;}
+  if(!n)throw new Error('Aucune vidéo disponible pour ces clips');
+  j.detail='Compression du .zip…';j.pct=97;xvQueueUI();
+  var blob=await zip.generateAsync({type:'blob'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=j.name.replace(/\.(mp4|webm|zip)$/i,'')+'.zip';document.body.appendChild(a);a.click();document.body.removeChild(a);setTimeout(function(){URL.revokeObjectURL(url);},4000);
+  j.pct=100;j.state='ok';
 }
 
 /*XV_END*/
