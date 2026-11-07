@@ -460,7 +460,7 @@ document.addEventListener('DOMContentLoaded', function(){
 var _SB_URL="https://umuvirwbtpflizxupwbr.supabase.co";
 // Version de ce fichier — à incrémenter à chaque déploiement, en cohérence avec la valeur
 // mise à jour dans la table Supabase `app_version` (voir _checkAppVersion ci-dessous).
-var APP_VERSION = "2026-11-07-389";
+var APP_VERSION = "2026-11-07-392";
 var _SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtdXZpcndidHBmbGl6eHVwd2JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3MTI1MDEsImV4cCI6MjA5MDI4ODUwMX0.fFQaF-zP9dzcWITJDf6GBmvu0pdcuvlaUz0A0qW0kfo";
 var _LICENCE_KEY='btp_licence';
 var _MACHINE_KEY='btp_machine';
@@ -4726,7 +4726,7 @@ var _MX_CSS='<style id="mxCss">'
 +'.mxMh b{font-size:13px;letter-spacing:.16em;color:var(--acc);white-space:nowrap;}.mxMh .c{font-size:13px;color:var(--txt2);}.mxMh .l{flex:1;height:1px;background:var(--bdr);}'
 +'.mxRow{display:grid;grid-template-columns:70px minmax(250px,320px) minmax(120px,1fr) 118px 100px 128px 116px 36px;grid-template-rows:auto auto;column-gap:10px;align-items:center;background:linear-gradient(180deg,#262626,#212121);border:1px solid var(--bdr);border-radius:16px;padding:14px 26px 14px 0;margin-bottom:9px;position:relative;}'
 +'.mxRow .bar{position:absolute;left:0;top:0;bottom:0;width:5px;border-radius:16px 0 0 16px;}'
-+'.mxB{display:contents;}'
++'.mxB{display:contents;}.mxC3{position:relative}.mxVid{position:absolute;left:calc(75% + 43px);top:50%;transform:translate(-50%,-50%);font-size:18px;line-height:1;padding:4px 7px;border-radius:9px;background:rgba(212,170,106,.16);border:1px solid rgba(212,170,106,.5)}@container (max-width:1150px){.mxVid{left:auto;right:calc(100% + 8px)}}'
 +'.mxC1{grid-column:1;grid-row:1/3;text-align:center;padding-left:8px;}.mxC1 b{display:block;font-size:30px;font-weight:900;line-height:1;letter-spacing:-.02em;color:var(--txt);}.mxC1 i{font-style:normal;font-size:11px;letter-spacing:.16em;color:var(--txt3);font-weight:700;}'
 +'.mxC2{grid-column:2;grid-row:1;margin-bottom:9px;min-width:0;}.mxC2b{grid-column:2;grid-row:2;min-width:0;}.mxC3{grid-column:3;grid-row:1/3;display:flex;justify-content:center;}'
 +'.mxTm{display:flex;align-items:center;gap:10px;font-size:17px;flex-wrap:wrap;}.mxTm .vs{font-size:12px;color:var(--txt3);}'
@@ -4824,7 +4824,7 @@ function _mxRow(m,cnt){
   return '<div class="mxRow"><div class="bar" style="background:'+col+'"></div>'
    +'<div class="mxC1"><b>'+dd+'</b><i>'+mm+'</i></div>'
    +'<div class="mxC2"><div class="mxTm">'+L.join('')+'<span class="vs">vs</span>'+R.join('')+'</div></div>'
-   +'<div class="mxC2b"><div class="mxSub">'+sub.join('')+'</div></div><div class="mxC3">'+sc+'</div>'
+   +'<div class="mxC2b"><div class="mxSub">'+sub.join('')+'</div></div><div class="mxC3">'+sc+(((m.videos&&m.videos.length)||m.videoURL||m.videoFile)?'<span class="mxVid" title="Vidéo chargée">🎬</span>':'')+'</div>'
    +'<div class="mxB">'
    +'<div class="mxBt g mxK4 k1"><button onclick="openCoding(\'codage\','+m.id+')">Codage</button></div>'
    +'<div class="mxBt g mxK5 k2"><button onclick="openCoding(\'instats\','+m.id+')">InStats</button></div>'
@@ -35973,7 +35973,7 @@ function xvListHtml(){
   o.on.concat(o.off).forEach(function(s){if(!groups[s.matchId]){groups[s.matchId]={on:[],off:[]};order.push(s.matchId);}(_isSeqExcludedFromExport(s.id)?groups[s.matchId].off:groups[s.matchId].on).push(s);});
   order.sort(function(a,b){var fa=groups[a].on.length?seqRank[groups[a].on[0].id]:1e9,fb=groups[b].on.length?seqRank[groups[b].on[0].id]:1e9;if(fa!==fb)return fa-fb;var ma=gM(a),mb=gM(b);return String((mb||{}).date||'').localeCompare(String((ma||{}).date||''));});
   var th='<div class="xv-g xrow" style="display:grid;height:26px;border-bottom:1px solid var(--bd);font-size:10px;font-weight:800;letter-spacing:.08em;color:var(--t3);text-transform:uppercase;background:#1d1d1d;position:sticky;top:0;z-index:3;border-radius:16px 16px 0 0"><div style="padding-left:36px">Famille</div><div>Sous-famille</div><div>Action</div><div>Sous-action</div><div>Résultat</div><div>Joueur · rôle</div><div>QT</div><div>Actions</div></div>';
-  if(!order.length)return'<div class="xcard">'+th+'<div style="padding:28px;text-align:center;color:var(--t3)">Aucune séquence ne correspond aux filtres.</div></div>';
+  if(!order.length)return'<div class="xcard">'+th+'<div style="padding:28px;text-align:center;color:var(--t3)">'+((_expState.matchIds.length===1&&_expState.matchIds[0]===0)?'Aucun match sélectionné : coche un ou plusieurs matchs ci-dessus, ou utilise « Seulement avec vidéo ».':'Aucune séquence ne correspond aux filtres.')+'</div></div>';
   var h='<div class="xcard">'+th;
   order.forEach(function(mid){
     var m=gM(mid),g=groups[mid],all=g.on.concat(g.off),t=m&&gT(m.teamId),closed=XV.col[mid];
@@ -36006,7 +36006,7 @@ function xvMatchCard(m,n,on){
   var mine=home;var nn=function(v,mm){return'<b style="font-size:14px;font-weight:900;color:'+(mm?c:'#bbb')+'">'+v+'</b>';};
   var pill=done?'<span style="display:inline-flex;align-items:center;gap:5px;border-radius:9px;padding:2px 8px;background:linear-gradient(180deg,rgba('+bg+',.16),rgba('+bg+',.05));border:1px solid rgba('+bg+',.45)">'+nn(m.scoreA,mine)+'<i style="width:2px;height:12px;transform:skewX(-14deg);background:rgba('+bg+',.5);display:block"></i>'+nn(m.scoreB,!mine)+'</span>':'<span class="xmut" style="font-weight:900">– / –</span>';
   var dp=String(m.date||'').split('-'),vid=xvMatchHasVideo(m);
-  return'<div onclick="xvToggleMatch('+m.id+')" title="'+xe(A.n+' – '+B.n+' · '+n+' séquences'+(vid?' · vidéo':' · sans vidéo'))+'" style="flex:0 0 232px;min-width:0;padding:5px 9px;border-radius:11px;cursor:pointer;background:'+(on?'rgba(212,170,106,.12)':'var(--b2)')+';border:1px solid '+(on?'var(--g)':'var(--bd)')+'"><div class="xrow" style="font-size:9.5px;color:var(--t3);font-weight:800;margin-bottom:3px;white-space:nowrap"><span>'+(dp[2]||'')+' '+xvShortMonth(dp[1])+(m.round!==''&&m.round!=null?' · J'+xe(m.round):'')+' · '+(m.home!==false?'Dom.':'Ext.')+'</span><span style="margin-left:auto;display:inline-flex;align-items:center;gap:6px">'+(vid?'<span title="Vidéo disponible" style="font-size:13px;line-height:1">🎬</span>':'')+xck(on,'event.stopPropagation();xvToggleMatch('+m.id+')',16)+'</span></div><div class="xrow" style="justify-content:space-between">'+xvLogo(A.t,A.n,26)+pill+xvLogo(B.t,B.n,26)+'</div></div>';
+  return'<div onclick="xvToggleMatch('+m.id+')" title="'+xe(A.n+' – '+B.n+' · '+n+' séquences'+(vid?' · vidéo':' · sans vidéo'))+'" style="flex:0 0 232px;min-width:0;padding:5px 9px;border-radius:11px;cursor:pointer;background:'+(on?'rgba(212,170,106,.12)':'var(--b2)')+';border:1px solid '+(on?'var(--g)':'var(--bd)')+'"><div class="xrow" style="font-size:9.5px;color:var(--t3);font-weight:800;margin-bottom:3px;white-space:nowrap"><span>'+(dp[2]||'')+' '+xvShortMonth(dp[1])+(m.round!==''&&m.round!=null?' · J'+xe(m.round):'')+' · '+(m.home!==false?'Dom.':'Ext.')+'</span><span style="margin-left:auto;display:inline-flex;align-items:center;gap:6px">'+(vid?'<span title="Vidéo disponible" style="font-size:12px;line-height:1;padding:2px 5px;border-radius:7px;background:linear-gradient(180deg,#e2bd80,#c9a05c);box-shadow:0 0 0 1px rgba(0,0,0,.35)">🎬</span>':'')+xck(on,'event.stopPropagation();xvToggleMatch('+m.id+')',16)+'</span></div><div class="xrow" style="justify-content:space-between">'+xvLogo(A.t,A.n,26)+pill+xvLogo(B.t,B.n,26)+'</div></div>';
 }
 window.xvTeamsMenu=function(btn){
   if(XV.open==='eq'){xvCloseMenus();return;}xvCloseMenus();XV.open='eq';
@@ -36091,7 +36091,7 @@ function renderExportPage(){
     +'<input id="vsIn" value="'+xe(typeof _vsLast!=='undefined'?_vsLast:'')+'" placeholder="Dis ou tape : « défense step out du #3 au QT4 »…" onkeydown="if(event.key===\'Enter\')vsRun(this.value)" style="flex:1;min-width:0;background:transparent;border:0;outline:0;color:#eee;font-size:14px;font-family:inherit"><span title="Effacer la recherche" onclick="xvVsClear()" style="color:#fff;cursor:pointer;font-size:17px;font-weight:700;padding:0 8px;line-height:1">✕</span><span class="xbtn" style="padding:7px 16px" onclick="vsRun(document.getElementById(\'vsIn\').value)">Chercher</span></div>'
     +'<span class="xmut" style="white-space:nowrap"><b style="font-size:20px;color:#fff">'+seqs.length+'</b> séq. · <b style="color:var(--ok)">'+sel+'</b> cochées</span></div>'
     +((typeof _vsMsg!=='undefined'&&_vsMsg)?'<div id="xvVsMsg" style="font-size:12px;color:var(--t3);margin:-6px 0 8px;line-height:1.6">'+_vsMsg+'</div>':'')
-    +'<div class="xrow" style="padding:0 0 6px;gap:10px">'+xvTeamsDd()+'<span class="xlab" style="margin-left:6px">Matchs · '+eff.filter(function(id){return matches.some(function(x){return x.m.id===id;});}).length+' sur '+matches.length+'</span></div>'
+    +'<div class="xrow" style="padding:0 0 6px;gap:10px">'+xvTeamsDd()+'<span class="xlab" style="margin-left:6px">Matchs · '+eff.filter(function(id){return matches.some(function(x){return x.m.id===id;});}).length+' sur '+matches.length+'</span><span class="xchip sm" style="margin-left:auto" onclick="xvMatchesAll(\'video\')">Seulement avec vidéo</span></div>'
     +'<div id="xvMs">'+matches.map(function(x){return xvMatchCard(x.m,x.n,eff.indexOf(x.m.id)>=0);}).join('')+(matches.length?'':'<div class="xmut" style="padding:10px">Aucun match.</div>')+'</div></div>'
     +xvCmpBanner()+(XV.tab==='cmp'?'':'<div style="flex:none">'+xvFilterBar()+'</div>')
     +'<div id="xvBody">'+(XV.tab==='cmp'?_cmpCard():xvListHtml())+'</div>'
@@ -36932,6 +36932,7 @@ function xvArrive(){
   if(!S.xvSeen){S.xvSeen=ids.slice();if(!(S.xvMt||[]).length){ids.forEach(function(id){if(!have[id]){ex.push(id);have[id]=1;}});}}
   else{var seen={};S.xvSeen.forEach(function(x){seen[x]=1;});ids.forEach(function(id){if(!seen[id]){S.xvSeen.push(id);if(!have[id]){ex.push(id);have[id]=1;}}});}
   _expSelectedIds=null;XV.pv=null;XV.cmpA=null;XV.f={fam:[],sub:[],act:[],sa:[],res:[],pl:[],role:[],qt:[]};
+  var HT=null;try{HT=gT(_dTId);}catch(e){}HT=HT||(DB.teams||[])[0];_expTeamFilter=HT?[HT.id]:[];_expState.matchIds=[0];
   saveDB();
 }
 window.xvClearMontage=function(){
@@ -36978,7 +36979,7 @@ function xvMontageHtml(){
   return'<div class="xv-sticky"><div class="xcard" style="background:linear-gradient(180deg,#232323,#161616);border-color:rgba(212,170,106,.35);box-shadow:0 -10px 40px #000a;padding:8px 16px"><div style="display:flex;gap:14px;align-items:flex-start">'
     +'<div class="xvid" style="width:192px;height:108px;flex:none;align-self:flex-start;cursor:pointer" onclick="xvPbToggle()"><video id="xvPv" muted playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:transparent"></video><div id="xvPvO" style="position:absolute;inset:0;display:none"></div><span id="xvPvP" style="position:absolute;inset:0;display:grid;place-items:center;font-size:28px;opacity:.8;pointer-events:none">▶</span></div>'
     +'<div style="flex:1;min-width:0"><div class="xvmh"><span class="xlab">Montage</span><span class="xrow xzc" style="gap:4px"><span class="xzb" title="Dézoomer" onclick="xvZoomStep(-1)">−</span><input type="range" class="xzr" id="xvZr" min="2" max="16" value="'+XV.zoom+'" oninput="xvZoomSet(this.value)"><span class="xzb" title="Zoomer" onclick="xvZoomStep(1)">+</span></span><b class="xcnt">'+cnt+'</b><span class="xmut" style="font-size:12px">≈ '+(mins?mins+' min ':'')+secs+' s</span>'
-    +'<span class="xchip" onclick="xvBandModal()" style="margin-left:2px">🎞 Bandeau : '+(bandOn?'activé':'désactivé')+' ▾</span>'
+    +'<span class="xchip" onclick="xvBandModal()" style="margin-left:2px">Bandeau : '+(bandOn?'activé':'désactivé')+' ▾</span>'
     +'<span class="xrow" style="gap:8px;border:1px solid var(--bd);border-radius:12px;padding:3px 10px 3px 12px;background:#141414;margin-left:2px"><span class="xmut" style="font-size:11px">Fichier</span><input id="xvFn" value="'+xe(_expState.filename||'')+'" placeholder="Nom du fichier" oninput="_expState.filename=this.value" style="width:64px;background:transparent;border:0;outline:0;color:#eee;font-weight:800;font-size:12.5px;font-family:inherit"><span class="xmut">.mp4</span><span style="color:var(--g)">✎</span><span title="Supprimer ce montage (décoche tout)" onclick="xvClearMontage()" style="cursor:pointer;color:#ff7b7b;font-weight:900;font-size:13px;line-height:1;margin-left:4px;padding:3px 7px;border-radius:8px;background:rgba(255,107,107,.12)">✕</span></span>'
     +'<span class="xbtn" style="margin-left:auto;padding:7px 10px" onclick="xvNewTitle()">＋ Titre</span><span class="xbtn" style="padding:7px 10px" onclick="xvInstant()">▶ Lecture instantanée</span><span class="xbtn gold" style="padding:7px 10px" onclick="xvEnqueue()">＋ Ajouter à la file</span><span class="xbtn" style="padding:7px 10px" onclick="xvFileOpen()">📤 File d\'export'+(typeof xvReadyN==='function'&&xvReadyN()?' ('+xvReadyN()+')':'')+'</span></div>'
     +'<div style="position:relative"><div id="xvTlS" onscroll="xvTlScroll()"><div id="xvTlIn" style="position:relative;padding:2px 0 0 '+XV_PAD+'px">'
@@ -37367,7 +37368,7 @@ window.cmpPreview=function(id){
 var _cl=window.cmpPvClose;window.cmpPvClose=function(){_cl();var o=document.getElementById('xvCP');if(o)o.remove();};})();
 
 /* ===== xv13 : recherche vocale renforcée (v387) ===== */
-var XV13_STOP=('je veux voudrais voudrait aimerais aimerai peux peut tu me moi montre montres montrer affiche afficher donne donnes mets mettre met sors sort trouve cherche recherche fais fait faits vois voir regarde regarder toutes tous tout toute les des du de la le l un une et ou puis ensuite aussi avec qui que qu dans sur pour par chez est sont etait ai as au aux en y il ils elle on ca ce cet cette ces mon ma mes son sa ses leur leurs notre nos donc alors bah euh ben bon ok voila genre vraiment juste peu plus tres bien faire faut faudrait stp svp merci s lors pendant durant partie moment fois cas truc trucs chose choses action actions sequence sequences clip clips video videos joueur joueurs joueuse implique impliques impliquee impliquees quand lorsque comme mais aussi egalement concernant concerne ceux celles celui celle et puis d l c j m n t qu').split(' ').reduce(function(o,w){if(w)o[w]=1;return o;},{});
+var XV13_STOP=('je veux voudrais voudrait aimerais aimerai peux peut tu me moi montre montres montrer affiche afficher donne donnes mets mettre met sors sort trouve cherche recherche fais fait faits vois voir regarde regarder toutes tous tout toute les des du de la le l un une et ou puis ensuite aussi avec qui que qu dans sur pour par chez est sont etait ai as au aux en y il ils elle on ca ce cet cette ces mon ma mes son sa ses leur leurs notre nos donc alors bah euh ben bon ok voila genre vraiment juste peu plus tres bien faire faut faudrait stp svp merci s lors pendant durant partie moment fois cas truc trucs chose choses action actions sequence sequences clip clips video videos joueur joueurs joueuse implique impliques impliquee impliquees quand lorsque comme equipe equipes match matchs rencontre rencontres journee journees saison contre mais aussi egalement concernant concerne ceux celles celui celle et puis d l c j m n t qu').split(' ').reduce(function(o,w){if(w)o[w]=1;return o;},{});
 var XV13_GEN={jeu:1,principe:1,phase:1,type:1};
 function xvPhon(w){return String(w).replace(/ck/g,'k').replace(/qu/g,'k').replace(/c(?=[aouklr])/g,'k').replace(/ph/g,'f').replace(/y/g,'i').replace(/h/g,'').replace(/w/g,'v').replace(/ou/g,'u').replace(/ei|ai/g,'e').replace(/(.)\1+/g,'$1').replace(/(?<=.{3})[sxtdzp]+$/,'');}
 function xvTokEq(a,b){
@@ -37383,6 +37384,8 @@ function xvV13Vocab(){
   seqs.forEach(function(s){add('fam',s.family);add('sub',s.sub);add('act',s.action);add('res',s.result);if(s.family)fams[s.family]=1;(s.subActions||[]).forEach(function(x){add('sa',x);});
     (s.seqPlayers||[]).forEach(function(sp){var pid=String(sp.pid);if(pid.indexOf('adv#')===0||seen['pl|'+pid])return;seen['pl|'+pid]=1;var o=xvPlayerLbl(sp,s),nm=vsNorm(o.name||'');var tk=nm.split(' ').filter(function(w){return w&&!VS_STOP[w];}).map(vsStem);var dg=String(o.num||'').replace(/\D/g,'');if(dg)tk.push('num'+dg);
       if(tk.length)voc.push({f:'pl',v:pid,n:nm||('num'+dg),toks:tk,label:(o.num&&o.num!=='?'?'#'+dg+' ':'')+(o.name||''),num:dg,nameToks:nm.split(' ').filter(Boolean).map(vsStem)});});});
+  var tms={};(DB.matches||[]).forEach(function(m){if(m.teamId)tms[m.teamId]=1;if(m.oppTeamId)tms[m.oppTeamId]=1;});
+  (DB.teams||[]).forEach(function(t){if(tms[t.id]&&t.name)add('tm',t.id,t.name);});
   VS_ROLES.forEach(function(r){if(r[0]==='implique')return;r[1].forEach(function(a){add('role',r[0],a);voc[voc.length-1]&&(voc[voc.length-1].label=r[1][0]);});});
   var mids={};seqs.forEach(function(s){mids[s.matchId]=1;});
   Object.keys(mids).forEach(function(id){var mm=gM(isNaN(+id)?id:+id);if(!mm)return;if(mm.opp)add('mt',mm.id,mm.opp);if(mm.round!=null&&mm.round!=='')add('mt',mm.id,'j'+mm.round);});
@@ -37400,8 +37403,16 @@ function xvV13Qt(T){
 function xvV13Parse(txt,voc){
   var T=' '+vsNorm(txt)+' ',fav=false;
   T=T.replace(/ joueu[rs]e? (\d{1,2}) /g,' num$1 ').replace(/ numero (\d{1,2}) /g,' num$1 ');
+  var MX={all:false,last:false,home:false,away:false,dates:[]},mo=['janvier','fevrier','mars','avril','mai','juin','juillet','aout','septembre','octobre','novembre','decembre'],mm0;
+  if(mm0=T.match(/ (?:tous|toutes|tout) (?:les|mes|ces) (?:matchs?|rencontres?|journees?) | toute la saison /)){MX.all=true;T=T.replace(mm0[0],' ');}
+  if(mm0=T.match(/ (?:le |la )?derniere? (?:match|rencontre) /)){MX.last=true;T=T.replace(mm0[0],' ');}
+  if(mm0=T.match(/ (?:a )?(?:la )?domicile | a la maison /)){MX.home=true;T=T.replace(mm0[0],' ');}
+  if(mm0=T.match(/ (?:a )?(?:l )?exterieur | en deplacement /)){MX.away=true;T=T.replace(mm0[0],' ');}
+  T=T.replace(new RegExp(' (?:du |le |au )?(\\d{1,2}|premier|1er) ('+mo.join('|')+') ','g'),function(m,d,mn){MX.dates.push({d:(d==='premier'||d==='1er')?1:+d,m:mo.indexOf(mn)+1});return ' ';});
+  T=T.replace(/ (?:journee|jour|j) ?(\d{1,2}) /g,' j$1 ');
   var Q=xvV13Qt(T);T=Q.T;
   var m;if(m=T.match(/ favoris? /)){fav=true;T=T.replace(m[0],' ');}
+  voc.forEach(function(e){if(e.f==='mt'||e.f==='tm')T=T.replace(' contre '+e.n+' ',' '+e.n+' ').replace(' face a '+e.n+' ',' '+e.n+' ').replace(' vs '+e.n+' ',' '+e.n+' ');});
   var vtok={};voc.forEach(function(e){e.toks.forEach(function(t){vtok[t]=1;});});
   var W=T.trim().split(' ').filter(function(w){return w&&!(XV13_STOP[w]&&!vtok[vsStem(w)]);}),P=W.map(vsStem),used=P.map(function(){return false;}),hits=[];
   var find=function(toks){var pos=[],ok=true;toks.forEach(function(tk){if(!ok)return;var f=-1;for(var i=0;i<P.length&&f<0;i++)if(!used[i]&&pos.indexOf(i)<0&&xvTokEq(P[i],tk))f=i;if(f<0)ok=false;else pos.push(f);});return ok?pos:null;};
@@ -37423,7 +37434,7 @@ function xvV13Parse(txt,voc){
   var syn=function(stem,fn){var i=P.indexOf(stem);if(i>=0&&!used[i]){var es=fn();if(es.length){used[i]=true;hits.push({n:W[i],entries:es,multi:true,label:W[i]});}}};
   syn('attaqu',function(){return(voc.fams||[]).filter(function(f){return !/defen|compteur/.test(vsNorm(f));}).map(function(f){return{f:'fam',v:f,n:f};});});
   syn('offensi',function(){var r=[];return r;});
-  return{qts:Q.qts,fav:fav,hits:hits,rest:W.filter(function(w,i){return !used[i]&&!XV13_STOP[w];}),W:W};
+  return{MX:MX,qts:Q.qts,fav:fav,hits:hits,rest:W.filter(function(w,i){return !used[i]&&!XV13_STOP[w]&&w!=='contre';}),W:W};
 }
 function xvV13Sugg(word,voc){
   var s=vsStem(word),out=[],seen={};if(s.length<3||/\d/.test(s))return out;
@@ -37432,7 +37443,7 @@ function xvV13Sugg(word,voc){
   out.sort(function(a,b){return b.sc-a.sc;});return out.slice(0,3).map(function(x){return x.e;});
 }
 window.vsPick=function(f,v){
-  v=decodeURIComponent(v);if(!XV.f[f])return;if(XV.f[f].indexOf(v)<0)XV.f[f].push(v);
+  v=decodeURIComponent(v);if(f==='tm'){_expTeamFilter=[+v];_expState.matchIds=[];_expSelectedIds=null;renderPage();return;}if(!XV.f[f])return;if(XV.f[f].indexOf(v)<0)XV.f[f].push(v);
   var n=getFilteredSeqs().length;if(!n){XV.f[f].pop();toast('Aucune séquence avec ça','red');return;}
   try{_vsMsg='<span style="display:inline-block;padding:2px 9px;border-radius:9px;background:rgba(61,201,122,.18);font-weight:700">Ajouté</span> → <b>'+n+' séquence'+(n>1?'s':'')+'</b>';}catch(e){}
   _expSelectedIds=null;_customSeqOrder=null;renderPage();
@@ -37445,12 +37456,29 @@ window.vsRun=function(txt){
   var saveF=JSON.parse(JSON.stringify(XV.f)),saveM=E.matchIds.slice(),saveFav=E.favOnly;
   XV.f={fam:[],sub:[],act:[],sa:[],res:[],pl:[],role:[],qt:[]};E.favOnly=false;E.family=E.sub=E.action=E.result=E.player=E.qt='Tous';E.role=E.rolePlayer='Tous';E.subActionFilter=[];
   var applied=[],ignored=[],mt=[],order=['fam','sub','act','sa','res','role','pl'],chip=function(t,c){return'<span style="display:inline-block;padding:2px 9px;margin:2px 4px 2px 0;border-radius:9px;background:'+c+';font-weight:700;">'+String(t).replace(/</g,'&lt;')+'</span>';};
-  P.hits.forEach(function(h){h.entries.forEach(function(e){if(e.f==='mt'&&mt.indexOf(e.v)<0)mt.push(e.v);});});
-  if(mt.length){_vsPrevM=E.matchIds.slice();E.matchIds=mt.slice();_vsSetM=E.matchIds.join();
-    if(getFilteredSeqs().length){mt.forEach(function(id){var mm=gM(id);applied.push(mm?'J'+mm.round+' '+(mm.opp||''):'match');});}
-    else{E.matchIds=_vsPrevM.slice();_vsPrevM=null;ignored.push('match');}}
+    var saveTF=_expTeamFilter.slice(),tm=[],list0=xvMatchesList(),l0={};list0.forEach(function(x){l0[x.m.id]=1;});
+  var Tn=' '+vsNorm(txt)+' ';
+  P.hits.forEach(function(h){ // un nom à la fois équipe et adversaire : « équipe X » = l'équipe, sinon le match contre X
+    var hasT=h.entries.some(function(e){return e.f==='tm';}),hasM=h.entries.some(function(e){return e.f==='mt';});if(!hasT||!hasM)return;
+    var mts=h.entries.filter(function(e){return e.f==='mt'&&l0[e.v];});
+    var asTeam=new RegExp('equipes? (?:de |du |des |d )?(?:l |le |la )?'+h.n.replace(/[^a-z0-9 ]/g,'')).test(Tn)||!mts.length;
+    h.entries=h.entries.filter(function(e){return asTeam?e.f!=='mt':e.f!=='tm';});});
+  P.hits.forEach(function(h){h.entries.forEach(function(e){if(e.f==='mt'&&mt.indexOf(e.v)<0)mt.push(e.v);if(e.f==='tm'&&tm.indexOf(e.v)<0)tm.push(e.v);});});
+  if(tm.length){_expTeamFilter=tm.slice();applied.push('équipe : '+tm.map(function(id){var t=gT(id);return t?t.name:'?';}).join(' + '));}
+  var MXp=P.MX,list=xvMatchesList(),lid={};list.forEach(function(x){lid[x.m.id]=x;});
+  var base=null,add=function(a){base=base||[];a.forEach(function(id){if(base.indexOf(id)<0)base.push(id);});};
+  var mtIn=mt.filter(function(id){return lid[id];});if(mtIn.length)add(mtIn);
+  MXp.dates.forEach(function(dt){var ids=list.filter(function(x){var q=String(x.m.date||'').split('-');return +q[1]===dt.m&&+q[2]===dt.d;}).map(function(x){return x.m.id;});if(ids.length)add(ids);else ignored.push(dt.d+'/'+dt.m);});
+  if(MXp.last){var lm=list.filter(function(x){return x.n>0;})[0];if(lm)add([lm.m.id]);}
+  if(MXp.home||MXp.away){base=(base||list.map(function(x){return x.m.id;})).filter(function(id){var m=lid[id].m;return MXp.home?m.home!==false:m.home===false;});}
+  var mset=false;
+  if(MXp.all){E.matchIds=[];mset=true;applied.push('tous les matchs');}
+  else if(base&&base.length){_vsPrevM=E.matchIds.slice();E.matchIds=base.length===list.length?[]:base.slice();_vsSetM=E.matchIds.join();mset=true;
+    base.slice(0,4).forEach(function(id){var mm=gM(id);applied.push(mm?'J'+mm.round+' '+(mm.opp||''):'match');});if(base.length>4)applied.push('+'+(base.length-4)+' matchs');}
+  else if(base&&!base.length){ignored.push('match');}
+  if(!mset&&E.matchIds.length===1&&E.matchIds[0]===0){E.matchIds=[];applied.push('tous les matchs de l\'équipe');}
   P.hits.forEach(function(h){
-    var cand=h.entries.filter(function(e){return e.f!=='mt';});if(!cand.length)return;
+    var cand=h.entries.filter(function(e){return e.f!=='mt'&&e.f!=='tm';});if(!cand.length)return;
     if(h.multi){var okM=0;cand.forEach(function(e){XV.f[e.f].push(e.v);});if(getFilteredSeqs().length){applied.push(h.label||h.n);}else{cand.forEach(function(e){XV.f[e.f].pop();});ignored.push(h.label||h.n);}return;}
     cand.sort(function(a,b){return order.indexOf(a.f)-order.indexOf(b.f);});
     var ok=false;
@@ -37461,8 +37489,8 @@ window.vsRun=function(txt){
   if(P.fav){E.favOnly=true;if(getFilteredSeqs().length)applied.push('favoris');else{E.favOnly=false;ignored.push('favoris');}}
   var sugg='';
   var sg=[];P.rest.forEach(function(w){xvV13Sugg(w,voc).forEach(function(e){if(!sg.some(function(x){return x.f===e.f&&x.v===e.v;}))sg.push(e);});});
-  if(sg.length){sugg='<br><span style="color:var(--t3)">Tu voulais dire : </span>'+sg.slice(0,6).map(function(e){return'<span class="xchip" style="margin:2px 4px 2px 0" onclick="vsPick(\''+e.f+'\',\''+encodeURIComponent(e.v)+'\')">'+String(e.label||e.v).replace(/</g,'&lt;')+(e.f==='pl'?' (joueur)':'')+'</span>';}).join('');}
-  if(!applied.length){XV.f=saveF;E.matchIds=saveM;E.favOnly=saveFav;
+  if(sg.length){sugg='<br><span style="color:var(--t3)">Tu voulais dire : </span>'+sg.slice(0,6).map(function(e){return'<span class="xchip" style="margin:2px 4px 2px 0" onclick="vsPick(\''+e.f+'\',\''+encodeURIComponent(e.v)+'\')">'+String(e.label||e.v).replace(/</g,'&lt;')+(e.f==='pl'?' (joueur)':e.f==='tm'?' (équipe)':'')+'</span>';}).join('');}
+  if(!applied.length){XV.f=saveF;E.matchIds=saveM;E.favOnly=saveFav;_expTeamFilter=saveTF;
     _vsMsg='<span style="color:#E05252;">Rien reconnu dans « '+String(txt).replace(/</g,'&lt;')+' ». Dis les mots de tes boards (famille, action, résultat, joueur, QT…).</span>'+sugg;
     renderPage();toast('Je n’ai rien reconnu','red');return;}
   var n=getFilteredSeqs().length;_expSelectedIds=null;_customSeqOrder=null;
@@ -37471,25 +37499,41 @@ window.vsRun=function(txt){
     +(ignored.length?'<br>Sans résultat avec le reste : '+ignored.map(function(x){return chip(x,'rgba(224,82,82,.18)');}).join(''):'')+sugg;
   renderPage();toast('🎙 '+n+' séquence'+(n>1?'s':''),ignored.length?'red':'acc');
 };
-/* dictée : parle librement, plusieurs alternatives de transcription, la meilleure est retenue */
+/* dictée : robuste sur iPad / iPhone (Safari) et sur Mac / Chrome */
+function xvIsIOS(){return /iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);}
 window.vsListen=function(){
   var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
   if(!SR){toast('Dictée non disponible sur ce navigateur : tape ta demande dans la barre','red');return;}
-  var rec;try{rec=new SR();}catch(e){return;}
-  rec.lang='fr-FR';rec.interimResults=true;rec.continuous=true;rec.maxAlternatives=5;
-  var inp=document.getElementById('vsIn'),btn=document.getElementById('vsMic'),finals=[],it='',tm=null,stopped=false;if(btn)btn.textContent='🔴';
-  var arm=function(ms){clearTimeout(tm);tm=setTimeout(function(){try{rec.stop();}catch(e){}},ms||1800);};
-  rec.onresult=function(e){it='';finals=[];for(var i=0;i<e.results.length;i++){var r=e.results[i];if(r.isFinal){var alts=[];for(var k=0;k<r.length;k++)alts.push(r[k].transcript);finals.push(alts);}else it+=r[0].transcript;}
-    var i2=document.getElementById('vsIn');if(i2)i2.value=(finals.map(function(a){return a[0];}).join(' ')+' '+it).trim();arm();};
-  rec.onerror=function(ev){if(ev&&(ev.error==='no-speech'||ev.error==='aborted'))return;toast('Micro indisponible ou refusé : tape ta demande dans la barre','red');};
-  rec.onend=function(){clearTimeout(tm);var b=document.getElementById('vsMic');if(b)b.textContent='🎙';
-    var i2=document.getElementById('vsIn'),t=(finals.map(function(a){return a[0];}).join(' ')+' '+it).trim()||(i2&&i2.value||'').trim();
-    if(finals.length){ // meilleure combinaison d'alternatives : celle qui fait reconnaître le plus de mots-clés
+  if(window._vsRec){try{window._vsRec.stop();}catch(e){}return;} // 2e appui = arrêter
+  var ios=xvIsIOS(),rec;try{rec=new SR();}catch(e){toast('Dictée indisponible sur cet appareil','red');return;}
+  window._vsRec=rec;
+  rec.lang='fr-FR';rec.interimResults=true;
+  try{rec.continuous=!ios;}catch(e){}
+  try{if(!ios)rec.maxAlternatives=5;}catch(e){}
+  var btn=document.getElementById('vsMic'),finals=[],it='',tm=null,err=null,got=false;if(btn)btn.textContent='🔴';
+  var arm=function(ms){clearTimeout(tm);if(ios)return;tm=setTimeout(function(){try{rec.stop();}catch(e){}},ms||1800);};
+  var show=function(t){var i2=document.getElementById('vsIn');if(i2)i2.value=t;};
+  rec.onstart=function(){var i2=document.getElementById('vsIn');if(i2&&!i2.value)i2.placeholder='Je t\'écoute…';};
+  rec.onresult=function(e){got=true;
+    if(ios){ // Safari renvoie le texte cumulé : on ne garde que le dernier résultat
+      var r=e.results[e.results.length-1];it=r&&r[0]?r[0].transcript:'';finals=(r&&r.isFinal)?[[it]]:[];show(it.trim());return;}
+    it='';finals=[];for(var i=0;i<e.results.length;i++){var r2=e.results[i];if(r2.isFinal){var alts=[];for(var k=0;k<r2.length;k++)alts.push(r2[k].transcript);finals.push(alts);}else it+=r2[0].transcript;}
+    show((finals.map(function(a){return a[0];}).join(' ')+' '+it).trim());arm();};
+  rec.onerror=function(ev){err=ev&&ev.error||'error';};
+  rec.onend=function(){clearTimeout(tm);window._vsRec=null;
+    var b=document.getElementById('vsMic');if(b)b.textContent='🎙';
+    var i2=document.getElementById('vsIn');if(i2)i2.placeholder='Dis ou tape : « défense step out du #3 au QT4 »…';
+    if(err==='not-allowed'||err==='service-not-allowed'){toast('Micro refusé : autorise le micro pour ce site (et active la Dictée dans Réglages › Général › Clavier sur iPad)','red');return;}
+    if(err==='network'){toast('Dictée : connexion internet requise','red');return;}
+    if(err==='audio-capture'){toast('Aucun micro détecté','red');return;}
+    var t=(ios?it:(finals.map(function(a){return a[0];}).join(' ')+' '+it)).trim();
+    if(!ios&&finals.length){
       try{var voc=xvV13Vocab(),best=t,bs=-1,maxA=Math.max.apply(null,finals.map(function(a){return a.length;}));
         for(var k=0;k<maxA;k++){var cand=finals.map(function(a){return a[k]||a[0];}).join(' ');var P=xvV13Parse(cand,voc),sc=P.hits.length*2+P.qts.length+(P.fav?1:0)-P.rest.length*0.5;if(sc>bs){bs=sc;best=cand;}}
         var P0=xvV13Parse(t,voc),s0=P0.hits.length*2+P0.qts.length+(P0.fav?1:0)-P0.rest.length*0.5;if(s0>=bs)best=t;t=best.trim();}catch(e){}}
-    if(i2)i2.value=t;if(t)vsRun(t);};
-  try{rec.start();arm(6000);}catch(e){}
+    if(!t){toast(got?'Je n\'ai rien compris, réessaie':'Rien entendu : appuie sur le micro et parle','red');return;}
+    show(t);vsRun(t);};
+  try{rec.start();arm(6000);}catch(e){window._vsRec=null;if(btn)btn.textContent='🎙';toast('Micro occupé, réessaie dans une seconde','red');}
 };
 
 /* joueur + rôle : « Karim passeur » = Karim lui-même a eu ce rôle (et pas un autre joueur passeur) */
@@ -37658,6 +37702,518 @@ async function xvRunZip(j){
   var blob=await zip.generateAsync({type:'blob'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=j.name.replace(/\.(mp4|webm|zip)$/i,'')+'.zip';document.body.appendChild(a);a.click();document.body.removeChild(a);setTimeout(function(){URL.revokeObjectURL(url);},4000);
   j.pct=100;j.state='ok';
 }
+
+/* filtres : 7 boutons de même largeur (espace libre divisé), QT réduit à son contenu */
+(function(){var st=document.createElement('style');st.textContent='.xv-g[style*="align-items:start"]{grid-template-columns:repeat(5,minmax(0,1fr)) minmax(0,2fr) auto!important}.xv-g[style*="align-items:start"]>div:nth-child(6){grid-template-columns:1fr 1fr!important}.xv-g[style*="align-items:start"]>div:nth-child(7){grid-column:auto!important}';document.head.appendChild(st);})();
+
+/* ═══════════ v392 — REFONTE « BOARDS DE CODAGE » : cartes · kits · vue d'ensemble · détail ═══════════
+   Modèle de données inchangé (board.nodes / board.links) : le codage, InStats, Playbook… continuent de fonctionner.
+   Ajouts : bibliothèque de cartes + kits (DB.settings.bxLib), board.teamIds, node.cardId, node.bx (kits appliqués). */
+var BX={tab:'boards',view:'home',bid:null,bv:'over',sf:null,act:null,famFilter:null,teamFilter:null,flt:'all',cardType:'Action',cardSel:null,cardForm:null,kitSel:null,kitForm:null,kitKind:'sub',search:'',boardSearch:'',official:null,officialLoaded:false,pop:null,nb:{name:'',mode:'vide',model:null,add:true}};
+var BX_TYPES=['Famille','Sous-famille','Action','Sous-action','Résultat','Compteur'];
+var BX_TYPE_LBL={'Famille':['Familles','Famille'],'Sous-famille':['Sous-familles','Sous-famille'],'Action':['Actions','Action'],'Sous-action':['Sous-actions','Sous-action'],'Résultat':['Résultats','Résultat'],'Compteur':['Compteurs','Compteur']};
+var BX_COL={'Famille':['#1f3fd8','#ffffff'],'Sous-famille':['#6f8ff0','#0f1a44'],'Action':['#2f5fe0','#ffffff'],'Sous-action':['#8aa4f4','#0f1a44'],'Résultat':['#2fae68','#06220f'],'Compteur':['#8a3fd0','#ffffff']};
+var BX_OWNER='maxime.lami18@gmail.com';
+function bxE(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function bxQ(s){return String(s==null?'':s).replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;');}
+function bxLib(){var s=DB.settings=DB.settings||{};var L=s.bxLib=s.bxLib||{cards:[],kits:[]};if(!L.cards)L.cards=[];if(!L.kits)L.kits=[];return L;}
+function bxCard(id){return bxLib().cards.filter(function(c){return c.id===id;})[0]||null;}
+function bxKit(id){return bxLib().kits.filter(function(k){return k.id===id;})[0]||null;}
+function bxBoard(id){return (DB.boards||[]).filter(function(b){return String(b.id)===String(id);})[0]||null;}
+function bxNode(board,id){return board.nodes.filter(function(n){return n.id===id;})[0]||null;}
+function bxTouch(board){if(board)board.mod=Date.now();}
+function bxKeyNorm(k){return String(k||'').trim().toLowerCase();}
+function bxCardKey(c){return c.type+'|'+String(c.label||'').trim().toLowerCase();}
+/* ── bibliothèque : alimentée par les boutons déjà créés (rien n'est perdu) ── */
+function bxSeed(){
+  var L=bxLib(),ch=false,idx={};
+  L.cards.forEach(function(c){idx[bxCardKey(c)]=c;});
+  (DB.boards||[]).forEach(function(b){(b.nodes||[]).forEach(function(n){
+    if(n.cardId&&bxCard(n.cardId))return;
+    var k=n.type+'|'+String(n.label||'').trim().toLowerCase(),c=idx[k];
+    if(!c){c={id:'c'+nid(),type:n.type,label:n.label,color:n.color,tc:n.tc,shortcut:n.shortcut||'',pts:n.pts!=null?n.pts:null,polarity:n.polarity||null,resKind:n.resKind||null,is3pt:n.is3pt||null};L.cards.push(c);idx[k]=c;}
+    n.cardId=c.id;ch=true;
+  });});
+  if(ch)saveDB();
+}
+function bxNewCardFromForm(f){return{id:'c'+nid(),type:f.type,label:f.label,color:f.color,tc:f.tc,shortcut:f.shortcut||'',pts:f.pts!=null?f.pts:null,polarity:f.polarity||null,resKind:f.resKind||null,is3pt:f.is3pt||null};}
+/* ── graphe du board ── */
+function bxOut(board,id,type){return board.links.filter(function(l){return l.from===id;}).map(function(l){return bxNode(board,l.to);}).filter(function(n){return n&&(!type||n.type===type);});}
+function bxIn(board,id,type){return board.links.filter(function(l){return l.to===id;}).map(function(l){return bxNode(board,l.from);}).filter(function(n){return n&&(!type||n.type===type);});}
+function bxFams(board){return board.nodes.filter(function(n){return n.type==='Famille';});}
+function bxSfsOf(board,fam){return bxOut(board,fam.id,'Sous-famille');}
+function bxActsOf(board,sf){return bxOut(board,sf.id,'Action');}
+function bxFamOfSf(board,sf){return bxIn(board,sf.id,'Famille')[0]||null;}
+function bxSfOfAct(board,a){return bxIn(board,a.id,'Sous-famille')[0]||null;}
+function bxPaths(board,a){var n=0,seen={};function go(id,d){if(d>6)return;bxOut(board,id).forEach(function(t){if(t.type==='Résultat')n++;else if(t.type==='Sous-action'&&!seen[t.id]){seen[t.id]=1;go(t.id,d+1);delete seen[t.id];}});}go(a.id,0);return n;}
+function bxResOf(board,a){return bxOut(board,a.id,'Résultat');}
+function bxSubOf(board,a){return bxOut(board,a.id,'Sous-action');}
+function bxIssues(board){
+  var out=[];
+  board.nodes.filter(function(n){return n.type==='Action';}).forEach(function(a){
+    if(!bxSfOfAct(board,a))out.push({k:'rangee',id:a.id,t:a.label,d:'carte non rangée',fix:'Ranger'});
+    if(!bxPaths(board,a))out.push({k:'res',id:a.id,t:a.label,d:'aucun résultat lié',fix:'Appliquer un kit'});
+  });
+  ['Action','Sous-action','Résultat','Sous-famille'].forEach(function(tp){var m={};board.nodes.filter(function(n){return n.type===tp&&n.shortcut;}).forEach(function(n){var k=bxKeyNorm(n.shortcut);(m[k]=m[k]||[]).push(n);});
+    Object.keys(m).forEach(function(k){if(m[k].length<2)return;if(tp==='Action'||tp==='Sous-famille'){var bySf={};m[k].forEach(function(n){var par=tp==='Action'?bxSfOfAct(board,n):bxFamOfSf(board,n);var pk=par?par.id:'-';(bySf[pk]=bySf[pk]||[]).push(n);});Object.keys(bySf).forEach(function(pk){if(bySf[pk].length>1)bySf[pk].slice(1).forEach(function(n){out.push({k:'dup',id:n.id,t:n.label,d:'raccourci « '+k+' » en double ('+bySf[pk][0].label+')',fix:'Changer'});});});}
+      else m[k].slice(1).forEach(function(n){out.push({k:'dup',id:n.id,t:n.label,d:'raccourci « '+k+' » en double ('+m[k][0].label+')',fix:'Changer'});});});});
+  board.nodes.filter(function(n){return n.type==='Sous-famille';}).forEach(function(s){if(!bxFamOfSf(board,s))out.push({k:'rangee',id:s.id,t:s.label,d:'sous-famille non rangée',fix:'Ranger'});});
+  return out;
+}
+function bxBoardStats(board){var fams=bxFams(board),sfs=board.nodes.filter(function(n){return n.type==='Sous-famille';}),acts=board.nodes.filter(function(n){return n.type==='Action';}),p=0;acts.forEach(function(a){p+=bxPaths(board,a);});return{fams:fams.length,sfs:sfs.length,acts:acts.length,paths:p,issues:bxIssues(board).length};}
+function bxPos(board,type){var col={'Famille':40,'Sous-famille':260,'Action':500,'Sous-action':760,'Résultat':1050,'Compteur':40};var c=board.nodes.filter(function(n){return n.type===type;}).length;return{x:col[type]||200,y:40+(c%28)*62+(type==='Compteur'?1300:0)};}
+function bxNodeFromCard(board,card){
+  var n=board.nodes.filter(function(x){return x.cardId===card.id;})[0]||board.nodes.filter(function(x){return x.type===card.type&&String(x.label).trim().toLowerCase()===String(card.label).trim().toLowerCase();})[0];
+  if(n){if(!n.cardId)n.cardId=card.id;return n;}
+  var p=bxPos(board,card.type);
+  n={id:'n'+nid(),label:card.label,type:card.type,color:card.color,tc:card.tc,shortcut:card.shortcut||'',pts:card.pts!=null?card.pts:null,polarity:card.polarity||null,resKind:card.resKind||null,is3pt:card.is3pt||null,x:p.x,y:p.y,cardId:card.id};
+  board.nodes.push(n);return n;
+}
+function bxLink(board,f,t){if(!board.links.some(function(l){return l.from===f&&l.to===t;}))board.links.push({from:f,to:t});}
+function bxUnlink(board,f,t){board.links=board.links.filter(function(l){return !(l.from===f&&l.to===t);});}
+/* ── kits appliqués à une action ── */
+function bxAdopt(board,a){if(a.bx)return a.bx;a.bx={res:[],sub:[],exc:[],man:[]};bxOut(board,a.id).forEach(function(t){if(t.type==='Résultat'||t.type==='Sous-action')a.bx.man.push(t.id);});return a.bx;}
+function bxKitNodes(board,kitId){var k=bxKit(kitId);if(!k)return[];return k.cardIds.map(function(cid){var c=bxCard(cid);return c?bxNodeFromCard(board,c):null;}).filter(Boolean);}
+function bxSync(board,a){
+  var b=bxAdopt(board,a),want={},res=[],subs=[];
+  (b.res||[]).forEach(function(kid){bxKitNodes(board,kid).forEach(function(n){if((b.exc||[]).indexOf(n.id)<0&&!want[n.id]){want[n.id]=1;res.push(n);}});});
+  (b.sub||[]).forEach(function(kid){bxKitNodes(board,kid).forEach(function(n){if(!want[n.id]){want[n.id]=1;subs.push(n);}});});
+  (b.man||[]).forEach(function(id){var n=bxNode(board,id);if(n&&!want[n.id]){want[n.id]=1;(n.type==='Résultat'?res:subs).push(n);}});
+  bxOut(board,a.id).forEach(function(t){if((t.type==='Résultat'||t.type==='Sous-action')&&!want[t.id])bxUnlink(board,a.id,t.id);});
+  res.forEach(function(n){bxLink(board,a.id,n.id);});
+  subs.forEach(function(s){bxLink(board,a.id,s.id);res.forEach(function(r){bxLink(board,s.id,r.id);});});
+  bxTouch(board);
+}
+function bxAddKit(bid,aid,kitId){var bd=bxBoard(bid),a=bd&&bxNode(bd,aid),k=bxKit(kitId);if(!a||!k)return;var b=bxAdopt(bd,a),key=k.kind==='res'?'res':'sub';if(b[key].indexOf(kitId)<0)b[key].push(kitId);bxSync(bd,a);saveDB();}
+function bxRemKit(bid,aid,kitId){var bd=bxBoard(bid),a=bd&&bxNode(bd,aid);if(!a)return;var b=bxAdopt(bd,a);b.res=b.res.filter(function(x){return x!==kitId;});b.sub=b.sub.filter(function(x){return x!==kitId;});bxSync(bd,a);saveDB();}
+function bxKitUse(kitId){var out=[];(DB.boards||[]).forEach(function(b){b.nodes.forEach(function(n){if(n.bx&&((n.bx.res||[]).indexOf(kitId)>=0||(n.bx.sub||[]).indexOf(kitId)>=0))out.push({board:b,node:n});});});return out;}
+function bxSuggestKits(){
+  var L=bxLib(),known={};L.kits.forEach(function(k){known[k.kind+'|'+k.cardIds.slice().sort().join(',')]=1;});
+  var groups={};
+  (DB.boards||[]).forEach(function(b){b.nodes.filter(function(n){return n.type==='Action';}).forEach(function(a){
+    var ids=bxResOf(b,a).map(function(r){return r.cardId;}).filter(Boolean);if(ids.length<2)return;ids=ids.filter(function(x,i){return ids.indexOf(x)===i;}).sort();var k='res|'+ids.join(',');if(known[k])return;(groups[k]=groups[k]||{ids:ids,n:0,kind:'res'}).n++;});});
+  return Object.keys(groups).map(function(k){return groups[k];}).filter(function(g){return g.n>=2;}).sort(function(a,b){return b.n-a.n;}).slice(0,4);
+}
+function bxTeamLogo(t,s){s=s||30;var col=t.color||'#D4AA6A';if(t.logo)return'<img class="bx-tlg" style="width:'+s+'px;height:'+s+'px;" src="'+bxE(t.logo)+'" alt="">';return'<span class="bx-tlg" style="width:'+s+'px;height:'+s+'px;background:'+col+';color:#fff;font-size:'+Math.round(s*0.46)+'px;">'+bxE((t.name||'?').charAt(0).toUpperCase())+'</span>';}
+function bxTeamsOf(b){return (b.teamIds||[]).map(function(id){return gT(id);}).filter(Boolean);}
+function bxTeamStack(ts,s){return'<span class="bx-stk">'+ts.map(function(t){return bxTeamLogo(t,s||30);}).join('')+'</span>';}
+function bxAgo(ts){if(!ts)return'';var d=Math.floor((Date.now()-ts)/86400000);return'modifié '+(d<=0?'aujourd’hui':'il y a '+d+' j');}
+
+/* ── CSS ── */
+(function(){var st=document.createElement('style');st.id='bxCss';st.textContent=
+'.bx{padding:0 0 30px;--bxk:#f3efe6;}.bx h1{font-size:26px;font-weight:800;letter-spacing:-.02em;margin:0;color:var(--txt);}'
++'.bx-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:10px;flex-wrap:wrap;}'
++'.bx-btn{display:inline-flex;align-items:center;gap:7px;height:38px;padding:0 15px;border-radius:11px;border:1px solid var(--bdr2);background:var(--surf2);color:var(--txt);font-weight:700;font-size:13.5px;cursor:pointer;font-family:inherit;white-space:nowrap;}'
++'.bx-btn:hover{border-color:var(--acc);}.bx-btn.sm{height:32px;padding:0 11px;font-size:12.5px;}.bx-btn.gold{background:linear-gradient(180deg,#E3BC7C,#C79A55);color:#1a1200;border-color:transparent;}.bx-btn.red{color:#e66;}'
++'.bx-tabs{display:flex;align-items:center;gap:14px;margin-bottom:16px;flex-wrap:wrap;}.bx-seg{display:flex;gap:4px;background:var(--surf);padding:4px;border-radius:12px;border:1px solid var(--bdr);}'
++'.bx-seg span{padding:8px 15px;border-radius:9px;font-weight:700;font-size:13.5px;color:var(--txt3);cursor:pointer;white-space:nowrap;}.bx-seg span.on{background:var(--acc-d);color:var(--acc);box-shadow:inset 0 0 0 1px rgba(212,170,106,.5);}'
++'.bx-sub{font-size:12px;color:var(--txt3);}.bx-lbl{font-size:11px;font-weight:800;letter-spacing:.11em;text-transform:uppercase;color:var(--acc);}'
++'.bx-card{background:var(--surf);border:1px solid var(--bdr);border-radius:16px;padding:16px;}'
++'.bx-tlg{display:inline-flex;align-items:center;justify-content:center;border-radius:50%;font-weight:900;border:2px solid var(--surf);object-fit:cover;flex:none;box-shadow:0 2px 6px rgba(0,0,0,.5);}'
++'.bx-stk{display:inline-flex;}.bx-stk .bx-tlg{margin-left:-8px;}.bx-stk .bx-tlg:first-child{margin-left:0;}'
++'.bx-ftr{display:flex;align-items:center;gap:8px;margin-bottom:16px;flex-wrap:wrap;}.bx-fc{display:inline-flex;align-items:center;gap:8px;padding:5px 14px 5px 6px;border-radius:999px;border:1px solid var(--bdr);background:var(--surf);font-weight:700;font-size:13px;color:var(--txt2);cursor:pointer;}'
++'.bx-fc.nolg{padding:7px 14px;}.bx-fc.on{border-color:var(--acc);background:var(--acc-d);color:var(--acc);}'
++'.bx-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:16px;}.bx-bc{background:var(--surf);border:1px solid var(--bdr);border-radius:18px;overflow:hidden;cursor:pointer;display:flex;flex-direction:column;transition:border-color .15s,transform .15s;}'
++'.bx-bc:hover{border-color:var(--acc);transform:translateY(-2px);}.bx-band{height:124px;padding:14px 16px;display:flex;flex-wrap:wrap;gap:6px;align-content:flex-start;background:radial-gradient(ellipse at 85% 90%,rgba(212,170,106,.22),transparent 55%),var(--bg2);overflow:hidden;}'
++'.bx-dot{width:13px;height:13px;border-radius:4px;flex:none;}.bx-bb{padding:14px 18px 16px;display:flex;flex-direction:column;gap:9px;flex:1;}.bx-bn{font-size:20px;font-weight:800;color:var(--txt);}.bx-bs{font-size:12.5px;color:var(--txt3);}.bx-bs b{color:var(--txt);}'
++'.bx-bt{display:flex;align-items:center;gap:9px;font-size:13px;color:var(--txt2);font-weight:600;min-height:34px;}.bx-bf{display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--bdr);padding-top:10px;font-size:12px;color:var(--txt3);margin-top:auto;}'
++'.bx-ok{color:#3DC97A;font-weight:800;}.bx-wn{color:#E8A040;font-weight:800;}.bx-attr{border:1px dashed rgba(212,170,106,.6);color:var(--acc);border-radius:9px;padding:6px 12px;font-weight:800;font-size:12.5px;}'
++'.bx-add{border:2px dashed rgba(212,170,106,.5);border-radius:18px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-height:300px;cursor:pointer;color:var(--acc);text-align:center;padding:20px;}.bx-add b{font-size:20px;}.bx-add span{font-size:12.5px;color:var(--txt3);}'
+/* boutons nouveau style */
++'.bx-nd{display:flex;align-items:center;gap:9px;padding:11px 13px;border-radius:12px;background-color:var(--c);color:var(--tc);background-image:linear-gradient(180deg,rgba(255,255,255,.18),rgba(255,255,255,0) 62%);border:1px solid rgba(255,255,255,.2);box-shadow:0 3px 0 rgba(0,0,0,.4),0 8px 16px rgba(0,0,0,.22);font-weight:800;font-size:14.5px;min-width:0;cursor:pointer;}'
++'.bx-nd .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}.bx-nd .bxk{margin-left:auto;}.bxk{background:var(--bxk);color:#1a1a1a;border-radius:6px;padding:1px 8px;font-family:ui-monospace,Menlo,monospace;font-weight:800;font-size:11.5px;box-shadow:0 2px 0 rgba(0,0,0,.35);flex:none;min-width:12px;text-align:center;}'
++'.bx-nd .pt{background:rgba(0,0,0,.3);border-radius:6px;padding:1px 7px;font-size:11px;font-family:monospace;font-weight:800;color:#fff;}.bx-nd.sel{outline:2px solid #fff;box-shadow:0 0 0 5px rgba(212,170,106,.4),0 3px 0 rgba(0,0,0,.4);}'
+/* kits */
++'.bx-kR,.bx-kS{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:800;padding:3px 10px 3px 4px;border-radius:9px;white-space:nowrap;cursor:default;}'
++'.bx-kR{background:rgba(212,170,106,.14);border:1px solid rgba(212,170,106,.6);color:#e6c488;}.bx-kS{background:rgba(243,239,230,.09);border:1px solid rgba(243,239,230,.45);color:#f3efe6;}'
++'.bx-kR i,.bx-kS i{font-style:normal;width:20px;height:20px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;}.bx-kR i{background:#D4AA6A;color:#1a1200;}.bx-kS i{background:#f3efe6;color:#1a1a1a;}'
++'.bx-kR em,.bx-kS em{font-style:normal;font-weight:700;opacity:.65;font-size:11px;}.bx-kw{display:flex!important;width:100%;box-sizing:border-box;}.bx-kw u{margin-left:auto;text-decoration:none;opacity:.7;font-size:12px;padding:2px 6px;cursor:pointer;}.bx-kw u:hover{opacity:1;color:#fff;}'
++'.bx-kx{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:800;padding:4px 9px;border-radius:9px;background:rgba(232,150,40,.14);color:#e8a040;border:1px solid rgba(232,150,40,.5);white-space:nowrap;}.bx-kx.bad{background:rgba(224,82,82,.14);color:#ff8b8b;border-color:rgba(224,82,82,.55);}.bx-kx.man{background:rgba(255,255,255,.06);color:var(--txt2);border-color:var(--bdr2);}'
++'.bx-addkit{margin-top:4px;border:1.5px dashed rgba(243,239,230,.45);color:#f3efe6;border-radius:10px;padding:8px 10px;font-size:12.5px;font-weight:800;text-align:center;cursor:pointer;}.bx-addkit.r{border-color:rgba(212,170,106,.65);color:#e6c488;}.bx-addkit.x{border-color:rgba(232,150,40,.5);color:#e8a040;}'
+/* vue d'ensemble */
++'.bx-stats{display:flex;gap:10px;margin-bottom:14px;align-items:stretch;flex-wrap:wrap;}.bx-st{background:var(--surf);border:1px solid var(--bdr);border-radius:13px;padding:10px 16px;min-width:92px;}.bx-st b{display:block;font-size:26px;font-weight:800;color:var(--txt);}.bx-st span{font-size:12px;color:var(--txt3);}.bx-st.w{border-color:rgba(232,150,40,.55);cursor:pointer;}.bx-st.w b{color:#E8A040;}'
++'.bx-fam{background:var(--surf);border:1px solid var(--bdr);border-radius:16px;padding:16px;margin-bottom:14px;}.bx-fh{display:flex;align-items:center;gap:12px;margin-bottom:12px;}.bx-chip{display:inline-block;padding:7px 16px;border-radius:9px;font-weight:800;font-size:14.5px;}'
++'.bx-tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:12px;}.bx-tile{background:var(--bg2);border:1px solid var(--bdr);border-top:3px solid var(--c);border-radius:13px;padding:14px;cursor:pointer;display:flex;flex-direction:column;gap:7px;}.bx-tile:hover{border-color:var(--acc);}'
++'.bx-tile b{font-size:17px;color:var(--txt);}.bx-tile .ds{display:flex;flex-wrap:wrap;gap:5px;min-height:30px;}.bx-tile .kc{display:flex;gap:6px;flex-wrap:wrap;}.bx-tile .kc span{font-size:11px;font-weight:800;padding:2px 9px;border-radius:7px;background:rgba(212,170,106,.12);color:#e6c488;border:1px solid rgba(212,170,106,.5);}.bx-tile .kc span.s{background:rgba(243,239,230,.08);color:#f3efe6;border-color:rgba(243,239,230,.4);}'
++'.bx-tile-add{border:2px dashed rgba(212,170,106,.5);border-radius:13px;display:flex;align-items:center;justify-content:center;gap:8px;color:var(--acc);font-weight:800;min-height:140px;cursor:pointer;}'
+/* détail */
++'.bx-det{display:grid;grid-template-columns:260px minmax(0,1fr) 330px;gap:14px;align-items:start;}.bx-tr{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:9px;cursor:pointer;font-size:14px;color:var(--txt2);}.bx-tr:hover{background:var(--bg2);}.bx-tr.on{background:var(--acc-d);color:var(--acc);font-weight:700;}'
++'.bx-tr i{width:11px;height:11px;border-radius:3px;flex:none;}.bx-tr .cn{margin-left:auto;font-size:12px;color:var(--txt3);}.bx-tr .wn{font-size:11px;font-weight:800;background:rgba(232,150,40,.18);color:#E8A040;border-radius:6px;padding:0 6px;}'
++'.bx-ac{background:var(--bg2);border-radius:12px;box-shadow:0 2px 8px #0008;overflow:hidden;cursor:pointer;}.bx-ac .hd{border-radius:0;border:none;}.bx-ft{display:flex;flex-direction:column;gap:6px;padding:9px 10px;min-height:76px;justify-content:center;background:var(--surf);}'
++'.bx-lane{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}.bx-lane small{font-size:9px;letter-spacing:.09em;font-weight:800;color:var(--txt3);width:86px;flex:none;white-space:nowrap;}'
++'.bx-grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;align-content:start;}.bx-addtile{border:2px dashed rgba(212,170,106,.6);border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:var(--acc);min-height:120px;cursor:pointer;}.bx-addtile b{font-size:15px;}.bx-addtile span{font-size:11.5px;color:var(--txt3);}'
++'.bx-flt{display:flex;gap:6px;flex-wrap:wrap;}.bx-flt span{padding:7px 12px;border-radius:9px;border:1px solid var(--bdr);font-size:12.5px;font-weight:700;color:var(--txt2);cursor:pointer;white-space:nowrap;}.bx-flt span.on{border-color:var(--acc);background:var(--acc-d);color:var(--acc);}'
++'.bx-leg{display:flex;gap:10px;margin-bottom:12px;padding:8px 10px;border-radius:10px;background:var(--bg2);border:1px solid var(--bdr);flex-wrap:wrap;}'
++'.bx-f{font-size:11.5px;font-weight:800;color:var(--acc);margin:12px 0 5px;}.bx-inp{width:100%;box-sizing:border-box;height:40px;border-radius:10px;border:1px solid var(--bdr2);background:var(--bg2);color:var(--txt);padding:0 12px;font-size:14px;font-family:inherit;}'
++'.bx-seg2{display:flex;background:var(--bg2);border:1px solid var(--bdr);border-radius:10px;padding:3px;gap:3px;}.bx-seg2 span{flex:1;text-align:center;padding:8px 6px;border-radius:7px;font-weight:700;font-size:13px;color:var(--txt3);cursor:pointer;}.bx-seg2 span.on{background:var(--acc-d);color:var(--acc);}'
++'.bx-colb{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;height:40px;border-radius:10px;border:1px solid var(--bdr2);background:var(--bg2);color:var(--txt);font-weight:700;cursor:pointer;font-family:inherit;font-size:14px;}.bx-colb i{width:16px;height:16px;border-radius:5px;border:1px solid #fff5;}'
++'.bx-libre{font-size:12px;font-weight:800;border-radius:9px;padding:0 11px;display:inline-flex;align-items:center;background:rgba(61,201,122,.14);color:#3DC97A;white-space:nowrap;}.bx-libre.no{background:rgba(232,150,40,.16);color:#E8A040;}'
++'.bx-pv{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px;}.bx-pv .bx-btn{flex:1 1 40%;justify-content:center;}.bx-srch{position:relative;}.bx-srch input{width:100%;box-sizing:border-box;height:38px;border-radius:11px;border:1px solid var(--bdr2);background:var(--bg2);color:var(--txt);padding:0 12px 0 34px;font-size:13.5px;font-family:inherit;}.bx-srch:before{content:"🔍";position:absolute;left:11px;top:9px;font-size:13px;}'
++'.bx-res{position:absolute;z-index:60;left:0;right:0;top:42px;background:var(--surf);border:1px solid var(--acc);border-radius:12px;box-shadow:0 16px 40px #000c;max-height:340px;overflow:auto;padding:6px;}.bx-ri{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;cursor:pointer;font-size:13.5px;color:var(--txt);}.bx-ri:hover{background:var(--acc-d);}.bx-ri small{margin-left:auto;color:var(--txt3);font-size:11.5px;}'
+/* popovers & modales */
++'#bxPop{position:fixed;z-index:3400;background:var(--surf);border:1px solid var(--acc);border-radius:16px;padding:14px;box-shadow:0 24px 60px #000d;max-height:80vh;overflow:auto;}'
++'.bx-pi{display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:10px;cursor:pointer;font-size:14.5px;font-weight:600;color:var(--txt);}.bx-pi:hover{background:var(--acc-d);}.bx-pi.red{color:#e66;}.bx-hr{height:1px;background:var(--bdr);margin:6px 0;}'
++'.bx-ov{position:fixed;inset:0;background:rgba(5,6,10,.82);backdrop-filter:blur(6px);z-index:3000;display:flex;align-items:center;justify-content:center;padding:20px;}.bx-box{background:var(--surf);border:1px solid var(--acc);border-radius:20px;padding:22px;box-shadow:0 30px 80px #000e;max-height:92vh;overflow:auto;width:min(1020px,96vw);box-sizing:border-box;}'
++'.bx-mh{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}.bx-mh b{font-size:21px;font-weight:800;}.bx-x{cursor:pointer;color:var(--txt3);font-size:20px;padding:0 6px;}'
++'.bx-cbx{width:20px;height:20px;border-radius:6px;border:1.5px solid var(--bdr2);display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;flex:none;color:#1a1200;}.bx-cbx.on{background:var(--acc);border-color:var(--acc);}'
++'.bx-opt{display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:10px;border:1px solid var(--bdr);background:var(--bg2);cursor:pointer;margin-bottom:6px;}.bx-opt.on{border-color:var(--acc);background:var(--acc-d);}.bx-opt .rd{width:16px;height:16px;border-radius:50%;border:2px solid var(--bdr2);flex:none;}.bx-opt.on .rd{border-color:var(--acc);box-shadow:inset 0 0 0 3px var(--surf),inset 0 0 0 9px var(--acc);}.bx-opt b{font-weight:700;font-size:14px;}.bx-opt small{margin-left:auto;color:var(--txt3);font-size:12px;}'
++'.bx-pk{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:8px;}.bx-pkc{display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:10px;background:var(--bg2);border:1px solid var(--bdr);font-size:14px;font-weight:600;cursor:pointer;color:var(--txt);}.bx-pkc.on{border-color:rgba(212,170,106,.6);background:var(--acc-d);}.bx-pkc em{margin-left:auto;font-style:normal;font-size:11px;}'
+/* cartes / kits */
++'.bx-tts{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:14px;}.bx-tt{display:flex;align-items:center;gap:12px;padding:16px 18px;border-radius:14px;background:var(--surf);border:1px solid var(--bdr);cursor:pointer;}.bx-tt i{width:10px;height:38px;border-radius:5px;flex:none;background:var(--acc);}.bx-tt b{display:block;font-size:16px;color:var(--txt);}.bx-tt span{font-size:12px;color:var(--txt3);}.bx-tt.on{border-color:var(--acc);background:var(--acc-d);}.bx-tt.on b{color:var(--acc);}'
++'.bx-cols{display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:14px;align-items:start;}.bx-lg{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;align-content:start;}.bx-lc .us{font-size:11px;color:var(--txt3);margin:5px 4px 0;}'
++'.bx-bar{margin-top:16px;display:flex;align-items:center;justify-content:center;gap:10px;border:1px solid rgba(212,170,106,.5);border-radius:12px;padding:10px;color:var(--acc);font-weight:700;}'
++'.bx-kcols{display:grid;grid-template-columns:290px minmax(0,1fr) 320px;gap:14px;align-items:start;}.bx-kh{font-size:11px;font-weight:800;letter-spacing:.09em;margin:14px 0 8px;padding:6px 10px;border-radius:8px;}.bx-kh.rk{background:rgba(212,170,106,.16);color:#e6c488;}.bx-kh.sk{background:rgba(243,239,230,.1);color:#f3efe6;}'
++'.bx-kc2{padding:11px 13px;border-radius:12px;border:1px solid var(--bdr);background:var(--bg2);margin-bottom:7px;border-left:4px solid #D4AA6A;cursor:pointer;}.bx-kc2.sk{border-left-color:#f3efe6;}.bx-kc2 b{display:block;font-size:14.5px;color:var(--txt);}.bx-kc2 span{font-size:11.5px;color:var(--txt3);}.bx-kc2.on{background:rgba(212,170,106,.12);border-color:rgba(212,170,106,.55);}.bx-kc2.sk.on{background:rgba(243,239,230,.1);border-color:rgba(243,239,230,.5);}'
++'.bx-addk{margin-top:10px;border:1.5px dashed rgba(212,170,106,.65);color:#e6c488;border-radius:11px;padding:10px;font-weight:800;font-size:13px;text-align:center;cursor:pointer;}.bx-addk.s{border-color:rgba(243,239,230,.45);color:#f3efe6;margin-top:8px;}'
++'.bx-sc{display:flex;align-items:center;gap:9px;margin-bottom:9px;}.bx-sc .hd{color:var(--txt3);cursor:grab;}.bx-sc .x{color:#e55;cursor:pointer;padding:0 4px;}.bx-lcc{display:flex;align-items:center;gap:9px;padding:9px 12px;border-radius:10px;border:1px solid var(--bdr);background:var(--bg2);font-size:14px;color:var(--txt3);cursor:pointer;}.bx-lcc.on{color:var(--txt);}'
++'.bx-newc{border:1.5px dashed rgba(212,170,106,.6);border-radius:11px;padding:11px 13px;color:var(--acc);font-weight:800;font-size:13.5px;display:flex;justify-content:space-between;gap:8px;margin-top:10px;cursor:pointer;}.bx-newc span{color:var(--txt3);font-weight:600;font-size:12px;}'
++'.bx-chk{padding:8px 11px;border-radius:9px;background:rgba(232,150,40,.12);color:#E8A040;font-size:12.5px;font-weight:700;margin-top:8px;cursor:pointer;}.bx-chk.g{background:rgba(61,201,122,.12);color:#3DC97A;cursor:default;}'
++'.bx-m3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px;}.bx-m3 .bx-opt{flex-direction:column;align-items:flex-start;gap:3px;padding:14px;}.bx-m3 .bx-opt b{font-size:16px;}.bx-m3 .bx-opt small{margin:0;}'
++'.bx-ml{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:12px;}.bx-mi{padding:11px 13px;border-radius:12px;border:1px solid var(--bdr);background:var(--bg2);margin-bottom:8px;cursor:pointer;}.bx-mi.on{border-color:var(--acc);background:var(--acc-d);}.bx-mi b{display:flex;justify-content:space-between;font-size:15px;color:var(--txt);}.bx-mi small{color:var(--txt3);font-size:12.5px;}.bx-tag{font-size:10px;font-weight:800;letter-spacing:.08em;background:var(--acc);color:#111;border-radius:6px;padding:2px 8px;}.bx-tag.m{background:#333;color:#ccc;}'
++'@media(max-width:1250px){.bx-det{grid-template-columns:230px minmax(0,1fr)}.bx-det>.bx-card:last-child{grid-column:1/-1}.bx-kcols{grid-template-columns:260px minmax(0,1fr)}.bx-grid3{grid-template-columns:repeat(2,minmax(0,1fr))}.bx-lg{grid-template-columns:repeat(3,minmax(0,1fr))}.bx-tts{grid-template-columns:repeat(3,1fr)}.bx-cols{grid-template-columns:1fr}}'
+;document.head.appendChild(st);})();
+/* ── popover générique ── */
+function bxPopClose(){var e=document.getElementById('bxPop');if(e)e.remove();BX.pop=null;}
+document.addEventListener('mousedown',function(e){if(!BX.pop)return;var p=document.getElementById('bxPop');if(p&&p.contains(e.target))return;if(e.target.closest&&e.target.closest('[data-bxpop]'))return;bxPopClose();});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'){bxPopClose();var ov=document.getElementById('bxOv');if(ov)ov.remove();}});
+function bxPopOpen(anchor,w,fn,right){bxPopClose();var r=anchor.getBoundingClientRect();BX.pop={fn:fn,w:w,r:{l:r.left,b:r.bottom,rt:r.right},right:!!right};var p=document.createElement('div');p.id='bxPop';document.body.appendChild(p);bxPopFill();}
+function bxPopFill(){var p=document.getElementById('bxPop');if(!p||!BX.pop)return;var s=BX.pop;p.style.width=s.w+'px';p.innerHTML=s.fn();var left=s.right?s.r.rt-s.w:s.r.l;p.style.left=Math.max(8,Math.min(left,innerWidth-s.w-8))+'px';p.style.top=Math.min(s.r.b+8,Math.max(10,innerHeight-p.offsetHeight-12))+'px';}
+function bxOvOpen(html,w){var o=document.getElementById('bxOv');if(o)o.remove();o=document.createElement('div');o.id='bxOv';o.className='bx-ov';o.onmousedown=function(e){if(e.target===o)o.remove();};o.innerHTML='<div class="bx-box" style="width:min('+(w||1020)+'px,96vw);">'+html+'</div>';document.body.appendChild(o);}
+function bxOvClose(){var o=document.getElementById('bxOv');if(o)o.remove();}
+function bxOvFill(html){var o=document.getElementById('bxOv');if(o)o.firstChild.innerHTML=html;}
+function bxLum(hex){var m=/^#?([0-9a-f]{6})$/i.exec(hex||'');if(!m)return 0;var n=parseInt(m[1],16),r=n>>16,g=(n>>8)&255,b=n&255;return(0.299*r+0.587*g+0.114*b)/255;}
+function bxTc(hex){return bxLum(hex)>0.6?'#0f1a44':'#ffffff';}
+function bxNd(label,col,tc,key,extra,cls,pts,attr){return'<div class="bx-nd '+(cls||'')+'" style="--c:'+col+';--tc:'+tc+';'+(extra||'')+'" '+(attr||'')+'><span class="nm">'+bxE(label)+'</span>'+(pts!=null&&pts!==''?'<span class="pt">'+(pts>0?'+':'')+pts+'</span>':'')+(key?'<span class="bxk">'+bxE(key)+'</span>':'')+'</div>';}
+/* ── navigation ── */
+function bxTab(t){BX.tab=t;BX.view='home';BX.kitSel=null;BX.cardSel=null;bxPopClose();renderPage();}
+function bxOpen(bid){var b=bxBoard(bid);if(!b)return;BX.view='board';BX.bid=b.id;BX.bv='over';BX.sf=null;BX.act=null;BX.flt='all';BX.boardSearch='';bxPopClose();renderPage();window.scrollTo(0,0);}
+function bxBack(){BX.view='home';BX.tab='boards';bxPopClose();renderPage();}
+function bxView(v){BX.bv=v;if(v==='detail'&&!BX.sf)bxPickFirstSf();bxPopClose();renderPage();}
+function bxPickFirstSf(){var b=bxBoard(BX.bid);if(!b)return;var s=b.nodes.filter(function(n){return n.type==='Sous-famille';})[0];BX.sf=s?s.id:null;BX.act=null;}
+function bxOpenSf(sid){BX.bv='detail';BX.sf=sid;BX.act=null;BX.flt='all';BX.boardSearch='';bxPopClose();renderPage();}
+function bxSelAct(id){BX.act=id;renderPage();}
+function bxSetFlt(f){BX.flt=f;renderPage();}
+function bxJump(nid){var b=bxBoard(BX.bid);if(!b)return;var n=bxNode(b,nid);if(!n)return;BX.boardSearch='';BX.bv='detail';if(n.type==='Action'){var s=bxSfOfAct(b,n);BX.sf=s?s.id:BX.sf;BX.act=n.id;}else if(n.type==='Sous-famille'){BX.sf=n.id;BX.act=null;}else if(n.type==='Famille'){var s2=bxSfsOf(b,n)[0];BX.sf=s2?s2.id:BX.sf;BX.act=null;}else{var a=bxIn(b,n.id,'Action')[0];if(a){var s3=bxSfOfAct(b,a);BX.sf=s3?s3.id:BX.sf;BX.act=a.id;}}bxOvClose();bxPopClose();renderPage();}
+/* ═════ PAGE ═════ */
+function renderBoardsPage(){
+  try{bxSeed();bxOwnerCheck();}catch(e){}
+  var h='<div class="bx">';
+  if(BX.view==='board'&&bxBoard(BX.bid))h+=bxBoardPage();
+  else{BX.view='home';h+=bxHomePage();}
+  return h+'</div>';
+}
+function bxHomeHead(){return'<div class="bx-top"><h1>Boards de codage</h1><div style="display:flex;gap:8px;"><button class="bx-btn" onclick="importBoardTrigger()">⬆ Importer</button><button class="bx-btn gold" onclick="bxNewBoardOpen()">+ Nouveau board</button></div></div>';}
+function bxHomeTabs(){var L=bxLib(),n=(DB.boards||[]).length;var tabs=[['boards','🗂 Mes boards · '+n],['cards','📚 Cartes'],['kits','🏷 Kits']];
+  var sub={boards:'Chaque board indique les <b style="color:var(--txt)">équipes qui l’utilisent</b>. Clique une board pour l’ouvrir.',cards:'Tes cartes sont créées <b style="color:var(--txt)">une seule fois</b> et servent à <b style="color:var(--txt)">tous tes boards</b>.',kits:'Un kit est un <b style="color:var(--txt)">lot de cartes du même type</b> : sous-actions <span class="bx-kS" style="padding:1px 8px"><i style="width:14px;height:14px;font-size:9px">↳</i>crème</span> ou résultats <span class="bx-kR" style="padding:1px 8px"><i style="width:14px;height:14px;font-size:9px">✓</i>doré</span>.'}[BX.tab];
+  return'<div class="bx-tabs"><div class="bx-seg">'+tabs.map(function(t){return'<span class="'+(BX.tab===t[0]?'on':'')+'" onclick="bxTab(\''+t[0]+'\')">'+t[1]+'</span>';}).join('')+'</div><span class="bx-sub" style="flex:1 1 0;min-width:240px;">'+sub+'</span></div>';}
+function bxHomePage(){var h=bxHomeHead()+bxHomeTabs();
+  if(BX.tab==='cards')return h+bxCardsPage();
+  if(BX.tab==='kits')return h+bxKitsPage();
+  return h+bxBoardsGrid();}
+function bxBoardCard(b){
+  var ts=bxTeamsOf(b),st=bxBoardStats(b),dots='';
+  b.nodes.filter(function(n){return n.type==='Sous-famille';}).forEach(function(sf){bxActsOf(b,sf).forEach(function(a){dots+='<i class="bx-dot" style="background:'+(a.color||sf.color)+';opacity:.9"></i>';});});
+  if(!dots)b.nodes.filter(function(n){return n.type==='Action';}).slice(0,150).forEach(function(a){dots+='<i class="bx-dot" style="background:'+a.color+'"></i>';});
+  var team=ts.length?'<div class="bx-bt" data-bxpop="1" onclick="event.stopPropagation();bxTeamPop(event,'+b.id+')" title="Changer les équipes">'+bxTeamStack(ts,32)+'<span>'+ts.map(function(t){return bxE(t.name);}).join(', ')+'</span></div>':'<div class="bx-bt"><span class="bx-attr" data-bxpop="1" onclick="event.stopPropagation();bxTeamPop(event,'+b.id+')">+ Attribuer une équipe</span></div>';
+  return'<div class="bx-bc" onclick="bxOpen('+b.id+')"><div class="bx-band">'+dots+'</div><div class="bx-bb"><div class="bx-bn">'+bxE(b.name)+'</div><div class="bx-bs"><b>'+st.fams+'</b> familles · <b>'+st.acts+'</b> actions · <b>'+st.paths+'</b> chemins</div>'+team
+   +'<div class="bx-bf">'+(st.issues?'<span class="bx-wn">⚠ '+st.issues+' à vérifier</span>':'<span class="bx-ok">✓ complète</span>')+'<span>'+bxE(bxAgo(b.mod))+'</span></div></div></div>';}
+function bxBoardsGrid(){
+  var h='<div class="bx-ftr"><span class="bx-lbl" style="margin-right:4px">Voir les boards de</span><span class="bx-fc nolg '+(BX.teamFilter==null?'on':'')+'" onclick="BX.teamFilter=null;renderPage()">Toutes</span>'
+   +(DB.teams||[]).map(function(t){return'<span class="bx-fc '+(BX.teamFilter==t.id?'on':'')+'" onclick="BX.teamFilter='+t.id+';renderPage()">'+bxTeamLogo(t,26)+bxE(t.name)+'</span>';}).join('')
+   +'<span class="bx-fc nolg '+(BX.teamFilter==='none'?'on':'')+'" onclick="BX.teamFilter=\'none\';renderPage()" style="color:#E8A040">Sans équipe · '+(DB.boards||[]).filter(function(b){return !bxTeamsOf(b).length;}).length+'</span></div>';
+  var list=(DB.boards||[]).filter(function(b){if(BX.teamFilter==null)return true;if(BX.teamFilter==='none')return !bxTeamsOf(b).length;return(b.teamIds||[]).indexOf(BX.teamFilter)>=0;});
+  h+='<div class="bx-grid">'+list.map(bxBoardCard).join('')+'<div class="bx-add" onclick="bxNewBoardOpen()"><b>＋ Nouveau board</b><span>vide, à partir d’un modèle<br>ou copie d’un de tes boards</span></div></div>';
+  return h;}
+/* équipes d'un board */
+function bxTeamPop(ev,bid){var a=ev.currentTarget||ev.target;bxPopOpen(a,360,function(){return bxTeamPopHtml(bid);});}
+function bxTeamPopHtml(bid){var b=bxBoard(bid);if(!b)return'';var sel=b.teamIds||[];
+  return'<div style="font-size:15px;font-weight:800;margin-bottom:2px;">Équipes qui utilisent « '+bxE(b.name)+' »</div><div class="bx-sub" style="margin-bottom:10px;">Ces équipes coderont avec cette board par défaut</div>'
+   +((DB.teams||[]).length?(DB.teams||[]).map(function(t){var on=sel.indexOf(t.id)>=0;return'<div class="bx-opt '+(on?'on':'')+'" onclick="bxTeamToggle('+bid+','+t.id+')"><span class="bx-cbx '+(on?'on':'')+'">'+(on?'✓':'')+'</span>'+bxTeamLogo(t,28)+'<b>'+bxE(t.name)+'</b></div>';}).join(''):'<div class="bx-sub">Aucune équipe pour l’instant — crée-les dans « Mes équipes ».</div>')
+   +'<div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;"><span class="bx-sub">'+sel.length+' équipe(s) sélectionnée(s)</span><button class="bx-btn gold sm" onclick="bxPopClose();renderPage()">Valider</button></div>';}
+function bxTeamToggle(bid,tid){var b=bxBoard(bid);if(!b)return;b.teamIds=b.teamIds||[];var i=b.teamIds.indexOf(tid);if(i>=0)b.teamIds.splice(i,1);else b.teamIds.push(tid);bxTouch(b);saveDB();bxPopFill();}
+/* ═════ BOARD : en-tête ═════ */
+function bxBoardHead(b){var ts=bxTeamsOf(b),st=bxBoardStats(b);
+  return'<div class="bx-top" style="margin-bottom:12px;"><div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;"><button class="bx-btn" onclick="bxBack()">← Mes boards</button><div style="font-size:26px;font-weight:800;letter-spacing:-.02em;color:var(--txt);cursor:text;" onclick="bxRenameOpen('+b.id+')" title="Renommer">'+bxE(b.name)+'</div>'+(ts.length?bxTeamStack(ts,30):'')
+   +'<button class="bx-btn sm" data-bxpop="1" onclick="bxTeamPop(event,'+b.id+')">Équipes ▾</button><button class="bx-btn sm" data-bxpop="1" onclick="bxBoardMenu(event)">⋯</button></div>'
+   +'<div style="display:flex;gap:10px;align-items:center;"><div class="bx-srch" style="width:240px;"><input id="bxBSearch" placeholder="Trouver un bouton…" value="'+bxE(BX.boardSearch)+'" oninput="bxBSearch(this.value)">'+bxSearchRes(b)+'</div><button class="bx-btn" style="'+(st.issues?'border-color:rgba(232,150,40,.6);color:#E8A040;background:rgba(232,150,40,.1)':'')+'" onclick="bxIssuesOpen()">'+(st.issues?'⚠ Vérifier · '+st.issues:'✓ Vérifier')+'</button></div></div>'
+   +'<div class="bx-tabs"><div class="bx-seg"><span class="'+(BX.bv==='over'?'on':'')+'" onclick="bxView(\'over\')">🧭 Vue d’ensemble</span><span class="'+(BX.bv==='detail'?'on':'')+'" onclick="bxView(\'detail\')">🔎 Détail</span></div><span class="bx-sub">'+(BX.bv==='over'?'Tout le board sur un écran. Un clic sur une sous-famille ouvre son détail.':'Tu entres dans une sous-famille à la fois. Les kits de sous-actions et de résultats se distinguent d’un coup d’œil.')+'</span></div>';}
+function bxSearchRes(b){var q=bxKeyNorm(BX.boardSearch);if(!q)return'';var r=b.nodes.filter(function(n){return String(n.label).toLowerCase().indexOf(q)>=0;}).slice(0,25);
+  return'<div class="bx-res">'+(r.length?r.map(function(n){var par='';if(n.type==='Action'){var s=bxSfOfAct(b,n);par=s?s.label:'';}else if(n.type==='Sous-famille'){var f=bxFamOfSf(b,n);par=f?f.label:'';}return'<div class="bx-ri" onmousedown="bxJump(\''+n.id+'\')"><span class="bx-dot" style="background:'+n.color+';width:11px;height:11px"></span>'+bxE(n.label)+'<small>'+bxE(par)+'</small></div>';}).join(''):'<div class="bx-ri" style="color:var(--txt3)">Aucun bouton</div>')+'</div>';}
+function bxBSearch(v){BX.boardSearch=v;var el=document.getElementById('bxBSearch');var b=bxBoard(BX.bid);if(!el||!b)return;var host=el.parentNode,old=host.querySelector('.bx-res');if(old)old.remove();var d=document.createElement('div');d.innerHTML=bxSearchRes(b);if(d.firstChild)host.appendChild(d.firstChild);}
+function bxBoardPage(){var b=bxBoard(BX.bid);var h=bxBoardHead(b);
+  if(BX.bv==='over')h+=bxOverview(b);else h+=bxDetail(b);return h;}
+/* ═════ VUE D'ENSEMBLE ═════ */
+function bxKitChipsOf(b,sf){var res={},sub={};bxActsOf(b,sf).forEach(function(a){if(a.bx){(a.bx.res||[]).forEach(function(k){res[k]=1;});(a.bx.sub||[]).forEach(function(k){sub[k]=1;});}});
+  return Object.keys(sub).map(function(k){var kk=bxKit(k);return kk?'<span class="s">'+bxE(kk.name)+'</span>':'';}).join('')+Object.keys(res).map(function(k){var kk=bxKit(k);return kk?'<span>'+bxE(kk.name)+'</span>':'';}).join('');}
+function bxOverview(b){var st=bxBoardStats(b),fams=bxFams(b);
+  var h='<div class="bx-stats">'+[['fams','familles'],['sfs','sous-familles'],['acts','actions'],['paths','chemins']].map(function(x){return'<div class="bx-st"><b>'+st[x[0]]+'</b><span>'+x[1]+'</span></div>';}).join('')+'<div class="bx-st '+(st.issues?'w':'')+'" onclick="bxIssuesOpen()"><b>'+st.issues+'</b><span>à vérifier</span></div>'+(st.issues?'<button class="bx-btn sm" style="margin-left:auto;align-self:center;" onclick="bxIssuesOpen()">⚠ Voir les '+st.issues+' points</button>':'')+'</div>';
+  fams.forEach(function(f){var sfs=bxSfsOf(b,f),na=0;sfs.forEach(function(s){na+=bxActsOf(b,s).length;});
+    h+='<div class="bx-fam"><div class="bx-fh"><span class="bx-chip" style="background:'+f.color+';color:'+f.tc+'">'+bxE(f.label)+'</span><span class="bx-sub">'+na+' action'+(na>1?'s':'')+' · '+sfs.length+' sous-famille'+(sfs.length>1?'s':'')+'</span></div><div class="bx-tiles">';
+    sfs.forEach(function(s){var acts=bxActsOf(b,s),iss=0,p=0;acts.forEach(function(a){var q=bxPaths(b,a);p+=q;if(!q)iss++;});
+      h+='<div class="bx-tile" style="--c:'+s.color+'" onclick="bxOpenSf(\''+s.id+'\')"><b>'+bxE(s.label)+'</b><div style="font-size:12px;font-weight:800;" class="'+(iss?'bx-wn':'bx-ok')+'">'+(iss?'⚠ '+iss+'\u00a0à vérifier':'✓ complet')+'</div><div class="ds">'+acts.map(function(a){return'<i class="bx-dot" style="background:'+a.color+'"></i>';}).join('')+'</div><div class="bx-sub"><b style="color:var(--txt)">'+acts.length+'</b> actions · <b style="color:var(--txt)">'+p+'</b> chemins</div><div class="kc">'+bxKitChipsOf(b,s)+'</div></div>';});
+    h+='<div class="bx-tile-add" onclick="bxAddOpen(\'Sous-famille\',\''+f.id+'\')">＋ Sous-famille</div></div></div>';});
+  var orphans=b.nodes.filter(function(n){return n.type==='Sous-famille'&&!bxFamOfSf(b,n);});
+  if(orphans.length)h+='<div class="bx-fam"><div class="bx-fh"><span class="bx-chip" style="background:#444;color:#fff">Sans famille</span></div><div class="bx-tiles">'+orphans.map(function(s){return'<div class="bx-tile" style="--c:'+s.color+'" onclick="bxOpenSf(\''+s.id+'\')"><b>'+bxE(s.label)+'</b><div class="bx-sub">'+bxActsOf(b,s).length+' actions</div></div>';}).join('')+'</div></div>';
+  var cn=b.nodes.filter(function(n){return n.type==='Compteur';});
+  if(cn.length)h+='<div class="bx-fam"><div class="bx-fh"><span class="bx-chip" style="background:#8a3fd0;color:#fff">Compteurs</span><span class="bx-sub">'+cn.length+' compteurs</span></div><div class="bx-grid3" style="grid-template-columns:repeat(4,minmax(0,1fr))">'+cn.map(function(n){return bxNd(n.label,n.color,n.tc,n.shortcut);}).join('')+'</div></div>';
+  h+='<div style="display:flex;gap:10px;margin-top:6px;"><button class="bx-btn gold" onclick="bxAddOpen(\'Famille\')">＋ Famille</button><button class="bx-btn" onclick="bxAddOpen(\'Compteur\')">＋ Compteur</button></div>';
+  return h;}
+/* ═════ DÉTAIL ═════ */
+function bxActCard(b,a,sel){
+  var res=bxResOf(b,a),subs=bxSubOf(b,a),bx=a.bx||{res:[],sub:[],exc:[],man:[]},lanes='';
+  var sh=bx.sub.map(function(k){var kk=bxKit(k);return kk?'<span class="bx-kS"><i>↳</i>'+bxE(kk.name)+' <em>'+kk.cardIds.length+'</em></span>':'';}).join('');
+  var inKit={};bx.sub.forEach(function(k){bxKitNodes(b,k).forEach(function(n){inKit[n.id]=1;});});
+  var manS=subs.filter(function(n){return !inKit[n.id];});if(manS.length)sh+='<span class="bx-kx man">'+manS.length+' sous-action(s)</span>';
+  if(sh)lanes+='<div class="bx-lane"><small>SOUS-ACTIONS</small>'+sh+'</div>';
+  var rh=bx.res.map(function(k){var kk=bxKit(k);return kk?'<span class="bx-kR"><i>✓</i>'+bxE(kk.name)+' <em>'+kk.cardIds.length+'</em></span>':'';}).join('');
+  var inR={};bx.res.forEach(function(k){bxKitNodes(b,k).forEach(function(n){inR[n.id]=1;});});
+  var manR=res.filter(function(n){return !inR[n.id];});if(manR.length)rh+='<span class="bx-kx man">'+manR.length+' résultat(s)</span>';
+  (bx.exc||[]).forEach(function(id){var n=bxNode(b,id);if(n)rh+='<span class="bx-kx">≠ sans '+bxE(n.label)+'</span>';});
+  if(!res.length&&!subs.length)rh='<span class="bx-kx bad">⚠ aucun résultat</span>';
+  lanes+='<div class="bx-lane"><small>RÉSULTATS</small>'+rh+'</div>';
+  return'<div class="bx-ac" onclick="bxSelAct(\''+a.id+'\')"><div class="bx-nd hd '+(sel?'sel':'')+'" style="--c:'+a.color+';--tc:'+a.tc+';border-radius:12px 12px 0 0;padding:10px 13px"><span class="nm">'+bxE(a.label)+'</span>'+(a.shortcut?'<span class="bxk">'+bxE(a.shortcut)+'</span>':'')+'</div><div class="bx-ft">'+lanes+'</div></div>';}
+function bxPlan(b){var h='';bxFams(b).forEach(function(f){var n=0;bxSfsOf(b,f).forEach(function(s){n+=bxActsOf(b,s).length;});
+    h+='<div class="bx-tr" onclick="bxJump(\''+f.id+'\')"><i style="background:'+f.color+'"></i><span style="font-weight:700;color:var(--txt)">'+bxE(f.label)+'</span><span class="cn">'+n+'</span></div>';
+    bxSfsOf(b,f).forEach(function(s){var acts=bxActsOf(b,s),iss=acts.filter(function(a){return !bxPaths(b,a);}).length;h+='<div class="bx-tr '+(BX.sf===s.id?'on':'')+'" style="margin-left:22px" onclick="bxOpenSf(\''+s.id+'\')"><i style="background:'+s.color+'"></i><span>'+bxE(s.label)+'</span>'+(iss?'<span class="wn">⚠ '+iss+'</span>':'')+'<span class="cn">'+acts.length+'</span></div>';});});
+  b.nodes.filter(function(n){return n.type==='Sous-famille'&&!bxFamOfSf(b,n);}).forEach(function(s){h+='<div class="bx-tr '+(BX.sf===s.id?'on':'')+'" onclick="bxOpenSf(\''+s.id+'\')"><i style="background:'+s.color+'"></i><span>'+bxE(s.label)+'</span><span class="cn">'+bxActsOf(b,s).length+'</span></div>';});
+  var cn=b.nodes.filter(function(n){return n.type==='Compteur';}).length;if(cn)h+='<div class="bx-tr '+(BX.sf==='__cnt'?'on':'')+'" onclick="bxOpenSf(\'__cnt\')"><i style="background:#8a3fd0"></i><span>Compteurs</span><span class="cn">'+cn+'</span></div>';
+  return h;}
+function bxDetail(b){
+  var sf=BX.sf==='__cnt'?null:(BX.sf&&bxNode(b,BX.sf)),st=bxBoardStats(b),cnt=BX.sf==='__cnt';
+  if(!sf&&!cnt){bxPickFirstSf();sf=BX.sf&&bxNode(b,BX.sf);}
+  var plan='<div class="bx-card" style="min-height:700px;display:flex;flex-direction:column;"><div class="bx-lbl" style="margin-bottom:8px">Plan du board</div><div style="display:flex;flex-direction:column;gap:2px;flex:1">'+bxPlan(b)+'</div><div class="bx-sub" style="margin-top:12px">'+st.acts+' actions · '+st.paths+' chemins</div>'+(st.issues?'<div class="bx-chk" onclick="bxIssuesOpen()">⚠ '+st.issues+' point(s) à vérifier</div>':'')
+   +'<div style="margin-top:14px;display:flex;flex-direction:column;gap:7px"><button class="bx-btn" style="justify-content:center" onclick="bxAddOpen(\'Sous-famille\')">＋ Sous-famille</button><button class="bx-btn gold" style="justify-content:center" onclick="bxAddOpen(\'Famille\')">＋ Famille</button></div></div>';
+  var center='',panel='';
+  if(cnt){var cs=b.nodes.filter(function(n){return n.type==='Compteur';});center='<div class="bx-card"><div class="bx-fh"><span class="bx-chip" style="background:#8a3fd0;color:#fff">Compteurs</span><span class="bx-sub">'+cs.length+' compteurs</span></div><div class="bx-grid3">'+cs.map(function(n){return'<div onclick="bxSelAct(\''+n.id+'\')">'+bxNd(n.label,n.color,n.tc,n.shortcut,'',BX.act===n.id?'sel':'')+'</div>';}).join('')+'<div class="bx-addtile" onclick="bxAddOpen(\'Compteur\')"><b>＋ Ajouter un compteur</b><span>depuis mes cartes · ou nouvelle carte</span></div></div></div>';panel=bxNodePanel(b,BX.act&&bxNode(b,BX.act));}
+  else if(sf){
+    var fam=bxFamOfSf(b,sf),acts=bxActsOf(b,sf),shown=acts.filter(function(a){var p=bxPaths(b,a);if(BX.flt==='inc')return !p;if(BX.flt==='sub')return bxSubOf(b,a).length>0;if(BX.flt==='exc')return a.bx&&(a.bx.exc||[]).length>0;return true;});
+    if(!BX.act||!bxNode(b,BX.act)||acts.map(function(a){return a.id;}).indexOf(BX.act)<0)BX.act=acts[0]?acts[0].id:null;
+    var inc=acts.filter(function(a){return !bxPaths(b,a);}).length;
+    center='<div class="bx-card"><div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap"><div style="display:flex;align-items:center;gap:8px">'+(fam?'<span class="bx-chip" style="background:'+fam.color+';color:'+fam.tc+';padding:5px 13px;font-size:13px">'+bxE(fam.label)+'</span><span style="color:var(--txt3)">›</span>':'')+'<span class="bx-chip" style="background:'+sf.color+';color:'+sf.tc+';padding:5px 13px;font-size:13px;outline:2px solid var(--acc)">'+bxE(sf.label)+'</span></div><span class="bx-sub">'+acts.length+' actions</span>'
+     +'<div class="bx-flt" style="margin-left:auto">'+[['all','Toutes'],['inc','⚠ Incomplètes · '+inc],['sub','Avec sous-actions'],['exc','≠ kit']].map(function(f){return'<span class="'+(BX.flt===f[0]?'on':'')+'" onclick="bxSetFlt(\''+f[0]+'\')">'+f[1]+'</span>';}).join('')+'</div></div>'
+     +'<div class="bx-leg"><span class="bx-kS"><i>↳</i>Kit de sous-actions</span><span class="bx-kR"><i>✓</i>Kit de résultats</span><span class="bx-kx">≠ exception au kit</span></div>'
+     +'<div class="bx-grid3">'+shown.map(function(a){return bxActCard(b,a,BX.act===a.id);}).join('')+'<div class="bx-addtile" onclick="bxAddOpen(\'Action\',\''+sf.id+'\')" style="background:rgba(212,170,106,.06)"><b>＋ Ajouter une action</b><span>depuis mes cartes · ou nouvelle carte</span></div></div></div>';
+    panel=bxNodePanel(b,BX.act&&bxNode(b,BX.act),sf);
+  }else center='<div class="bx-card"><div class="bx-sub">Aucune sous-famille — ajoute une famille puis une sous-famille avec les boutons à gauche.</div></div>';
+  return'<div class="bx-det">'+plan+center+panel+'</div>';}
+/* ── panneau de droite ── */
+function bxKeyStatus(b,n){if(!n||!n.shortcut)return'';var k=bxKeyNorm(n.shortcut),dup=b.nodes.filter(function(x){if(x.id===n.id||x.type!==n.type||bxKeyNorm(x.shortcut)!==k)return false;if(n.type==='Action'){var p1=bxSfOfAct(b,n),p2=bxSfOfAct(b,x);return p1&&p2&&p1.id===p2.id;}return true;});return dup.length?'<span class="bx-libre no">⚠ déjà « '+bxE(dup[0].label)+' »</span>':'<span class="bx-libre">✓ libre</span>';}
+function bxNodePanel(b,n,sf){
+  if(!n){if(!sf)return'<div class="bx-card"></div>';n=sf;}
+  var t=n.type,h='<div class="bx-card" style="border-color:rgba(212,170,106,.5);display:flex;flex-direction:column;min-height:700px"><div class="bx-lbl" style="margin-bottom:10px">'+bxE(n.label)+'</div>';
+  h+='<div class="bx-nd" data-bxn="'+n.id+'" style="--c:'+n.color+';--tc:'+n.tc+';font-size:16px;padding:8px 14px;cursor:default"><input value="'+bxE(n.label)+'" onchange="bxSetNode(\''+n.id+'\',\'label\',this.value)" style="flex:1;min-width:0;background:transparent;border:none;outline:none;color:inherit;font:inherit;padding:5px 0" title="Nom"><span class="bxk">'+bxE(n.shortcut||'·')+'</span></div>';
+  if(t!=='Famille'){h+='<div class="bx-f">Raccourci clavier</div><div style="display:flex;gap:8px"><input class="bx-inp" style="flex:1" value="'+bxE(n.shortcut||'')+'" placeholder="ex : p, 1, F2" onchange="bxSetNode(\''+n.id+'\',\'shortcut\',this.value)">'+bxKeyStatus(b,n)+'</div>';}
+  if(t==='Action'){h+='<div class="bx-f">Compte comme</div><div class="bx-seg2">'+[['marque','Marqués'],['encaisse','Encaissés'],['','Non défini']].map(function(o){return'<span class="'+((n.polarity||'')===o[0]?'on':'')+'" onclick="bxSetNode(\''+n.id+'\',\'polarity\',\''+o[0]+'\')">'+o[1]+'</span>';}).join('')+'</div>';
+    var bx=n.bx||{res:[],sub:[],exc:[],man:[]};
+    h+='<div class="bx-f">Kits de sous-actions</div>'+bx.sub.map(function(k){var kk=bxKit(k);return kk?'<div style="margin-bottom:6px"><span class="bx-kS bx-kw"><i>↳</i>'+bxE(kk.name)+' <em>'+kk.cardIds.length+'</em><u onclick="bxKitRem(\''+n.id+'\',\''+k+'\')" title="Retirer ce kit">✕</u></span></div>':'';}).join('')+'<div class="bx-addkit" data-bxpop="1" onclick="bxKitPickOpen(event,\''+n.id+'\',\'sub\')">＋ Ajouter un kit de sous-actions</div>';
+    h+='<div class="bx-f">Kits de résultats</div>'+bx.res.map(function(k){var kk=bxKit(k);return kk?'<div style="margin-bottom:6px"><span class="bx-kR bx-kw"><i>✓</i>'+bxE(kk.name)+' <em>'+kk.cardIds.length+'</em><u onclick="bxKitRem(\''+n.id+'\',\''+k+'\')" title="Retirer ce kit">✕</u></span></div>':'';}).join('')+'<div class="bx-addkit r" data-bxpop="1" onclick="bxKitPickOpen(event,\''+n.id+'\',\'res\')">＋ Ajouter un kit de résultats</div>';
+    h+=(bx.exc||[]).map(function(id){var x=bxNode(b,id);return x?'<div style="margin-top:6px"><span class="bx-kx bx-kw">≠ sans '+bxE(x.label)+'<u onclick="bxExcRestore(\''+n.id+'\',\''+id+'\')" title="Remettre">✕</u></span></div>':'';}).join('')+'<div class="bx-addkit x" style="margin-top:6px" data-bxpop="1" onclick="bxExcOpen(event,\''+n.id+'\')">≠ Retirer un résultat à cette action seulement</div>';}
+  if(t==='Résultat'||t==='Sous-action'||t==='Compteur'){}
+  h+='<div class="bx-f">Couleur</div><button class="bx-colb" data-xvpk="1" onclick="bxColor(this,\''+n.id+'\')"><i style="background:'+n.color+'" data-bxsw="'+n.id+'"></i> Couleur ▾</button>';
+  h+='<div style="margin-top:auto;padding-top:14px"><div class="bx-pv">'+(t==='Action'?'<button class="bx-btn" onclick="bxDupAct(\''+n.id+'\')">⧉ Dupliquer</button><button class="bx-btn" data-bxpop="1" onclick="bxMoveOpen(event,\''+n.id+'\')">⇄ Déplacer vers…</button>':'')+'<button class="bx-btn red" style="flex:1 1 100%" onclick="bxDelNode(\''+n.id+'\')">✕ Supprimer</button></div></div></div>';
+  return h;}
+function bxSetNode(id,f,v){var b=bxBoard(BX.bid),n=b&&bxNode(b,id);if(!n)return;var old=n.label;
+  if(f==='label'){v=String(v).trim();if(!v)return renderPage();n.label=v;if(old!==v&&typeof cascadeNodeRename==='function')cascadeNodeRename(b.id,n.id,v);}
+  else if(f==='shortcut')n.shortcut=String(v||'').trim();else if(f==='polarity')n.polarity=v||null;else n[f]=v;
+  bxTouch(b);saveDB();renderPage();}
+function bxColor(btn,id){var b=bxBoard(BX.bid),n=b&&bxNode(b,id);if(!n||typeof xvPick!=='function')return;var tm=null;
+  xvPick(btn,n.color||'#2f5fe0',function(hex){n.color=hex;n.tc=bxTc(hex);document.querySelectorAll('[data-bxn="'+id+'"]').forEach(function(e){e.style.setProperty('--c',hex);e.style.setProperty('--tc',n.tc);});document.querySelectorAll('[data-bxsw="'+id+'"]').forEach(function(e){e.style.background=hex;});clearTimeout(tm);tm=setTimeout(function(){bxTouch(b);saveDB();},400);});}
+function bxDelNode(id){var b=bxBoard(BX.bid),n=b&&bxNode(b,id);if(!n)return;
+  var msg='Supprimer « '+n.label+' » du board ?';var extra=[];
+  if(n.type==='Sous-famille'){extra=bxActsOf(b,n).filter(function(a){return bxIn(b,a.id,'Sous-famille').length<=1;});msg='Supprimer la sous-famille « '+n.label+' »'+(extra.length?' et ses '+extra.length+' action(s)':'')+' ?';}
+  if(n.type==='Famille'){msg='Supprimer la famille « '+n.label+' » et ses sous-familles ?';}
+  if(!confirm(msg))return;
+  var kill={};kill[n.id]=1;if(n.type==='Sous-famille')extra.forEach(function(a){kill[a.id]=1;});
+  if(n.type==='Famille')bxSfsOf(b,n).forEach(function(s){kill[s.id]=1;bxActsOf(b,s).forEach(function(a){if(bxIn(b,a.id,'Sous-famille').length<=1)kill[a.id]=1;});});
+  b.nodes=b.nodes.filter(function(x){return !kill[x.id];});b.links=b.links.filter(function(l){return !kill[l.from]&&!kill[l.to];});
+  if(kill[BX.act])BX.act=null;if(kill[BX.sf])BX.sf=null;bxTouch(b);saveDB();renderPage();}
+function bxDupAct(id){var b=bxBoard(BX.bid),n=b&&bxNode(b,id);if(!n)return;var nid2='n'+nid();
+  var c=JSON.parse(JSON.stringify(n));c.id=nid2;c.label=n.label+' (copie)';c.shortcut='';c.x=(n.x||0)+28;c.y=(n.y||0)+28;b.nodes.push(c);
+  b.links.slice().forEach(function(l){if(l.from===id)b.links.push({from:nid2,to:l.to});else if(l.to===id)b.links.push({from:l.from,to:nid2});});
+  BX.act=nid2;bxTouch(b);saveDB();renderPage();toast('✓ Action dupliquée avec ses kits — donne-lui un nom et un raccourci','acc');}
+
+/* ═════ MENUS : kits sur une action, exceptions, déplacer ═════ */
+function bxKitPickOpen(ev,aid,kind){var a=ev.currentTarget;bxPopOpen(a,330,function(){return bxKitPickHtml(aid,kind);});}
+function bxKitPickHtml(aid,kind){var b=bxBoard(BX.bid),n=b&&bxNode(b,aid);if(!n)return'';var bx=n.bx||{res:[],sub:[]},cur=kind==='res'?bx.res:bx.sub,ks=bxLib().kits.filter(function(k){return k.kind===kind&&!k.hidden;});
+  return'<div class="bx-lbl" style="margin-bottom:8px">'+(kind==='res'?'Kits de résultats':'Kits de sous-actions')+'</div>'
+   +ks.map(function(k){var on=cur.indexOf(k.id)>=0;return'<div class="bx-opt '+(on?'on':'')+'" onclick="bxKitToggle(\''+aid+'\',\''+k.id+'\')"><span class="rd"></span><b>'+bxE(k.name)+'</b><small>'+k.cardIds.length+' cartes</small></div>';}).join('')
+   +(ks.length?'<div class="bx-opt '+(!cur.length?'on':'')+'" onclick="bxKitNone(\''+aid+'\',\''+kind+'\')"><span class="rd"></span><b>Aucun</b><small>'+(kind==='res'?'retirer les résultats':'retirer les sous-actions')+'</small></div>':'<div class="bx-sub" style="margin-bottom:8px">Aucun kit pour l’instant.</div>')
+   +'<div class="bx-hr"></div><div class="bx-pi" style="color:var(--acc);font-weight:800" onclick="bxPopClose();BX.kitKind=\''+kind+'\';BX.kitSel=null;BX.kitForm=null;bxTab(\'kits\');bxKitNew(\''+kind+'\')">＋ Créer un nouveau kit…</div>';}
+function bxKitToggle(aid,kid){var b=bxBoard(BX.bid),n=b&&bxNode(b,aid);if(!n)return;var bx=bxAdopt(b,n),k=bxKit(kid);if(!k)return;var list=k.kind==='res'?bx.res:bx.sub;if(list.indexOf(kid)>=0)bxRemKit(b.id,aid,kid);else bxAddKit(b.id,aid,kid);bxPopFill();renderPage();}
+function bxKitNone(aid,kind){var b=bxBoard(BX.bid),n=b&&bxNode(b,aid);if(!n)return;var bx=bxAdopt(b,n);if(kind==='res')bx.res=[];else bx.sub=[];bxSync(b,n);saveDB();bxPopFill();renderPage();}
+function bxKitRem(aid,kid){bxRemKit(BX.bid,aid,kid);renderPage();}
+function bxExcOpen(ev,aid){var a=ev.currentTarget;bxPopOpen(a,320,function(){var b=bxBoard(BX.bid),n=b&&bxNode(b,aid);if(!n)return'';var rs=bxResOf(b,n);return'<div class="bx-lbl" style="margin-bottom:8px">Retirer un résultat à cette action</div>'+(rs.length?rs.map(function(r){return'<div class="bx-pi" onclick="bxExcAdd(\''+aid+'\',\''+r.id+'\')"><span class="bx-dot" style="background:'+r.color+'"></span>'+bxE(r.label)+'</div>';}).join(''):'<div class="bx-sub">Cette action n’a aucun résultat.</div>');});}
+function bxExcAdd(aid,rid){var b=bxBoard(BX.bid),n=b&&bxNode(b,aid);if(!n)return;var bx=bxAdopt(b,n);bx.man=bx.man.filter(function(x){return x!==rid;});var inKit=false;bx.res.forEach(function(k){bxKitNodes(b,k).forEach(function(x){if(x.id===rid)inKit=true;});});if(inKit&&bx.exc.indexOf(rid)<0)bx.exc.push(rid);bxSync(b,n);saveDB();bxPopClose();renderPage();}
+function bxExcRestore(aid,rid){var b=bxBoard(BX.bid),n=b&&bxNode(b,aid);if(!n)return;var bx=bxAdopt(b,n);bx.exc=bx.exc.filter(function(x){return x!==rid;});bxSync(b,n);saveDB();renderPage();}
+function bxMoveOpen(ev,aid){var a=ev.currentTarget;bxPopOpen(a,320,function(){var b=bxBoard(BX.bid),n=b&&bxNode(b,aid);if(!n)return'';var cur=bxSfOfAct(b,n),h='<div class="bx-sub" style="margin-bottom:8px">Choisis la sous-famille de « '+bxE(n.label)+' »</div>';
+  bxFams(b).forEach(function(f){h+='<div class="bx-tr" style="cursor:default"><i style="background:'+f.color+'"></i><span style="font-weight:700;color:var(--txt)">'+bxE(f.label)+'</span></div>';bxSfsOf(b,f).forEach(function(s){h+='<div class="bx-tr '+(cur&&cur.id===s.id?'on':'')+'" style="margin-left:22px" onclick="bxMoveTo(\''+aid+'\',\''+s.id+'\')"><i style="background:'+s.color+'"></i><span>'+bxE(s.label)+'</span></div>';});});
+  return h+'<div class="bx-hr"></div><div class="bx-pi" style="color:var(--acc);font-weight:800" onclick="bxPopClose();bxAddOpen(\'Sous-famille\')">＋ Nouvelle sous-famille…</div>';});}
+function bxMoveTo(aid,sid){var b=bxBoard(BX.bid),n=b&&bxNode(b,aid);if(!n)return;bxIn(b,aid,'Sous-famille').forEach(function(s){bxUnlink(b,s.id,aid);});bxLink(b,sid,aid);BX.sf=sid;BX.act=aid;bxTouch(b);saveDB();bxPopClose();renderPage();toast('✓ Action déplacée','acc');}
+/* ═════ AJOUTER DEPUIS MES CARTES (volet) ═════ */
+function bxAddOpen(type,parent){var b=bxBoard(BX.bid);if(!b)return;
+  var p=parent||null;if(!p){if(type==='Action')p=BX.sf&&BX.sf!=='__cnt'?BX.sf:null;else if(type==='Sous-famille'){var cs=BX.sf&&BX.sf!=='__cnt'&&bxNode(b,BX.sf)?bxFamOfSf(b,bxNode(b,BX.sf)):null;p=cs?cs.id:(bxFams(b)[0]?bxFams(b)[0].id:null);}}
+  BX.add={type:type,parent:p,tab:'lib',sel:[],q:'',form:{label:'',shortcut:'',color:BX_COL[type][0],tc:BX_COL[type][1],polarity:null}};bxAddFill(true);}
+function bxAddFill(first){var A=BX.add;if(!A)return;var b=bxBoard(BX.bid),t=A.type,L=BX_TYPE_LBL[t];
+  var par=A.parent&&bxNode(b,A.parent),on={};b.nodes.forEach(function(n){if(n.type===t&&n.cardId&&(t==='Compteur'||t==='Famille'||bxIn(b,n.id).some(function(x){return x.id===A.parent;})))on[n.cardId]=1;});
+  var cards=bxLib().cards.filter(function(c){return c.type===t&&(!A.q||String(c.label).toLowerCase().indexOf(A.q.toLowerCase())>=0);});
+  var h='<div class="bx-mh"><b>Ajouter '+(t==='Action'?'des actions':t==='Sous-famille'?'des sous-familles':t==='Famille'?'des familles':'des compteurs')+(par?' à « '+bxE(par.label)+' »':'')+'</b><span class="bx-x" onclick="bxOvClose()">✕</span></div>'
+   +'<div class="bx-seg" style="margin-bottom:10px;"><span class="'+(A.tab==='lib'?'on':'')+'" style="flex:1;text-align:center" onclick="BX.add.tab=\'lib\';bxAddFill()">Depuis mes cartes</span><span class="'+(A.tab==='new'?'on':'')+'" style="flex:1;text-align:center" onclick="BX.add.tab=\'new\';bxAddFill()">Nouvelle carte</span></div>';
+  if(A.tab==='lib'){
+    h+='<div class="bx-srch" style="margin-bottom:10px"><input id="bxAq" placeholder="Rechercher dans mes '+bxE(L[0].toLowerCase())+'…" value="'+bxE(A.q)+'" oninput="BX.add.q=this.value;bxAddFill()"></div><div class="bx-pk">'
+     +(cards.length?cards.map(function(c){var s=A.sel.indexOf(c.id)>=0,done=!!on[c.id];return'<div class="bx-pkc '+(s?'on':'')+'" style="'+(done?'opacity:.45;cursor:default':'')+'" onclick="'+(done?'':'bxAddTog(\''+c.id+'\')')+'"><span class="bx-cbx '+(s||done?'on':'')+'">'+(s||done?'✓':'')+'</span><span class="bx-dot" style="background:'+c.color+';width:11px;height:11px"></span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+bxE(c.label)+'</span>'+(c.shortcut?'<em><span class="bxk">'+bxE(c.shortcut)+'</span></em>':'')+'</div>';}).join(''):'<div class="bx-sub" style="grid-column:1/-1">Aucune carte — crée-en une dans l’onglet « Nouvelle carte ».</div>')+'</div>'
+     +'<div class="bx-sub" style="margin:6px 0 10px">'+A.sel.length+' sélectionnée(s)'+(par?' → dans « '+bxE(par.label)+' »':'')+'</div><div style="display:flex;gap:10px"><button class="bx-btn gold" style="flex:1;justify-content:center;height:44px" onclick="bxAddGo()">＋ Ajouter au board</button><button class="bx-btn" style="height:44px" onclick="bxOvClose()">Annuler</button></div>';
+  }else{var f=A.form;
+    h+='<div class="bx-f" style="margin-top:0">Nom</div><input class="bx-inp" id="bxAfN" value="'+bxE(f.label)+'" oninput="BX.add.form.label=this.value" placeholder="Nom de la carte">'
+     +(t!=='Famille'?'<div class="bx-f">Raccourci clavier</div><input class="bx-inp" value="'+bxE(f.shortcut)+'" oninput="BX.add.form.shortcut=this.value" placeholder="ex : p, 1, F2">':'')
+     +(t==='Action'?'<div class="bx-f">Compte comme</div><div class="bx-seg2">'+[['marque','Marqués'],['encaisse','Encaissés'],['','Non défini']].map(function(o){return'<span class="'+((f.polarity||'')===o[0]?'on':'')+'" onclick="BX.add.form.polarity=\''+o[0]+'\';bxAddFill()">'+o[1]+'</span>';}).join('')+'</div>':'')
+     +'<div class="bx-f">Couleur</div><button class="bx-colb" data-xvpk="1" onclick="bxAddColor(this)"><i style="background:'+f.color+'" id="bxAfSw"></i> Couleur ▾</button>'
+     +'<div style="display:flex;gap:10px;margin-top:16px"><button class="bx-btn gold" style="flex:1;justify-content:center;height:44px" onclick="bxAddCreate()">＋ Créer et ajouter au board</button><button class="bx-btn" style="height:44px" onclick="bxOvClose()">Annuler</button></div>';}
+  if(first)bxOvOpen(h,680);else bxOvFill(h);
+  if(!first&&A.tab==='lib'){var q=document.getElementById('bxAq');if(q&&A.q){q.focus();q.setSelectionRange(q.value.length,q.value.length);}}}
+function bxAddTog(cid){var s=BX.add.sel,i=s.indexOf(cid);if(i>=0)s.splice(i,1);else s.push(cid);bxAddFill();}
+function bxAddColor(btn){xvPick(btn,BX.add.form.color,function(hex){BX.add.form.color=hex;BX.add.form.tc=bxTc(hex);var s=document.getElementById('bxAfSw');if(s)s.style.background=hex;});}
+function bxPlaceNode(b,card,parent){
+  var t=card.type,n=null;
+  if(t==='Action'||t==='Sous-famille'){n=b.nodes.filter(function(x){return x.cardId===card.id&&x.type===t&&!bxIn(b,x.id).some(function(p){return p.type===(t==='Action'?'Sous-famille':'Famille');});})[0];
+    if(!n){var p=bxPos(b,t);n={id:'n'+nid(),label:card.label,type:t,color:card.color,tc:card.tc,shortcut:card.shortcut||'',pts:null,polarity:card.polarity||null,resKind:null,is3pt:null,x:p.x,y:p.y,cardId:card.id};b.nodes.push(n);}}
+  else n=bxNodeFromCard(b,card);
+  if(parent){bxLink(b,parent,n.id);}return n;}
+function bxAddGo(){var A=BX.add,b=bxBoard(BX.bid);if(!A||!b)return;if(!A.sel.length){toast('Coche au moins une carte','red');return;}
+  if((A.type==='Action'||A.type==='Sous-famille')&&!A.parent){toast(A.type==='Action'?'Crée d’abord une sous-famille':'Crée d’abord une famille','red');return;}
+  var last=null;A.sel.forEach(function(cid){var c=bxCard(cid);if(c)last=bxPlaceNode(b,c,A.parent);});bxFinishAdd(b,last);}
+function bxAddCreate(){var A=BX.add,b=bxBoard(BX.bid);if(!A||!b)return;var f=A.form;if(!String(f.label).trim()){toast('Donne un nom à la carte','red');return;}
+  if((A.type==='Action'||A.type==='Sous-famille')&&!A.parent){toast(A.type==='Action'?'Crée d’abord une sous-famille':'Crée d’abord une famille','red');return;}
+  var c=bxNewCardFromForm({type:A.type,label:String(f.label).trim(),color:f.color,tc:f.tc,shortcut:f.shortcut,polarity:f.polarity});bxLib().cards.push(c);var n=bxPlaceNode(b,c,A.parent);bxFinishAdd(b,n);}
+function bxFinishAdd(b,n){bxTouch(b);saveDB();bxOvClose();if(n){if(n.type==='Action'){var s=bxSfOfAct(b,n);if(s)BX.sf=s.id;BX.act=n.id;BX.bv='detail';}else if(n.type==='Sous-famille'){BX.sf=n.id;BX.bv='detail';BX.act=null;}}BX.add=null;renderPage();}
+/* ═════ MENU ⋯ DU BOARD ═════ */
+function bxIsOwner(){return BX.owner===true;}
+function bxOwnerCheck(){if(BX.ownerChecked)return;BX.ownerChecked=true;try{var k=_getLicenceKey();if(!k)return;fetch(_SB_URL+'/rest/v1/rpc/is_official_owner',{method:'POST',headers:{apikey:_SB_KEY,Authorization:'Bearer '+_SB_KEY,'Content-Type':'application/json'},body:JSON.stringify({p_licence:k})}).then(function(r){return r.ok?r.json():false;}).then(function(v){BX.owner=(v===true);}).catch(function(){});}catch(e){}}
+function bxBoardMenu(ev){var a=ev.currentTarget;bxPopOpen(a,290,function(){var b=bxBoard(BX.bid);return[['✎','Renommer','bxRenameOpen('+b.id+')'],['⧉','Dupliquer','bxDupBoard('+b.id+')'],['⬇','Exporter le board','exportBoard('+b.id+');bxPopClose()'],['⬆','Importer dans ce board','bxImportInto('+b.id+')']].concat(bxIsOwner()?[['📦','Enregistrer comme modèle officiel','bxPublish('+b.id+')']]:[]).map(function(i){return'<div class="bx-pi" onclick="bxPopClose();'+i[2]+'"><span style="width:20px;text-align:center">'+i[0]+'</span>'+i[1]+'</div>';}).join('')+'<div class="bx-hr"></div><div class="bx-pi red" onclick="bxPopClose();bxDelBoard('+b.id+')"><span style="width:20px;text-align:center">✕</span>Supprimer le board</div>';},true);}
+function bxRenameOpen(bid){var b=bxBoard(bid);if(!b)return;bxPopClose();bxOvOpen('<div class="bx-mh"><b>Renommer le board</b><span class="bx-x" onclick="bxOvClose()">✕</span></div><input class="bx-inp" id="bxRn" value="'+bxE(b.name)+'" onkeydown="if(event.key===\'Enter\')bxRenameGo('+bid+')"><div style="display:flex;gap:10px;margin-top:16px"><button class="bx-btn gold" style="flex:1;justify-content:center;height:42px" onclick="bxRenameGo('+bid+')">Enregistrer</button><button class="bx-btn" style="height:42px" onclick="bxOvClose()">Annuler</button></div>',460);setTimeout(function(){var e=document.getElementById('bxRn');if(e){e.focus();e.select();}},30);}
+function bxRenameGo(bid){var b=bxBoard(bid),e=document.getElementById('bxRn');if(b&&e&&e.value.trim()){b.name=e.value.trim();bxTouch(b);saveDB();}bxOvClose();renderPage();}
+function bxDupBoard(bid){var b=bxBoard(bid);if(!b)return;var idMap={},nb=JSON.parse(JSON.stringify(b));nb.id=nid();nb.name=b.name+' (copie)';nb.nodes.forEach(function(n){var x='n'+nid();idMap[n.id]=x;n.id=x;});nb.links.forEach(function(l){l.from=idMap[l.from]||l.from;l.to=idMap[l.to]||l.to;});nb.nodes.forEach(function(n){if(n.bx){n.bx.exc=(n.bx.exc||[]).map(function(i){return idMap[i]||i;});n.bx.man=(n.bx.man||[]).map(function(i){return idMap[i]||i;});}});nb.mod=Date.now();DB.boards.push(nb);saveDB();BX.bid=nb.id;BX.bv='over';renderPage();toast('Board dupliqué : '+nb.name,'acc');}
+function bxDelBoard(bid){var b=bxBoard(bid);if(!b)return;if(!confirm('Supprimer le board « '+b.name+' » ?'))return;DB.boards=DB.boards.filter(function(x){return String(x.id)!==String(bid);});if(String(BX.bid)===String(bid)){BX.view='home';BX.tab='boards';}saveDB();renderPage();}
+function bxImportInto(bid){var fi=document.createElement('input');fi.type='file';fi.accept='.json,application/json';fi.onchange=function(){var f=fi.files&&fi.files[0];if(!f)return;var r=new FileReader();r.onload=function(e){var d;try{d=JSON.parse(e.target.result);}catch(x){toast('❌ Fichier invalide','red');return;}if(!d||!Array.isArray(d.nodes)){toast('❌ Ce fichier n’est pas un board valide','red');return;}var b=bxBoard(bid);if(!b)return;var m={};d.nodes.forEach(function(n){var x='n'+nid();m[n.id]=x;var c=Object.assign({},n,{id:x});delete c.cardId;delete c.bx;b.nodes.push(c);});(d.links||[]).forEach(function(l){b.links.push({from:m[l.from]||l.from,to:m[l.to]||l.to});});bxTouch(b);saveDB();renderPage();toast('✓ '+d.nodes.length+' boutons importés dans ce board','acc');};r.readAsText(f);};fi.click();}
+/* ═════ VÉRIFICATIONS ═════ */
+function bxIssuesOpen(){var b=bxBoard(BX.bid);if(!b)return;var is=bxIssues(b),st=bxBoardStats(b);
+  bxOvOpen('<div class="bx-mh"><b>Vérifications du board</b><span class="bx-x" onclick="bxOvClose()">✕</span></div>'+is.map(function(i){return'<div class="bx-mi" style="background:rgba(232,150,40,.1);border-color:rgba(232,150,40,.4)" onclick="bxJump(\''+i.id+'\')"><b><span style="color:#E8A040">⚠ '+bxE(i.t)+'</span><span style="color:var(--acc);font-size:13px">'+i.fix+' ▸</span></b><small>'+bxE(i.d)+'</small></div>';}).join('')+'<div class="bx-chk g">✓ '+st.paths+' chemins cohérents</div>',620);}
+/* ═════ NOUVEAU BOARD ═════ */
+function bxOfficialLoad(cb){if(BX.officialLoaded){cb&&cb();return;}BX.officialLoaded=true;
+  try{fetch(_SB_URL+'/rest/v1/official_boards?select=id,name,data&order=name.asc',{headers:{apikey:_SB_KEY,Authorization:'Bearer '+_SB_KEY}}).then(function(r){return r.ok?r.json():[];}).then(function(rows){BX.official=(rows||[]).map(function(r){return{id:'o'+r.id,name:r.name,data:r.data,official:true};});cb&&cb();}).catch(function(){BX.official=[];cb&&cb();});}catch(e){BX.official=[];cb&&cb();}}
+function bxModelOf(b){var cards={},kits={};b.nodes.forEach(function(n){if(n.cardId){var c=bxCard(n.cardId);if(c)cards[c.id]=c;}if(n.bx){(n.bx.res||[]).concat(n.bx.sub||[]).forEach(function(k){var kk=bxKit(k);if(kk){kits[kk.id]=kk;kk.cardIds.forEach(function(ci){var c2=bxCard(ci);if(c2)cards[c2.id]=c2;});}});}});
+  return{name:b.name,nodes:JSON.parse(JSON.stringify(b.nodes)),links:JSON.parse(JSON.stringify(b.links)),cards:Object.keys(cards).map(function(k){return cards[k];}),kits:Object.keys(kits).map(function(k){return kits[k];})};}
+function bxModelData(m){return m.official?m.data:bxModelOf(bxBoard(m.id));}
+function bxModelCount(d){var a=d.nodes.filter(function(n){return n.type==='Action';}).length;return a+' actions · '+(d.kits||[]).length+' kits';}
+function bxNewBoardOpen(){BX.nb={name:'',mode:'vide',model:null,add:true};bxNewBoardFill(true);bxOfficialLoad(function(){if(document.getElementById('bxNb'))bxNewBoardFill();});}
+function bxNewBoardFill(first){var N=BX.nb,mine=(DB.boards||[]).map(function(b){return{id:b.id,name:b.name,official:false};});
+  var h='<div class="bx-mh"><b>Nouveau board</b><span class="bx-x" onclick="bxOvClose()">✕</span></div><div id="bxNb"></div><div class="bx-f" style="margin-top:0">Nom du board</div><input class="bx-inp" id="bxNbN" value="'+bxE(N.name)+'" placeholder="Nom du board" oninput="BX.nb.name=this.value">'
+   +'<div class="bx-f">Comment veux-tu le démarrer ?</div><div class="bx-m3">'+[['vide','☐','Board vide','je construis avec mes cartes'],['modele','📦','À partir d’un modèle','cartes et kits déjà prêts'],['copie','⧉','Copier un de mes boards','je pars d’un existant']].map(function(o){return'<div class="bx-opt '+(N.mode===o[0]?'on':'')+'" onclick="BX.nb.mode=\''+o[0]+'\';BX.nb.model=null;bxNewBoardFill()"><span style="font-size:22px">'+o[1]+'</span><b>'+o[2]+'</b><small>'+o[3]+'</small></div>';}).join('')+'</div>';
+  if(N.mode!=='vide'){var list=N.mode==='modele'?(BX.official||[]).concat(mine):mine;var cur=list.filter(function(m){return m.id===N.model;})[0];
+    h+='<div class="bx-ml"><div><div class="bx-lbl" style="margin-bottom:8px">Modèles</div>'+(list.length?list.map(function(m){var d=null;try{d=bxModelData(m);}catch(e){}return'<div class="bx-mi '+(N.model===m.id?'on':'')+'" onclick="BX.nb.model=\''+m.id+'\';bxNewBoardFill()"><b>'+bxE(m.name)+'<span class="bx-tag '+(m.official?'':'m')+'">'+(m.official?'OFFICIEL':'MIEN')+'</span></b><small>'+(d?bxModelCount(d):'')+'</small></div>';}).join(''):'<div class="bx-sub">Aucun modèle officiel pour l’instant.</div>')+'</div>'
+     +'<div><div class="bx-lbl" style="margin-bottom:8px">Contenu du modèle</div><div style="border:1px solid var(--bdr);border-radius:12px;padding:14px;background:var(--bg2);min-height:230px">'+(cur?bxModelContent(bxModelData(cur)):'<div class="bx-sub">Choisis un modèle à gauche.</div>')+'</div></div></div>'
+     +'<div class="bx-opt '+(N.add?'on':'')+'" onclick="BX.nb.add=!BX.nb.add;bxNewBoardFill()" style="margin-bottom:12px"><span class="bx-cbx '+(N.add?'on':'')+'">'+(N.add?'✓':'')+'</span><b>Ajouter à ma bibliothèque les cartes et kits qui me manquent</b></div>';}
+  h+='<div style="display:flex;gap:10px"><button class="bx-btn gold" style="flex:1;justify-content:center;height:46px" onclick="bxNewBoardGo()">✓ Créer le board</button><button class="bx-btn" style="height:46px" onclick="bxOvClose()">Annuler</button></div>';
+  if(first)bxOvOpen(h,1020);else{var inp=document.getElementById('bxNbN'),v=inp?inp.value:N.name;N.name=v;bxOvFill(h);}}
+function bxModelContent(d){var h='';d.nodes.filter(function(n){return n.type==='Famille';}).forEach(function(f){var sfs=d.links.filter(function(l){return l.from===f.id;}).map(function(l){return d.nodes.filter(function(n){return n.id===l.to&&n.type==='Sous-famille';})[0];}).filter(Boolean),na=0;sfs.forEach(function(s){na+=d.links.filter(function(l){return l.from===s.id;}).length;});h+='<div style="margin-bottom:10px"><span class="bx-chip" style="background:'+f.color+';color:'+f.tc+'">'+bxE(f.label)+'</span><div class="bx-sub" style="margin-top:5px">'+sfs.length+' sous-familles · '+na+' actions</div></div>';});
+  var ks=(d.kits||[]);if(ks.length)h+='<div class="bx-lbl" style="margin:8px 0 6px">Kits inclus</div><div style="display:flex;gap:6px;flex-wrap:wrap">'+ks.map(function(k){return'<span class="'+(k.kind==='res'?'bx-kR':'bx-kS')+'" style="padding:3px 10px">'+(k.kind==='res'?'':'↳ ')+bxE(k.name)+'</span>';}).join('')+'</div>';return h||'<div class="bx-sub">Modèle vide.</div>';}
+function bxNewBoardGo(){var N=BX.nb,inp=document.getElementById('bxNbN');if(inp)N.name=inp.value;var name=String(N.name||'').trim();if(!name){toast('Donne un nom au board','red');return;}
+  var b={id:nid(),name:name,nodes:[],links:[],teamIds:[],mod:Date.now()};
+  if(N.mode!=='vide'){var list=N.mode==='modele'?(BX.official||[]).concat((DB.boards||[]).map(function(x){return{id:x.id,name:x.name,official:false};})):(DB.boards||[]).map(function(x){return{id:x.id,name:x.name,official:false};});var m=list.filter(function(x){return x.id===N.model;})[0];if(!m){toast('Choisis un modèle','red');return;}
+    var d=JSON.parse(JSON.stringify(bxModelData(m))),L=bxLib(),cmap={},kmap={},nmap={};
+    (d.cards||[]).forEach(function(c){var ex=L.cards.filter(function(x){return bxCardKey(x)===bxCardKey(c);})[0];if(ex)cmap[c.id]=ex.id;else if(N.add){var nc=JSON.parse(JSON.stringify(c));nc.id='c'+nid();L.cards.push(nc);cmap[c.id]=nc.id;}});
+    (d.kits||[]).forEach(function(k){var ex=L.kits.filter(function(x){return x.kind===k.kind&&x.name===k.name&&!x.hidden;})[0];if(ex)kmap[k.id]=ex.id;else if(N.add){var nk={id:'k'+nid(),kind:k.kind,name:k.name,cardIds:k.cardIds.map(function(ci){return cmap[ci];}).filter(Boolean)};L.kits.push(nk);kmap[k.id]=nk.id;}});
+    d.nodes.forEach(function(n){var x='n'+nid();nmap[n.id]=x;n.id=x;if(n.cardId){n.cardId=cmap[n.cardId]||null;if(!n.cardId)delete n.cardId;}});
+    d.nodes.forEach(function(n){if(n.bx){n.bx.res=(n.bx.res||[]).map(function(k){return kmap[k];}).filter(Boolean);n.bx.sub=(n.bx.sub||[]).map(function(k){return kmap[k];}).filter(Boolean);n.bx.exc=(n.bx.exc||[]).map(function(i){return nmap[i];}).filter(Boolean);n.bx.man=(n.bx.man||[]).map(function(i){return nmap[i];}).filter(Boolean);}});
+    b.nodes=d.nodes;b.links=d.links.map(function(l){return{from:nmap[l.from]||l.from,to:nmap[l.to]||l.to};});}
+  DB.boards.push(b);saveDB();bxOvClose();BX.view='board';BX.bid=b.id;BX.bv=b.nodes.length?'over':'over';BX.sf=null;BX.act=null;renderPage();toast('✓ Board créé : '+b.name,'acc');}
+/* publication d'un modèle officiel (uniquement le propriétaire — contrôlé côté Supabase) */
+function bxPublish(bid){var b=bxBoard(bid);if(!b)return;var name=prompt('Nom du modèle officiel :',b.name);if(!name)return;var data=bxModelOf(b);data.name=name;
+  fetch(_SB_URL+'/rest/v1/rpc/publish_official_board',{method:'POST',headers:{apikey:_SB_KEY,Authorization:'Bearer '+_SB_KEY,'Content-Type':'application/json'},body:JSON.stringify({p_licence:_getLicenceKey(),p_name:name,p_data:data})}).then(function(r){if(r.ok){BX.officialLoaded=false;toast('✓ Modèle officiel publié : '+name,'acc');}else r.text().then(function(t){toast('❌ Publication refusée ('+r.status+') — '+String(t).slice(0,80),'red');});}).catch(function(){toast('❌ Réseau indisponible','red');});}
+/* remplacement des anciennes fonctions de création : plus aucun résultat standard créé automatiquement */
+function openBoardModal(){bxNewBoardOpen();}
+function createBoard(){var el=document.getElementById('newBoardName');if(!el||!el.value)return;var b={id:nid(),name:el.value,nodes:[],links:[],teamIds:[],mod:Date.now()};DB.boards.push(b);_selBId=b.id;BX.view='board';BX.bid=b.id;BX.bv='over';saveDB();closeModal();renderPage();}
+function deleteBoard(id){bxDelBoard(id);}
+
+/* ═════ PAGE CARTES ═════ */
+function bxCardUse(c){var n=0;(DB.boards||[]).forEach(function(b){if(b.nodes.some(function(x){return x.cardId===c.id;}))n++;});return n;}
+function bxCardFormInit(type){var c=BX_COL[type];BX.cardForm={id:null,type:type,label:'',shortcut:'',color:c[0],tc:c[1],pts:null,polarity:null,resKind:null,is3pt:false};}
+function bxCardType(t){BX.cardType=t;BX.cardSel=null;bxCardFormInit(t);renderPage();}
+function bxCardPick(id){var c=bxCard(id);if(!c)return;if(BX.cardSel===id){BX.cardSel=null;bxCardFormInit(BX.cardType);}else{BX.cardSel=id;BX.cardForm=JSON.parse(JSON.stringify(c));}renderPage();}
+function bxCardsPage(){
+  var L=bxLib(),t=BX.cardType;if(!BX.cardForm||BX.cardForm.type!==t)bxCardFormInit(t);var F=BX.cardForm;
+  var q=bxKeyNorm(BX.search),cards=L.cards.filter(function(c){return c.type===t&&(!q||String(c.label).toLowerCase().indexOf(q)>=0);});
+  var tiles='<div class="bx-tts">'+BX_TYPES.map(function(x){var n=L.cards.filter(function(c){return c.type===x;}).length;return'<div class="bx-tt '+(x===t?'on':'')+'" onclick="bxCardType(\''+x+'\')"><i></i><div><b>'+BX_TYPE_LBL[x][0]+'</b><span>'+n+' cartes</span></div></div>';}).join('')+'</div>';
+  var grid=cards.map(function(c){var u=bxCardUse(c);return'<div class="bx-lc"><div onclick="bxCardPick(\''+c.id+'\')">'+bxNd(c.label,c.color,c.tc,c.shortcut,'',BX.cardSel===c.id?'sel':'',t==='Résultat'&&c.pts!=null?c.pts:null)+'</div><div class="us">'+(u?u+(u>1?' boards':' board'):'non utilisée')+'</div></div>';}).join('');
+  var sel=BX.cardSel?bxCard(BX.cardSel):null;
+  var left='<div class="bx-card" style="min-height:560px;display:flex;flex-direction:column"><div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap"><div class="bx-lbl">Mes '+BX_TYPE_LBL[t][0].toLowerCase()+' · '+L.cards.filter(function(c){return c.type===t;}).length+'</div><span class="bx-sub">utilisables dans tous tes boards</span><div class="bx-srch" style="margin-left:auto;width:260px"><input placeholder="Rechercher…" value="'+bxE(BX.search)+'" oninput="BX.search=this.value;bxKeepFocus(\'bxCs\')" id="bxCs"></div></div>'
+   +'<div class="bx-lg">'+(grid||'<div class="bx-sub" style="grid-column:1/-1">Aucune carte de ce type pour l’instant — crée la première avec le formulaire à droite.</div>')+'</div>'
+   +(sel?'<div class="bx-bar" style="margin-top:auto"><b>1 sélectionnée</b><button class="bx-btn sm" onclick="bxCardDup()">⧉ Dupliquer</button><button class="bx-btn sm red" onclick="bxCardDel()">✕ Supprimer</button></div>':'<div style="margin-top:auto"></div>')+'</div>';
+  var sing=BX_TYPE_LBL[t][1];
+  var form='<div class="bx-card" style="border-color:rgba(212,170,106,.5);display:flex;flex-direction:column;min-height:560px"><div class="bx-lbl" style="margin-bottom:8px">'+(F.id?'Modifier « '+bxE(F.label)+' »':'Nouvelle '+sing.toLowerCase())+'</div>'
+   +'<div style="background:var(--bg2);border:1px dashed var(--bdr2);border-radius:12px;padding:12px" id="bxCardPrev">'+bxNd(F.label||sing,F.color,F.tc,F.shortcut,'font-size:16px;padding:12px 16px','',t==='Résultat'&&F.pts!=null?F.pts:null,'data-bxcp="1"')+'</div>'
+   +'<div class="bx-f">Nom</div><input class="bx-inp" value="'+bxE(F.label)+'" oninput="bxCardF(\'label\',this.value,1)" placeholder="Nom de la carte">'
+   +(t!=='Famille'?'<div class="bx-f">Raccourci clavier</div><input class="bx-inp" value="'+bxE(F.shortcut)+'" oninput="bxCardF(\'shortcut\',this.value,1)" placeholder="ex : p, 1, F2"><div class="bx-sub" style="margin-top:5px" id="bxCardKey">'+bxCardKeyMsg(F)+'</div>':'')
+   +(t==='Action'?'<div class="bx-f">Compte comme</div><div class="bx-seg2">'+[['marque','Marqués'],['encaisse','Encaissés'],['','Non défini']].map(function(o){return'<span class="'+((F.polarity||'')===o[0]?'on':'')+'" onclick="bxCardF(\'polarity\',\''+o[0]+'\')">'+o[1]+'</span>';}).join('')+'</div>':'')
+   +(t==='Résultat'?'<div class="bx-f">Valeur en points</div><input class="bx-inp" type="number" step="0.5" min="0" max="5" value="'+(F.pts!=null?F.pts:'')+'" placeholder="ex : 2, 3, 1.5, 0 (vide pour Faute provoquée)" oninput="bxCardF(\'pts\',this.value===\'\'?null:parseFloat(this.value),1)">'
+     +'<label style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--txt2);font-weight:600;margin-top:10px;cursor:pointer"><input type="checkbox" '+(F.is3pt?'checked':'')+' onchange="bxCardF(\'is3pt\',this.checked,1)" style="width:16px;height:16px"> Tir à 3 points (marqué ou loupé)</label>'
+     +'<div class="bx-f">Catégorie (joueurs impliqués auto)</div><select class="bx-inp" onchange="bxCardF(\'resKind\',this.value||null,1)">'+[['','Non catégorisé'],['marque','🏀 Panier marqué'],['loupe','🎯 Panier loupé'],['perte','❌ Balle perdue'],['interception','🛡️ Interception (déf.)'],['faute_provoquee','🟡 Faute provoquée (LF en attente)']].map(function(o){return'<option value="'+o[0]+'"'+((F.resKind||'')===o[0]?' selected':'')+'>'+o[1]+'</option>';}).join('')+'</select>':'')
+   +'<div class="bx-f">Couleur</div><button class="bx-colb" data-xvpk="1" onclick="bxCardColor(this)"><i id="bxCardSw" style="background:'+F.color+'"></i> Couleur ▾</button>'
+   +'<div style="margin-top:auto;padding-top:14px">'+(F.id?'<button class="bx-btn gold" style="width:100%;justify-content:center;height:46px" onclick="bxCardSave()">✓ Enregistrer les modifications</button><button class="bx-btn" style="width:100%;justify-content:center;height:40px;margin-top:8px" onclick="BX.cardSel=null;bxCardFormInit(BX.cardType);renderPage()">＋ Nouvelle carte</button>':'<button class="bx-btn gold" style="width:100%;justify-content:center;height:46px" onclick="bxCardCreate()">＋ Créer la carte</button><div class="bx-sub" style="text-align:center;margin-top:8px">Le formulaire reste ouvert : tu enchaînes la carte suivante</div>')+'</div></div>';
+  return tiles+'<div class="bx-cols">'+left+form+'</div>';}
+function bxKeepFocus(id){renderPage();setTimeout(function(){var e=document.getElementById(id);if(e){e.focus();e.setSelectionRange(e.value.length,e.value.length);}},0);}
+function bxCardKeyMsg(F){var k=bxKeyNorm(F.shortcut);if(!k)return'';var d=bxLib().cards.filter(function(c){return c.type===F.type&&c.id!==F.id&&bxKeyNorm(c.shortcut)===k;})[0];return d?'<span style="color:#E8A040">⚠ « '+bxE(k)+' » déjà utilisé par « '+bxE(d.label)+' »</span>':'✓ libre parmi tes '+BX_TYPE_LBL[F.type][0].toLowerCase();}
+function bxCardF(f,v,live){BX.cardForm[f]=v;if(live){var pv=document.querySelector('#bxCardPrev .bx-nd');var F=BX.cardForm;if(pv){var nm=pv.querySelector('.nm');if(nm)nm.textContent=F.label||BX_TYPE_LBL[F.type][1];var kk=pv.querySelector('.bxk');if(F.shortcut){if(!kk){kk=document.createElement('span');kk.className='bxk';pv.appendChild(kk);}kk.textContent=F.shortcut;}else if(kk)kk.remove();var pt=pv.querySelector('.pt');if(F.type==='Résultat'&&F.pts!=null){if(!pt){pt=document.createElement('span');pt.className='pt';pv.insertBefore(pt,pv.querySelector('.bxk'));}pt.textContent=(F.pts>0?'+':'')+F.pts;}else if(pt)pt.remove();}var km=document.getElementById('bxCardKey');if(km)km.innerHTML=bxCardKeyMsg(F);}else renderPage();}
+function bxCardColor(btn){xvPick(btn,BX.cardForm.color,function(hex){BX.cardForm.color=hex;BX.cardForm.tc=bxTc(hex);var pv=document.querySelector('#bxCardPrev .bx-nd');if(pv){pv.style.setProperty('--c',hex);pv.style.setProperty('--tc',BX.cardForm.tc);}var s=document.getElementById('bxCardSw');if(s)s.style.background=hex;});}
+function bxCardCreate(){var F=BX.cardForm;if(!String(F.label).trim()){toast('Donne un nom à la carte','red');return;}var c=bxNewCardFromForm(Object.assign({},F,{label:String(F.label).trim()}));bxLib().cards.push(c);saveDB();var col=BX_COL[F.type];BX.cardSel=null;bxCardFormInit(F.type);toast('✓ Carte créée : '+c.label,'acc');renderPage();}
+function bxCardSave(){var F=BX.cardForm,c=bxCard(F.id);if(!c)return;if(!String(F.label).trim()){toast('Donne un nom à la carte','red');return;}var old=c.label;
+  ['label','color','tc','shortcut','pts','polarity','resKind','is3pt'].forEach(function(k){c[k]=F[k];});c.label=String(c.label).trim();var n=0;
+  (DB.boards||[]).forEach(function(b){b.nodes.forEach(function(x){if(x.cardId!==c.id)return;x.label=c.label;x.color=c.color;x.tc=c.tc;x.shortcut=c.shortcut;if(c.type==='Résultat'){x.pts=c.pts;x.resKind=c.resKind;x.is3pt=c.is3pt;}if(c.type==='Action')x.polarity=c.polarity;n++;if(old!==c.label&&typeof cascadeNodeRename==='function')cascadeNodeRename(b.id,x.id,c.label);});});
+  saveDB();toast('✓ Carte enregistrée'+(n?' — mise à jour dans '+n+' bouton(s) de tes boards':''),'acc');renderPage();}
+function bxCardDup(){var c=bxCard(BX.cardSel);if(!c)return;var d=JSON.parse(JSON.stringify(c));d.id='c'+nid();d.label=c.label+' (copie)';d.shortcut='';bxLib().cards.push(d);BX.cardSel=d.id;BX.cardForm=JSON.parse(JSON.stringify(d));saveDB();renderPage();}
+function bxCardDel(){var c=bxCard(BX.cardSel);if(!c)return;var u=bxCardUse(c);if(!confirm('Supprimer la carte « '+c.label+' » de ta bibliothèque ?'+(u?'\n\nElle est utilisée dans '+u+' board(s) : les boutons déjà posés restent dans ces boards.':'')))return;var L=bxLib();L.cards=L.cards.filter(function(x){return x.id!==c.id;});L.kits.forEach(function(k){k.cardIds=k.cardIds.filter(function(i){return i!==c.id;});});BX.cardSel=null;bxCardFormInit(BX.cardType);saveDB();renderPage();}
+/* ═════ PAGE KITS ═════ */
+function bxKitNew(kind){BX.kitSel=null;BX.kitKind=kind;BX.kitForm={id:null,kind:kind,name:'',cardIds:[],mode:'all',q:''};renderPage();}
+function bxKitPick(id){var k=bxKit(id);if(!k)return;BX.kitSel=id;BX.kitForm={id:k.id,kind:k.kind,name:k.name,cardIds:k.cardIds.slice(),mode:'all',q:''};renderPage();}
+function bxKitsPage(){var L=bxLib();
+  if(!BX.kitForm){var first=L.kits.filter(function(k){return !k.hidden&&k.kind==='sub';})[0]||L.kits.filter(function(k){return !k.hidden;})[0];if(first){BX.kitSel=first.id;BX.kitForm={id:first.id,kind:first.kind,name:first.name,cardIds:first.cardIds.slice(),mode:'all',q:''};}else BX.kitForm={id:null,kind:'sub',name:'',cardIds:[],mode:'all',q:''};}
+  var F=BX.kitForm,isRes=F.kind==='res';
+  var groups=[['sub','KITS DE SOUS-ACTIONS','↳'],['res','KITS DE RÉSULTATS','✓']],left='<div class="bx-card"><div class="bx-lbl" style="margin-bottom:2px">Mes kits</div><div class="bx-sub" style="margin-bottom:6px">disponibles dans tous tes boards</div>';
+  groups.forEach(function(g){var ks=L.kits.filter(function(k){return k.kind===g[0]&&!k.hidden;});left+='<div class="bx-kh '+(g[0]==='res'?'rk':'sk')+'">'+g[2]+' '+g[1]+'</div>'+(ks.length?'':'<div class="bx-sub" style="margin-bottom:6px">Aucun kit.</div>')+ks.map(function(k){return'<div class="bx-kc2 '+(g[0]==='sub'?'sk':'')+' '+(BX.kitSel===k.id?'on':'')+'" onclick="bxKitPick(\''+k.id+'\')"><b>'+bxE(k.name)+'</b><span>'+k.cardIds.length+' cartes · '+bxKitUse(k.id).length+' actions</span></div>';}).join('');});
+  left+='<div class="bx-addk s" onclick="bxKitNew(\'sub\')">＋ Nouveau kit de sous-actions</div><div class="bx-addk" onclick="bxKitNew(\'res\')">＋ Nouveau kit de résultats</div>';
+  var sg=bxSuggestKits();if(sg.length)left+='<div class="bx-kh" style="background:var(--bg2);color:var(--txt2)">💡 KITS SUGGÉRÉS</div>'+sg.map(function(g,i){var nm=g.ids.slice(0,2).map(function(c){var cc=bxCard(c);return cc?cc.label:'';}).join(' · ');return'<div class="bx-kc2" style="border-left-color:#555" onclick="bxKitSuggest('+i+')"><b>'+bxE(nm)+(g.ids.length>2?'…':'')+'</b><span>'+g.ids.length+' résultats · identiques sur '+g.n+' actions — cliquer pour créer</span></div>';}).join('');
+  left+='</div>';
+  var tp=isRes?'Résultat':'Sous-action',lib=L.cards.filter(function(c){return c.type===tp&&(!F.q||String(c.label).toLowerCase().indexOf(F.q.toLowerCase())>=0);});
+  var selh=F.cardIds.map(function(cid,i){var c=bxCard(cid);if(!c)return'';return'<div class="bx-sc" draggable="true" ondragstart="BX.kd='+i+'" ondragover="event.preventDefault()" ondrop="bxKitDrop('+i+')"><span class="hd">⠿</span><div style="flex:1;min-width:0">'+bxNd(c.label,c.color,c.tc,c.shortcut,'padding:11px 13px','',isRes&&c.pts!=null?c.pts:null)+'</div><span class="x" onclick="bxKitTog(\''+cid+'\')">✕</span></div>';}).join('');
+  var libh=lib.map(function(c){var on=F.cardIds.indexOf(c.id)>=0;return'<div class="bx-lcc '+(on?'on':'')+'" onclick="bxKitTog(\''+c.id+'\')"><span class="bx-cbx '+(on?'on':'')+'">'+(on?'✓':'')+'</span><span>'+bxE(c.label)+'</span></div>';}).join('');
+  var use=F.id?bxKitUse(F.id):[],boards={};use.forEach(function(u){boards[u.board.id]=u.board.name;});
+  var shorts={},dups=[];F.cardIds.forEach(function(cid){var c=bxCard(cid);if(c&&c.shortcut){var k=bxKeyNorm(c.shortcut);if(shorts[k]&&dups.indexOf(k)<0)dups.push(k);shorts[k]=1;}});
+  var other=[];F.cardIds.forEach(function(cid){var c=bxCard(cid);if(!c||!c.shortcut)return;var o=L.cards.filter(function(x){return x.type!==c.type&&x.id!==c.id&&bxKeyNorm(x.shortcut)===bxKeyNorm(c.shortcut)&&(x.type==='Action'||x.type==='Résultat'||x.type==='Sous-action');})[0];if(o)other.push('« '+c.shortcut+' » aussi utilisé par « '+o.label+' » ('+o.type+')');});
+  var ed='<div class="bx-card" style="border-color:rgba(212,170,106,.5);display:flex;flex-direction:column;min-height:640px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><div class="bx-lbl">'+(F.id?'Modifier le kit':'Nouveau kit')+'</div>'+(F.id?'<div style="display:flex;gap:6px"><button class="bx-btn sm" onclick="bxKitDup()">⧉ Dupliquer le kit</button><button class="bx-btn sm red" onclick="bxKitDel()">✕ Supprimer</button></div>':'')+'</div>'
+   +'<div style="display:grid;grid-template-columns:1fr 340px;gap:14px"><div><div class="bx-f" style="margin-top:0">Nom du kit</div><input class="bx-inp" value="'+bxE(F.name)+'" placeholder="ex : Kit Tirs" oninput="BX.kitForm.name=this.value"></div><div><div class="bx-f" style="margin-top:0">Type de kit</div><div class="bx-seg2"><span class="'+(!isRes?'on':'')+'" onclick="bxKitKind(\'sub\')">↳ Sous-actions</span><span class="'+(isRes?'on':'')+'" onclick="bxKitKind(\'res\')">✓ Résultats</span></div></div></div>'
+   +'<div style="display:grid;grid-template-columns:1fr 1.15fr;gap:20px;margin-top:6px;flex:1"><div><div class="bx-f">Cartes du kit · '+F.cardIds.length+' · dans l’ordre du codage</div>'+(selh||'<div class="bx-sub">Coche des cartes dans la bibliothèque →</div>')+'<div class="bx-sub" style="margin-top:10px">⠿ glisse pour réordonner</div></div>'
+   +'<div><div class="bx-f">Ajouter depuis ma bibliothèque de '+(isRes?'résultats':'sous-actions')+'</div><div class="bx-srch" style="margin-bottom:10px"><input id="bxKq" placeholder="Rechercher…" value="'+bxE(F.q)+'" oninput="BX.kitForm.q=this.value;bxKeepFocus(\'bxKq\')"></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'+libh+'</div><div class="bx-newc" onclick="bxKitQuickCard()">＋ Créer une nouvelle carte '+(isRes?'résultat':'sous-action')+'<span>nom · raccourci'+(isRes?' · points…':'')+'</span></div></div></div>'
+   +'<div style="display:flex;gap:10px;margin-top:14px"><button class="bx-btn gold" style="flex:1;justify-content:center;height:46px" onclick="bxKitSave()">✓ Enregistrer le kit</button><button class="bx-btn" style="height:46px" onclick="BX.kitForm=null;renderPage()">Annuler</button></div></div>';
+  var rp='<div style="display:flex;flex-direction:column;gap:12px"><div class="bx-card"><div class="bx-lbl" style="margin-bottom:10px">Utilisation</div>'+(F.id?'<div><b style="font-size:30px;color:var(--txt)">'+use.length+'</b> <span style="color:var(--txt2)">actions utilisent ce kit</span></div><div class="bx-sub" style="margin-top:4px">dans '+Object.keys(boards).length+' boards</div><div class="bx-chk g" style="background:var(--bg2);color:var(--txt2);font-weight:600">'+(use.slice(0,5).map(function(u){return bxE(u.node.label);}).join(' · ')||'—')+(use.length>5?'…':'')+'</div>':'<div class="bx-sub">Enregistre le kit, puis applique-le depuis le détail d’une action.</div>')+'</div>'
+   +(F.id?'<div class="bx-card"><div class="bx-lbl" style="margin-bottom:10px">Si je modifie ce kit</div><div class="bx-opt '+(F.mode==='all'?'on':'')+'" onclick="BX.kitForm.mode=\'all\';renderPage()"><span class="rd"></span><div><b>Mettre à jour mes boards</b><div class="bx-sub">les '+use.length+' actions reçoivent le changement</div></div></div><div class="bx-opt '+(F.mode==='new'?'on':'')+'" onclick="BX.kitForm.mode=\'new\';renderPage()"><span class="rd"></span><div><b>Seulement les nouveaux boards</b><div class="bx-sub">les boards existants ne bougent pas</div></div></div></div>':'')
+   +'<div class="bx-card"><div class="bx-lbl" style="margin-bottom:8px">Vérifications</div>'+(dups.length?'<div class="bx-chk">⚠ Raccourci(s) en double dans le kit : '+dups.map(bxE).join(', ')+'</div>':'<div class="bx-chk g">✓ Raccourcis tous différents dans le kit</div>')+other.map(function(o){return'<div class="bx-chk">⚠ '+bxE(o)+'</div>';}).join('')+'</div></div>';
+  return'<div class="bx-kcols">'+left+ed+rp+'</div>';}
+function bxKitKind(k){var F=BX.kitForm;if(F.id){toast('Le type d’un kit existant ne se change pas','red');return;}if(F.kind!==k){F.kind=k;F.cardIds=[];}renderPage();}
+function bxKitTog(cid){var F=BX.kitForm,i=F.cardIds.indexOf(cid);if(i>=0)F.cardIds.splice(i,1);else F.cardIds.push(cid);renderPage();}
+function bxKitDrop(i){var F=BX.kitForm,f=BX.kd;if(f==null||f===i)return;var x=F.cardIds.splice(f,1)[0];F.cardIds.splice(i,0,x);BX.kd=null;renderPage();}
+function bxKitQuickCard(){var F=BX.kitForm,tp=F.kind==='res'?'Résultat':'Sous-action',col=BX_COL[tp];BX.qc={type:tp,label:'',shortcut:'',pts:null,color:col[0],tc:col[1]};
+  var h='<div class="bx-mh"><b>Nouvelle carte '+(tp==='Résultat'?'résultat':'sous-action')+'</b><span class="bx-x" onclick="bxOvClose()">✕</span></div><div class="bx-f" style="margin-top:0">Nom</div><input class="bx-inp" id="bxQcN" oninput="BX.qc.label=this.value" placeholder="Nom de la carte"><div class="bx-f">Raccourci clavier</div><input class="bx-inp" oninput="BX.qc.shortcut=this.value" placeholder="ex : é, 3, F2">'+(tp==='Résultat'?'<div class="bx-f">Valeur en points</div><input class="bx-inp" type="number" step="0.5" min="0" max="5" oninput="BX.qc.pts=this.value===\'\'?null:parseFloat(this.value)" placeholder="ex : 2, 3, 0">':'')+'<div class="bx-f">Couleur</div><button class="bx-colb" data-xvpk="1" onclick="xvPick(this,BX.qc.color,function(h){BX.qc.color=h;BX.qc.tc=bxTc(h);var s=document.getElementById(\'bxQcSw\');if(s)s.style.background=h;})"><i id="bxQcSw" style="background:'+col[0]+'"></i> Couleur ▾</button><div style="display:flex;gap:10px;margin-top:16px"><button class="bx-btn gold" style="flex:1;justify-content:center;height:44px" onclick="bxKitQuickGo()">＋ Créer et ajouter au kit</button><button class="bx-btn" style="height:44px" onclick="bxOvClose()">Annuler</button></div>';
+  bxOvOpen(h,520);setTimeout(function(){var e=document.getElementById('bxQcN');if(e)e.focus();},30);}
+function bxKitQuickGo(){var q=BX.qc;if(!q||!String(q.label).trim()){toast('Donne un nom à la carte','red');return;}var c=bxNewCardFromForm({type:q.type,label:String(q.label).trim(),color:q.color,tc:q.tc,shortcut:q.shortcut,pts:q.pts});bxLib().cards.push(c);BX.kitForm.cardIds.push(c.id);saveDB();bxOvClose();BX.qc=null;renderPage();}
+function bxKitSave(){var F=BX.kitForm,L=bxLib();if(!String(F.name).trim()){toast('Donne un nom au kit','red');return;}if(!F.cardIds.length){toast('Ajoute au moins une carte au kit','red');return;}
+  if(!F.id){var k={id:'k'+nid(),kind:F.kind,name:String(F.name).trim(),cardIds:F.cardIds.slice()};L.kits.push(k);BX.kitSel=k.id;F.id=k.id;saveDB();toast('✓ Kit créé : '+k.name,'acc');renderPage();return;}
+  var kit=bxKit(F.id);if(!kit)return;var use=bxKitUse(kit.id);
+  if(use.length&&F.mode==='new'){var snap={id:'k'+nid(),kind:kit.kind,name:kit.name,cardIds:kit.cardIds.slice(),hidden:true};L.kits.push(snap);use.forEach(function(u){['res','sub'].forEach(function(key){u.node.bx[key]=(u.node.bx[key]||[]).map(function(x){return x===kit.id?snap.id:x;});});});}
+  kit.name=String(F.name).trim();kit.cardIds=F.cardIds.slice();
+  if(!use.length||F.mode==='all'){use.forEach(function(u){bxSync(u.board,u.node);});}
+  saveDB();toast('✓ Kit enregistré'+(use.length&&F.mode==='all'?' — '+use.length+' action(s) mise(s) à jour':''),'acc');renderPage();}
+function bxKitDup(){var k=bxKit(BX.kitForm.id);if(!k)return;var d={id:'k'+nid(),kind:k.kind,name:k.name+' (copie)',cardIds:k.cardIds.slice()};bxLib().kits.push(d);saveDB();bxKitPick(d.id);}
+function bxKitDel(){var k=bxKit(BX.kitForm.id);if(!k)return;var u=bxKitUse(k.id);if(u.length){toast('Ce kit est utilisé par '+u.length+' action(s) — retire-le d’abord de ces actions','red');return;}if(!confirm('Supprimer le kit « '+k.name+' » ?'))return;var L=bxLib();L.kits=L.kits.filter(function(x){return x.id!==k.id;});BX.kitSel=null;BX.kitForm=null;saveDB();renderPage();}
+function bxKitSuggest(i){var g=bxSuggestKits()[i];if(!g)return;var nm='Kit '+(bxCard(g.ids[0])?bxCard(g.ids[0]).label:'résultats');BX.kitSel=null;BX.kitForm={id:null,kind:'res',name:nm,cardIds:g.ids.slice(),mode:'all',q:''};renderPage();}
 
 /*XV_END*/
 </script>
