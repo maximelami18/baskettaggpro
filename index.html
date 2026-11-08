@@ -460,7 +460,7 @@ document.addEventListener('DOMContentLoaded', function(){
 var _SB_URL="https://umuvirwbtpflizxupwbr.supabase.co";
 // Version de ce fichier — à incrémenter à chaque déploiement, en cohérence avec la valeur
 // mise à jour dans la table Supabase `app_version` (voir _checkAppVersion ci-dessous).
-var APP_VERSION = "2026-11-08-404";
+var APP_VERSION = "2026-11-08-406";
 var _SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtdXZpcndidHBmbGl6eHVwd2JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3MTI1MDEsImV4cCI6MjA5MDI4ODUwMX0.fFQaF-zP9dzcWITJDf6GBmvu0pdcuvlaUz0A0qW0kfo";
 var _LICENCE_KEY='btp_licence';
 var _MACHINE_KEY='btp_machine';
@@ -38237,10 +38237,10 @@ function xFit(n){var k=BX_SH[n.type]||'A',tw=xTw(n.label||''),w,h;
   return{w:w,h:h,k:k};}
 function xRect(n){var f=xFit(n);return{x:n.x,y:n.y,w:f.w,h:f.h};}
 function xShape(n,o){o=o||{};var f=xFit(n),k=f.k,col=n.color||(BX_COL[n.type]||BX_COL.Action)[0],tc=n.tc||bxTc(col);
-  var clip=XPOLY[k]?'clip-path:'+XPOLY[k]+';':'border-radius:'+XRAD[k]+';',lab=XLAB[k]||'inset:0;';
+  var clip=XPOLY[k]?'clip-path:'+XPOLY[k]+';':'border-radius:'+XRAD[k]+';',lab=XLAB[k]||'inset:0;';var bf=xFit({label:n.label,type:n.type}),sc=Math.max(.3,Math.min(5,Math.min(f.w/bf.w,f.h/bf.h))),fs=(12.5*sc).toFixed(1);lab+='font-size:'+fs+'px;';
   var pos=o.rel?'position:relative;margin:0 auto;':'left:'+Math.round(n.x)+'px;top:'+Math.round(n.y)+'px;';
   var s='<div class="xs'+(o.cls?' '+o.cls:'')+'"'+(o.nid?' data-nid="'+bxE(n.id)+'"':'')+' style="'+pos+'width:'+f.w+'px;height:'+f.h+'px;--c:'+col+';--tc:'+tc+'"><div class="o" style="'+clip+'"></div><div class="i" style="'+clip+'"></div><div class="lab" style="'+lab+'">'+bxE(n.label)+'</div>';
-  if(n.shortcut)s+='<span class="xkb" style="'+XKB[k]+'">'+bxE(n.shortcut)+'</span>';
+  if(n.shortcut)s+='<span class="xkb" style="'+XKB[k]+(sc!==1?';font-size:'+Math.max(8,10.5*sc).toFixed(1)+'px;padding:1px '+Math.round(6*Math.max(1,sc))+'px':'')+'">'+bxE(n.shortcut)+'</span>';
   if(o.handles){[['nw',0,0],['n',50,0],['ne',100,0],['w',0,50],['e',100,50],['sw',0,100],['s',50,100],['se',100,100]].forEach(function(h){s+='<i class="xh" data-h="'+h[0]+'" style="left:calc('+h[1]+'% - 5px);top:calc('+h[2]+'% - 5px);cursor:'+h[0]+'-resize"></i>';});}
   return s+'</div>';}
 function xMini(type,color){var k=BX_SH[type],st={F:'width:20px;height:11px;margin-top:3px;border-radius:99px',S:'width:18px;height:13px;margin-top:2px;border-radius:3px',A:'border-radius:50%'}[k]||'clip-path:'+XPOLY[k];return'<span class="xmini" style="background:'+color+';'+st+'"></span>';}
@@ -38428,6 +38428,24 @@ var _xCard=bxCardHtml;bxCardHtml=function(b){var h=_xCard(b),sv='';try{sv=bxPrev
 var _xLT=bxLierToggle;bxLierToggle=function(){BX.ms=[];_xLT();};
 var _xUT=bxUnlToggle;bxUnlToggle=function(){BX.ms=[];_xUT();};
 var _xLH=bxLierHtml;bxLierHtml=function(b){return _xLH(b).replace('Clique un bouton sur la board ou dans « non placés ».','Clique un bouton sur la board (ou entoure-en plusieurs).').replace('les boutons non placés se placent tout seuls','un seul clic pour tout créer');};
+/* ── carte de board : fond unique à points, titre sous l'aperçu, logos d'équipe, bas stylisé ── */
+bxCardHtml=function(b){var st=bxBoardStats(b),ts=bxTeamsOf(b),sv='';try{sv=bxPreviewSvg(b);}catch(e){}
+  return'<div class="bx-bc2" onclick="bxOpen('+bxQ(b.id)+')"><div class="bx-cv">'+sv+'</div>'
+   +'<div class="bx-bb"><div class="bx-ttl">'+bxE(b.name)+'</div>'
+   +'<div class="bx-bt"><span style="flex:1;min-width:0">'+(ts.length?bxTeamStack(ts.slice(0,5),34):'<span class="bx-sub">Aucune équipe</span>')+'</span><span class="bx-plus" data-bxpop="1" title="Attribuer une équipe" onclick="event.stopPropagation();bxTeamPop(event,\''+bxQ(b.id)+'\')">+</span></div>'
+   +'<div class="bx-bf"><span>'+(st.issues?'<span class="bx-wn">⚠ '+st.issues+' à vérifier</span>':'<span class="bx-ok">✓ complète</span>')+'</span><span>'+bxAgo(b.mod)+'</span></div></div></div>';};
+(function(){var st=document.createElement('style');st.id='xv17Card';st.textContent=
+'.bx-cv{height:190px!important;padding:0!important;display:block!important;background:radial-gradient(ellipse 80% 70% at 50% 110%,rgba(212,170,106,.22),transparent 65%),linear-gradient(180deg,#26231f 0%,#171513 100%)!important;border-bottom:1px solid rgba(212,170,106,.25);}'
++'.bx-cv:before{content:"";position:absolute;inset:0;background-image:radial-gradient(rgba(243,239,230,.09) 1px,transparent 1px);background-size:16px 16px;z-index:0;}'
++'.bx-cv .xpv{left:14px!important;top:14px!important;width:calc(100% - 28px)!important;height:calc(100% - 28px)!important;opacity:1!important;}'
++'.bx-bb{padding:16px 18px 16px!important;gap:12px!important;background:linear-gradient(180deg,rgba(212,170,106,.06),transparent 55%);}'
++'.bx-ttl{font-size:20px;font-weight:900;letter-spacing:.015em;text-transform:uppercase;color:var(--txt);line-height:1.12;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}'
++'.bx-bt{min-height:40px!important;gap:10px!important;}.bx-bt .bx-stk .bx-tlg{border-color:#262421!important;}'
++'.bx-bf{border-top:1px solid rgba(212,170,106,.16)!important;padding-top:12px!important;}.bx-bf>span:last-child{font-size:12px;color:var(--txt3);}'
++'.bx-ok,.bx-wn{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:999px;font-size:12px;font-weight:800;}'
++'.bx-ok{background:rgba(61,201,122,.13);border:1px solid rgba(61,201,122,.35);}.bx-wn{background:rgba(232,160,64,.13);border:1px solid rgba(232,160,64,.4);}'
++'.bx-plus{width:34px!important;height:34px!important;font-size:20px!important;}'
+;document.head.appendChild(st);})();
 
 /*XV_END*/
 </script>
