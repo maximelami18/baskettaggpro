@@ -460,7 +460,7 @@ document.addEventListener('DOMContentLoaded', function(){
 var _SB_URL="https://umuvirwbtpflizxupwbr.supabase.co";
 // Version de ce fichier — à incrémenter à chaque déploiement, en cohérence avec la valeur
 // mise à jour dans la table Supabase `app_version` (voir _checkAppVersion ci-dessous).
-var APP_VERSION = "2026-11-08-402";
+var APP_VERSION = "2026-11-08-403";
 var _SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtdXZpcndidHBmbGl6eHVwd2JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3MTI1MDEsImV4cCI6MjA5MDI4ODUwMX0.fFQaF-zP9dzcWITJDf6GBmvu0pdcuvlaUz0A0qW0kfo";
 var _LICENCE_KEY='btp_licence';
 var _MACHINE_KEY='btp_machine';
@@ -38116,7 +38116,7 @@ function bxGMove(k,g,dir){var b=bxBoard(BX.bid),els=bxGNames(k),i=els.indexOf(g)
 function bxGDragS(ev,g,k){ev.stopPropagation();BX.drag=null;BX.gdrag={g:g,k:k};try{ev.dataTransfer.setData('text/plain',g);ev.dataTransfer.effectAllowed='move';}catch(e){}}
 function bxGDrop(tg,k){var d=BX.gdrag;BX.gdrag=null;var b=bxBoard(BX.bid);if(!b||!d||d.k!==k||d.g===tg)return;var els=bxGNames(k),i=els.indexOf(d.g),j=els.indexOf(tg);if(i<0||j<0)return;els.splice(i,1);els.splice(j,0,d.g);bxGSave(b,k,els);}
 
-function bxRDotsH(b,id){var seen={},q=[id],gs={};while(q.length){var x=q.pop();bxOut(b,x).forEach(function(t){if(t.type==='Résultat'){var g=bxRGrpName(t);gs[g]=1;}else if(t.type==='Sous-action'&&!seen[t.id]){seen[t.id]=1;q.push(t.id);}});}
+function bxRDotsH(b,id){var gs={};bxOut(b,id,'Résultat').forEach(function(t){gs[bxRGrpName(t)]=1;});
   var k=Object.keys(gs);return k.length?'<span class="gd br">'+k.map(function(g){return'<i style="background:'+bxRGrpColor(b,g)+'"></i>';}).join('')+'</span>':'';}
 function bxBZSet(z){BX.bz=Math.max(.4,Math.min(1.6,Math.round(z*100)/100));var c=document.getElementById('bxc'),l=document.getElementById('bxZl');if(c)c.style.zoom=BX.bz;if(l)l.textContent=Math.round(BX.bz*100)+'%';bxDraw('bxc');}
 function bxBZ(d){bxBZSet((BX.bz||1)+d);}
