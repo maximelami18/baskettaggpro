@@ -460,7 +460,7 @@ document.addEventListener('DOMContentLoaded', function(){
 var _SB_URL="https://umuvirwbtpflizxupwbr.supabase.co";
 // Version de ce fichier — à incrémenter à chaque déploiement, en cohérence avec la valeur
 // mise à jour dans la table Supabase `app_version` (voir _checkAppVersion ci-dessous).
-var APP_VERSION = "2026-11-08-407";
+var APP_VERSION = "2026-11-08-408";
 var _SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtdXZpcndidHBmbGl6eHVwd2JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3MTI1MDEsImV4cCI6MjA5MDI4ODUwMX0.fFQaF-zP9dzcWITJDf6GBmvu0pdcuvlaUz0A0qW0kfo";
 var _LICENCE_KEY='btp_licence';
 var _MACHINE_KEY='btp_machine';
@@ -38446,6 +38446,33 @@ bxCardHtml=function(b){var st=bxBoardStats(b),ts=bxTeamsOf(b),sv='';try{sv=bxPre
 +'.bx-ok{background:rgba(61,201,122,.13);border:1px solid rgba(61,201,122,.35);}.bx-wn{background:rgba(232,160,64,.13);border:1px solid rgba(232,160,64,.4);}'
 +'.bx-plus{width:34px!important;height:34px!important;font-size:20px!important;}'
 ;document.head.appendChild(st);})();
+
+/* v408 : un raccourci n'est en conflit que s'il est affiché en même temps (mêmes parents) */
+bxIssues=function(b){
+  var out=[],P=bxPlace(b);
+  P.unp.forEach(function(n){out.push({id:n.id,t:n.label,d:n.type.toLowerCase()+' non placé(e)',fix:'Lier'});});
+  b.nodes.filter(function(n){return n.type==='Action'&&P.placedAct[n.id];}).forEach(function(a){if(!bxPaths(b,a))out.push({id:a.id,t:a.label,d:'aucun résultat lié',fix:'Lier'});});
+  var seen={};
+  ['Famille','Sous-famille','Action','Sous-action','Résultat','Compteur'].forEach(function(tp){
+    var groups={};
+    b.nodes.filter(function(n){return n.type===tp&&n.shortcut;}).forEach(function(n){
+      var ps=b.links.filter(function(l){return l.to===n.id;}).map(function(l){return l.from;});
+      if(!ps.length)ps=['-'];
+      ps.forEach(function(p){(groups[p]=groups[p]||[]).push(n);});
+    });
+    Object.keys(groups).forEach(function(p){
+      var m={};groups[p].forEach(function(n){var k=bxKeyNorm(n.shortcut);(m[k]=m[k]||[]).push(n);});
+      Object.keys(m).forEach(function(k){
+        if(m[k].length<2)return;
+        m[k].slice(1).forEach(function(n){
+          if(seen[n.id+'|'+k])return;seen[n.id+'|'+k]=1;
+          out.push({id:n.id,t:n.label,d:'raccourci « '+k+' » déjà pris par « '+m[k][0].label+' » (affichés ensemble)',fix:'Changer'});
+        });
+      });
+    });
+  });
+  return out;
+};
 
 /*XV_END*/
 </script>
