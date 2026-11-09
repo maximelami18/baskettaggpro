@@ -460,7 +460,7 @@ document.addEventListener('DOMContentLoaded', function(){
 var _SB_URL="https://umuvirwbtpflizxupwbr.supabase.co";
 // Version de ce fichier — à incrémenter à chaque déploiement, en cohérence avec la valeur
 // mise à jour dans la table Supabase `app_version` (voir _checkAppVersion ci-dessous).
-var APP_VERSION = "2026-11-08-408";
+var APP_VERSION = "2026-11-09-409";
 var _SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtdXZpcndidHBmbGl6eHVwd2JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3MTI1MDEsImV4cCI6MjA5MDI4ODUwMX0.fFQaF-zP9dzcWITJDf6GBmvu0pdcuvlaUz0A0qW0kfo";
 var _LICENCE_KEY='btp_licence';
 var _MACHINE_KEY='btp_machine';
@@ -14590,7 +14590,7 @@ function generateShotChartPDF(){
   _esState.matchIds.forEach(function(mid){var m=gM(mid);if(m&&m.oppTeamId){var ot=gT(m.oppTeamId);if(ot)ot.players.forEach(function(p){_allAdvTeamPlayerIds.push(p.id);});}});
   var _selOurPids=_esState.playerIds.filter(function(id){return _allOurTeamPlayerIds.indexOf(id)>=0;});
   var _selAdvPids=_esState.playerIds.filter(function(id){return _allAdvTeamPlayerIds.indexOf(id)>=0;});
-  if(_esState._advShot&&_selAdvPids.length===0){toast('Sélectionnez au moins un joueur de l\'équipe adverse','red');_esState._advShot=false;return;}
+  if(_esState._advShot&&_selAdvPids.length===0&&!(_esState._teamShot&&_esState.matchIds.some(function(mid){var mm=gM(mid);return mm&&mm.oppTeamId&&DB.pStats&&DB.pStats[mid+'_collectifAdv'];}))){toast('Sélectionnez au moins un joueur de l\'équipe adverse','red');_esState._advShot=false;return;}
   if(!_esState._advShot&&_esState.playerIds.length>0&&_selOurPids.length===0){toast('Sélectionnez au moins un joueur de votre équipe','red');return;}
   // ── MODE ADVERSE ──
   if(_esState._advShot){
@@ -38473,6 +38473,346 @@ bxIssues=function(b){
   });
   return out;
 };
+
+/* ───────────────────────────────────────────────────────────
+   xv18 — Refonte de la page « Export statistiques PDF » (v409)
+   Cartes de match (comme l'Export MP4), joueurs cochés d'office,
+   périodes automatiques, panneau Exporter (stats + graphiques de tir)
+   Préfixe CSS/JS : es18 (ne jamais réutiliser des noms génériques)
+   ─────────────────────────────────────────────────────────── */
+var ES18={sl:0,pc:{},init:false};
+
+(function(){
+  var st=document.createElement('style');st.id='xv18Css';
+  st.textContent=`
+.es18-head{display:flex;align-items:flex-end;gap:16px;margin-bottom:16px;flex-wrap:wrap}
+.es18-head h1{margin:0;font-size:28px;font-weight:800;letter-spacing:-.02em;color:var(--txt)}
+.es18-head .es18-sub{margin-top:3px;font-size:13px;color:var(--txt3)}
+.es18-sp{flex:1}
+.es18-seg{display:inline-flex;background:#1f1d1a;border:1px solid #3c3934;border-radius:13px;padding:4px;gap:3px}
+.es18-seg span{padding:9px 18px;border-radius:10px;font-weight:800;font-size:13.5px;color:#8a8478;display:flex;gap:8px;align-items:center;cursor:pointer;white-space:nowrap}
+.es18-seg span.on{background:linear-gradient(180deg,#e2bd80,#c99c58);color:#1a1200;box-shadow:0 2px 8px #0006}
+.es18-seg.sm span{padding:7px 14px;font-size:12.5px;flex:1;justify-content:center}
+.es18-card{background:var(--surf);border:1px solid var(--bdrw);border-radius:18px;padding:16px 20px;box-shadow:var(--sh)}
+.es18-ct{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.es18-n{width:24px;height:24px;border-radius:50%;background:#D4AA6A;color:#1a1200;font-weight:900;font-size:12.5px;display:flex;align-items:center;justify-content:center;flex:none}
+.es18-n.off{background:#1f1d1a;border:1px solid #4a463f;color:#8a8478}
+.es18-ct b{font-size:14.5px;font-weight:800;letter-spacing:.01em;color:var(--txt)}
+.es18-ct .es18-hint{color:#8a8478;font-size:12.5px}
+.es18-lk{font-size:12px;font-weight:700;color:#D4AA6A;padding:5px 11px;border-radius:8px;border:1px solid #3c3934;background:#1f1d1a;cursor:pointer;white-space:nowrap}
+.es18-lk.mut{color:#a89880}
+.es18-dd{display:inline-flex;align-items:center;gap:8px;height:32px;padding:0 12px;border-radius:10px;border:1px solid #3c3934;background:#1f1d1a;font-size:12.5px;font-weight:700;color:#f3efe6;cursor:pointer}
+.es18-lgs{display:inline-flex}.es18-lgs>span+span{margin-left:-6px}
+.es18-strip{display:flex;gap:11px;overflow-x:auto;padding-bottom:8px;scrollbar-width:thin;scrollbar-color:#4a463f transparent}
+.es18-mc{flex:0 0 372px;min-width:0;padding:11px 18px 13px;border-radius:17px;cursor:pointer;background:#202020;border:1px solid rgba(255,255,255,.09);transition:.15s}
+.es18-mc.on{background:rgba(212,170,106,.12);border-color:#D4AA6A}
+.es18-mc .h{display:flex;align-items:center;font-size:13px;color:#8d8d8d;font-weight:800;margin-bottom:10px;white-space:nowrap;gap:6px}
+.es18-mc .h .r{margin-left:auto;display:inline-flex;align-items:center;gap:7px}
+.es18-mc .b{display:flex;align-items:center;justify-content:space-between}
+.es18-ck{width:24px;height:24px;border-radius:7px;display:inline-grid;place-items:center;font-weight:900;font-size:15px;flex:0 0 auto;border:1.5px solid #D4AA6A;color:#111}
+.es18-ck.on{background:#D4AA6A}
+.es18-vb{font-size:16px;line-height:1;padding:3px 7px;border-radius:7px;background:linear-gradient(180deg,#e2bd80,#c9a05c);box-shadow:0 0 0 1px rgba(0,0,0,.35)}
+.es18-ot{font-size:11px;font-weight:900;border-radius:6px;padding:2px 7px;background:linear-gradient(180deg,#e2bd80,#c9a05c);color:#1a1200;margin-left:6px}
+.es18-cols{display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:16px;align-items:start;margin-top:14px}
+@media(max-width:1180px){.es18-cols{grid-template-columns:1fr}}
+.es18-gh{display:flex;align-items:center;gap:9px;margin:0 0 8px;font-size:11px;font-weight:800;letter-spacing:.08em;color:#8a8478;text-transform:uppercase}
+.es18-gh.red{color:#e66;margin-top:22px}.es18-gh.first{margin-top:0}
+.es18-gh .es18-sp{flex:1}.es18-gh i{margin-left:8px;font-style:normal;text-transform:none;letter-spacing:0;font-size:11.5px;color:#D4AA6A;cursor:pointer}.es18-gh.red i{color:#e66}
+.es18-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:9px}
+.es18-pp{display:flex;align-items:center;gap:13px;padding:12px 14px;border-radius:16px;border:1px solid #34312c;background:#1f1d1a;cursor:pointer;transition:.15s;min-width:0}
+.es18-pp.on{border-color:rgba(212,170,106,.75);background:rgba(212,170,106,.09);border-left:3px solid #D4AA6A}
+.es18-pp.off{opacity:.5}
+.es18-pp.red.on{border-color:rgba(224,82,82,.75);background:rgba(224,82,82,.09);border-left:3px solid #e05252}
+.es18-cb{width:18px;height:18px;border-radius:6px;border:1.5px solid #5a554c;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:#1a1200;flex:none}
+.es18-cb.on{background:#D4AA6A;border-color:#D4AA6A}.es18-pp.red .es18-cb.on{background:#e05252;border-color:#e05252;color:#fff}
+.es18-ph{position:relative;width:68px;height:68px;flex:none}
+.es18-ph .im{display:block;width:68px;height:68px;border-radius:50%;overflow:hidden;border:2px solid #4a463f;background:#2a2723}
+.es18-pp.on .es18-ph .im{border-color:#D4AA6A}.es18-pp.red.on .es18-ph .im{border-color:#e05252}
+.es18-ph svg,.es18-ph img{width:100%;height:100%;display:block;object-fit:cover}
+.es18-no{position:absolute;right:-8px;bottom:-6px;min-width:26px;height:24px;padding:0 5px;border-radius:7px;background:#D4AA6A;color:#1a1200;font-weight:900;font-size:13.5px;display:flex;align-items:center;justify-content:center;border:2px solid #262421}
+.es18-pp.red .es18-no{background:#e05252;color:#fff}
+.es18-nm{line-height:1.05;flex:1;min-width:0}
+.es18-nm small{display:block;font-size:13.5px;letter-spacing:.14em;text-transform:uppercase;color:#D4AA6A;font-weight:700;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.es18-pp.red .es18-nm small{color:#f08a8a}
+.es18-nm b{display:block;font-size:24px;font-weight:800;letter-spacing:-.025em;color:#f6efe0;white-space:nowrap;text-transform:uppercase}
+.es18-pres{display:flex;gap:7px;align-items:center;margin-top:7px;flex-wrap:wrap}
+.es18-pres i{font-style:normal;font-size:9.5px;font-weight:800;color:#8a8478;display:flex;align-items:center;gap:4px}
+.es18-dot{display:inline-block;width:10px;height:10px;border-radius:50%;background:#D4AA6A;flex:none}.es18-dot.o{background:transparent;border:1.5px solid #4a463f}
+.es18-nb{font-size:12px;color:#8a8478;margin-top:14px}
+.es18-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:#8a8478;gap:10px;border:1.5px dashed #3c3934;border-radius:16px;padding:60px 20px}
+.es18-empty .ic{width:64px;height:64px;border-radius:50%;background:#1f1d1a;border:1px solid #3c3934;display:flex;align-items:center;justify-content:center;font-size:28px}
+.es18-empty b{color:#f3efe6;font-size:16px}
+.es18-rp{position:sticky;top:12px;border-color:rgba(212,170,106,.4)!important;background:linear-gradient(180deg,#2a2723,#242220)!important;display:flex;flex-direction:column}
+.es18-sm{display:flex;gap:10px;margin-bottom:12px}
+.es18-sm div{flex:1;background:#1f1d1a;border:1px solid #34312c;border-radius:13px;padding:8px 12px}
+.es18-sm b{font-size:22px;display:block;line-height:1.1;color:#D4AA6A}.es18-sm small{font-size:11.5px;color:#8a8478}.es18-sm div.z b{color:#5a554c}
+.es18-lb{font-size:11px;font-weight:800;color:#D4AA6A;letter-spacing:.06em;margin:12px 0 7px;text-transform:uppercase;display:flex;align-items:center}
+.es18-lb .es18-sp{flex:1}.es18-lb i{font-style:normal;color:#a89880;text-transform:none;letter-spacing:0;font-size:11.5px;font-weight:700;cursor:pointer}
+.es18-qts{display:flex;gap:6px}
+.es18-qts span{flex:1;text-align:center;padding:7px 0;border-radius:10px;border:1px solid #3c3934;background:#1f1d1a;font-weight:800;font-size:13px;color:#8a8478;cursor:pointer}
+.es18-qts span.on{border-color:#D4AA6A;background:rgba(212,170,106,.14);color:#D4AA6A}
+.es18-qts span.dis{opacity:.4;border-style:dashed;cursor:default}
+.es18-qts span em{font-style:normal;font-size:9px;display:block;color:#a89880;font-weight:700;margin-top:1px}
+.es18-auto{display:flex;gap:8px;align-items:center;font-size:12px;color:#a89880;background:rgba(212,170,106,.08);border:1px dashed rgba(212,170,106,.4);border-radius:10px;padding:7px 11px;margin-top:8px}
+.es18-opt{display:flex;gap:11px;align-items:flex-start;padding:11px 12px;border-radius:12px;border:1px solid #34312c;background:#1f1d1a;cursor:pointer}
+.es18-opt b{font-size:13px;display:block;color:var(--txt)}.es18-opt small{font-size:11.5px;color:#8a8478}
+.es18-sw{width:38px;height:22px;border-radius:999px;background:#4a463f;position:relative;flex:none;margin-top:1px}
+.es18-sw:after{content:"";position:absolute;left:3px;top:3px;width:16px;height:16px;border-radius:50%;background:#bdb6a8;transition:.2s}
+.es18-sw.on{background:#D4AA6A}.es18-sw.on:after{left:19px;background:#1a1200}
+.es18-sheetp{min-height:150px;border-radius:14px;background:linear-gradient(180deg,#2e2b27,#232120);border:1px solid #3c3934;padding:34px 14px 0;position:relative;overflow:hidden;display:flex;justify-content:center;align-items:flex-end;height:190px;margin:14px 0}
+.es18-sheetp .cap{position:absolute;left:14px;top:12px;font-size:10.5px;font-weight:800;letter-spacing:.08em;color:#8a8478;text-transform:uppercase}
+.es18-paper{width:78%;height:100%;background:#f3eee2;border-radius:6px 6px 0 0;box-shadow:0 10px 30px #000a;padding:12px 14px;color:#2a2620;transform:rotate(-1.2deg);transform-origin:bottom center}
+.es18-paper .pt{display:flex;align-items:center;gap:8px;margin-bottom:8px}.es18-paper .pt b{font-size:12px;letter-spacing:.02em;color:#2a2620;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.es18-paper .pt i{width:16px;height:16px;border-radius:50%;background:#c62f2f;flex:none}.es18-paper .pt span{margin-left:auto;font-size:9px;font-weight:800;color:#8a8070}
+.es18-paper .gr{display:grid;grid-template-columns:2.2fr repeat(6,1fr);gap:4px;margin-bottom:5px}.es18-paper .gr span{height:7px;border-radius:3px;background:#dcd5c2}
+.es18-paper .gr.h span{background:#2a2620;height:9px}.es18-paper .gr.t span{background:#b8904a}
+.es18-cta{display:flex;align-items:center;justify-content:center;gap:10px;height:52px;border-radius:14px;background:linear-gradient(180deg,#e8c88a,#c99c58);color:#1a1200;font-weight:900;font-size:16px;box-shadow:0 6px 22px rgba(212,170,106,.25);cursor:pointer;border:0;font-family:inherit;width:100%}
+.es18-cta.off{background:#2e2b27;color:#6f695d;box-shadow:none;border:1px solid #3c3934;cursor:not-allowed}
+.es18-hintb{font-size:11.5px;color:#8a8478;text-align:center;margin-top:8px}
+.es18-pv{border-radius:14px;overflow:hidden;border:1px solid #3c3934;background:#1a1815;margin-top:10px}
+.es18-pv svg{width:100%;height:120px;display:block}
+.es18-pvc{display:flex;gap:14px;font-size:11.5px;color:#a89880;margin-top:8px;align-items:center}
+.es18-pvc i{display:inline-block;width:11px;height:11px;border-radius:50%;vertical-align:-1px;margin-right:5px}
+.es18-heatbar{height:8px;width:90px;border-radius:6px;background:linear-gradient(90deg,#2a2723,#7a3b22,#e0643c,#ffd36a)}
+.es18-rowh{display:flex;align-items:center;gap:8px;margin:10px 0 6px;font-size:12.5px;font-weight:800;color:var(--txt)}
+.es18-rowh.red{color:#f3a0a0}
+.es18-mx{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.es18-mx .b{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;height:52px;border-radius:13px;font-weight:800;font-size:13px;border:1px solid #D4AA6A;background:rgba(212,170,106,.12);color:#f3efe6;cursor:pointer}
+.es18-mx .b small{font-size:11px;font-weight:600;color:#a89880}
+.es18-mx .b.p{background:linear-gradient(180deg,#e8c88a,#c99c58);color:#1a1200;border-color:transparent}.es18-mx .b.p small{color:#4a3a14}
+.es18-mx .b.r{border-color:rgba(224,82,82,.7);background:rgba(224,82,82,.12);color:#f3a0a0}
+.es18-mx .b.r.p{background:linear-gradient(180deg,#ec7a7a,#d04444);color:#fff}.es18-mx .b.r.p small{color:#ffd6d6}
+.es18-mx .b.off{border-color:#3c3934;background:#2a2723;color:#5f594e;cursor:not-allowed}.es18-mx .b.off small{color:#5f594e}
+`;
+  document.head.appendChild(st);
+})();
+
+/* ── Données ── */
+function es18Sorted(){
+  var f=_esTeamFilter||[];
+  var ms=(DB.matches||[]).filter(function(m){return f.length===0||f.indexOf(m.teamId)>=0||f.indexOf(m.oppTeamId)>=0;});
+  return ms.map(function(m,i){return{m:m,i:i};}).sort(function(a,b){var da=String(a.m.date||''),db=String(b.m.date||'');return da<db?-1:da>db?1:a.i-b.i;}).map(function(x){return x.m;});
+}
+function es18Parts(m){
+  var ours=[],adv=[],t=gT(m.teamId),ot=m.oppTeamId?gT(m.oppTeamId):null;
+  if(t)(t.players||[]).forEach(function(p){if(DB.pStats&&DB.pStats[m.id+'_'+p.id]&&_esConvoked(m,p.id))ours.push(p);});
+  if(ot)(ot.players||[]).forEach(function(p){if(DB.pStats&&DB.pStats[m.id+'_'+p.id]&&(!(m.oppPlayers&&m.oppPlayers.length)||m.oppPlayers.indexOf(p.id)>=0))adv.push(p);});
+  return{ours:ours,adv:adv,team:t,opp:ot};
+}
+function es18Pers(m){
+  if(ES18.pc[m.id])return ES18.pc[m.id];
+  var r={5:false,6:false};
+  try{(getLog(m.id)||[]).forEach(function(ev){var q=parseInt(ev.qt)||0;if(q===5)r[5]=true;if(q===6)r[6]=true;});}catch(e){}
+  ES18.pc[m.id]=r;return r;
+}
+function es18Sync(added){
+  var ids=_esState.matchIds,keep={},cur;
+  ids.forEach(function(id){var m=gM(id);if(!m)return;var p=es18Parts(m);p.ours.concat(p.adv).forEach(function(x){keep[x.id]=1;});});
+  cur=_esState.playerIds.filter(function(id){return keep[id];});
+  (added||[]).forEach(function(id){var m=gM(id);if(!m)return;var p=es18Parts(m);p.ours.concat(p.adv).forEach(function(x){if(cur.indexOf(x.id)<0)cur.push(x.id);});});
+  _esState.playerIds=cur;
+  var q=['1','2','3','4'];
+  ids.forEach(function(id){var m=gM(id);if(!m)return;var o=es18Pers(m);if(o[5]&&q.indexOf('5')<0)q.push('5');if(o[6]&&q.indexOf('6')<0)q.push('6');});
+  _esState.qts=q;
+}
+function es18Avail(){
+  var a={5:[],6:[]};
+  _esState.matchIds.forEach(function(id){var m=gM(id);if(!m)return;var o=es18Pers(m);if(o[5])a[5].push(m);if(o[6])a[6].push(m);});
+  return a;
+}
+
+/* ── Actions ── */
+window.es18Match=function(id){
+  var i=_esState.matchIds.indexOf(id),added=[];
+  if(i>=0)_esState.matchIds.splice(i,1);else{_esState.matchIds.push(id);added=[id];}
+  es18Sync(added);renderPage();
+};
+window.es18MatchAll=function(mode){
+  var vis=es18Sorted().filter(function(m){return mode!=='video'||xvMatchHasVideo(m);}).map(function(m){return m.id;});
+  var before=_esState.matchIds.slice();
+  _esState.matchIds=mode==='none'?[]:vis;
+  var added=_esState.matchIds.filter(function(id){return before.indexOf(id)<0;});
+  es18Sync(added);renderPage();
+};
+window.es18PlayersAll=function(on){
+  var ids=[];
+  _esState.matchIds.forEach(function(mid){var m=gM(mid);if(!m)return;var p=es18Parts(m);p.ours.concat(p.adv).forEach(function(x){if(ids.indexOf(x.id)<0)ids.push(x.id);});});
+  _esState.playerIds=on?ids:[];renderPage();
+};
+window.es18Group=function(ids,on){
+  var cur=_esState.playerIds.filter(function(id){return ids.indexOf(id)<0;});
+  if(on)cur=cur.concat(ids);_esState.playerIds=cur;renderPage();
+};
+window.es18Q=function(q){toggleEsQt(q);};
+window.es18QAll=function(on){
+  var q=['1','2','3','4'],a=es18Avail();
+  if(on){if(a[5].length)q.push('5');if(a[6].length)q.push('6');}else q=[];
+  _esState.qts=q;renderPage();
+};
+window.es18Hs=function(){_esState.hs=!(_esState.hs!==false);renderPage();};
+window.es18Heat=function(on){_esState._heatMap=!!on;renderPage();};
+window.es18Tab=function(t){_esState.type=t;renderPage();};
+window.es18Gen=function(team,adv){
+  _esState._teamShot=team;_esState._advShot=adv;generateShotChartPDF();
+};
+window.es18Teams=function(btn){
+  if(XV.open==='es18'){xvCloseMenus();return;}xvCloseMenus();XV.open='es18';
+  var ts={};(DB.matches||[]).forEach(function(m){if(m.teamId)ts[m.teamId]=1;if(m.oppTeamId)ts[m.oppTeamId]=1;});
+  var r=btn.getBoundingClientRect(),m=document.createElement('div');m.id='xvMenu';m.className='xv-menu2';m.style.left=r.left+'px';m.style.top=(r.bottom+6)+'px';m.style.minWidth='270px';
+  m.innerHTML='<div class="xlab" style="padding:6px 10px">Équipes · plusieurs possibles</div>'+DB.teams.filter(function(t){return ts[t.id];}).map(function(t){var on=(_esTeamFilter||[]).indexOf(t.id)>=0,nb=(DB.matches||[]).filter(function(x){return x.teamId===t.id||x.oppTeamId===t.id;}).length;
+    return'<div class="xv-mi'+(on?' on':'')+'" style="'+(on?'background:rgba(212,170,106,.22);color:#D4AA6A;':'')+'" onclick="es18Tick('+t.id+','+(!on)+')"><span style="display:flex;align-items:center;gap:8px">'+xvLogo(t,t.name,18)+xe(t.name)+'</span><span>'+nb+' matchs</span></div>';}).join('')
+    +'<div style="padding:6px 4px"><span class="xchip sm" onclick="es18TeamsAll()">Toutes</span></div>';
+  document.body.appendChild(m);
+};
+window.es18TeamsAll=function(){_esTeamFilter=[];_esState.matchIds=[];es18Sync([]);xvCloseMenus();renderPage();};
+window.es18Tick=function(id,on){
+  var a=_esTeamFilter,i=a.indexOf(id);if(on&&i<0)a.push(id);else if(!on&&i>=0)a.splice(i,1);
+  var vis=es18Sorted().map(function(m){return m.id;});
+  _esState.matchIds=_esState.matchIds.filter(function(x){return vis.indexOf(x)>=0;});es18Sync([]);
+  var st=document.getElementById('xvMenu'),L=st?st.style.left:null,T=st?st.style.top:null;
+  renderPage();XV.open=null;var b=document.querySelector('[data-xvdd="es18"]');
+  if(b&&st){es18Teams(b);var m=document.getElementById('xvMenu');m.style.left=L;m.style.top=T;}
+};
+
+/* ── Rendu ── */
+function es18Photo(p){
+  if(p.photo){var py=(p.photoY==null||isNaN(p.photoY))?22:p.photoY;return'<img src="'+xe(p.photo)+'" loading="lazy" style="object-position:50% '+py+'%">';}
+  var h=(p.id*47)%360;
+  return'<svg viewBox="0 0 40 40"><rect width="40" height="40" fill="hsl('+h+',18%,22%)"/><path d="M5 41c0-10 6-15 15-15s15 5 15 15z" fill="hsl('+h+',22%,36%)"/><circle cx="20" cy="16" r="7.2" fill="hsl('+h+',16%,52%)"/></svg>';
+}
+function es18Card(p,red,pres){
+  var on=_esState.playerIds.indexOf(p.id)>=0,num=_esNum(p,false);
+  var dots='';
+  if(pres&&pres.length>1)dots='<div class="es18-pres">'+(pres.length<=4?pres.map(function(x){return'<i title="'+xe(x.t)+'"><span class="es18-dot'+(x.v?'':' o')+'"></span>'+xe(x.l)+'</i>';}).join(''):'<i style="font-size:11px">'+pres.filter(function(x){return x.v;}).length+'/'+pres.length+' matchs</i>')+'</div>';
+  return'<div class="es18-pp '+(on?'on':'off')+(red?' red':'')+'" onclick="toggleEsPlayer('+p.id+')"><span class="es18-cb'+(on?' on':'')+'">'+(on?'✓':'')+'</span><span class="es18-ph"><span class="im">'+es18Photo(p)+'</span>'+(num!==''&&num!=null?'<span class="es18-no">'+xe(String(num))+'</span>':'')+'</span><div class="es18-nm"><small>'+xe(p.first||'')+'</small><b>'+xe(p.last||'')+'</b>'+dots+'</div></div>';
+}
+function es18MatchCard(m){
+  var on=_esState.matchIds.indexOf(m.id)>=0;
+  var t=gT(m.teamId),o=m.oppTeamId?gT(m.oppTeamId):null,home=m.home!==false;
+  var A=home?{t:t,n:t?t.name:'?'}:{t:o,n:m.opp||'?'},B=home?{t:o,n:m.opp||'?'}:{t:t,n:t?t.name:'?'};
+  var done=m.status==='Terminé'&&m.scoreA!=null,win=m.outcome==='V',lose=m.outcome==='D';
+  var c=win?'#4BE08C':lose?'#FF6B6B':'#ddd',bg=win?'61,201,122':lose?'224,82,82':'255,255,255';
+  var nn=function(v,mm){return'<b style="font-size:22px;font-weight:900;color:'+(mm?c:'#bbb')+'">'+v+'</b>';};
+  var pill=done?'<span style="display:inline-flex;align-items:center;gap:6px;border-radius:10px;padding:4px 14px;background:linear-gradient(180deg,rgba('+bg+',.16),rgba('+bg+',.05));border:1px solid rgba('+bg+',.45)">'+nn(m.scoreA,home)+'<i style="width:2px;height:16px;transform:skewX(-14deg);background:rgba('+bg+',.5);display:block"></i>'+nn(m.scoreB,!home)+'</span>':'<span style="color:#8d8d8d;font-weight:900;font-size:20px">– / –</span>';
+  var dp=String(m.date||'').split('-'),vid=xvMatchHasVideo(m),per=es18Pers(m);
+  var ot=per[6]?'+ 2 PROLONG.':per[5]?'+ PROLONG.':'';
+  return'<div class="es18-mc'+(on?' on':'')+'" onclick="es18Match('+m.id+')" title="'+xe(A.n+' – '+B.n)+'"><div class="h"><span>'+(dp[2]||'')+' '+xvShortMonth(dp[1])+(m.round!==''&&m.round!=null?' · J'+xe(m.round):'')+' · '+(home?'Dom.':'Ext.')+(ot?'<span class="es18-ot">'+ot+'</span>':'')+'</span><span class="r">'+(vid?'<span class="es18-vb" title="Vidéo disponible">🎬</span>':'')+'<span class="es18-ck'+(on?' on':'')+'">'+(on?'✓':'')+'</span></span></div><div class="b">'+xvLogo(A.t,A.n,48)+pill+xvLogo(B.t,B.n,48)+'</div></div>';
+}
+function es18Court(heat,id){
+  var body;
+  if(heat){
+    var b=[[158,36,34,.55],[158,30,20,.7],[112,62,24,.35],[204,60,24,.38],[76,36,20,.28],[240,36,20,.25],[158,100,30,.2],[140,84,16,.3]].map(function(a){return'<circle cx="'+a[0]+'" cy="'+a[1]+'" r="'+a[2]+'" fill="rgba(235,100,50,'+a[3]+')"/>';}).join('');
+    body='<defs><filter id="es18bl'+id+'"><feGaussianBlur stdDeviation="8"/></filter></defs><g filter="url(#es18bl'+id+')">'+b+'</g>';
+  }else{
+    body=[[150,30,1],[165,38,1],[158,22,0],[140,46,1],[176,44,0],[112,60,1],[98,38,0],[210,58,1],[224,34,0],[158,110,0],[132,96,1],[188,92,0],[72,20,1],[246,22,1],[130,30,0],[160,54,1],[120,84,0],[198,80,1]].map(function(a){return a[2]?'<circle cx="'+a[0]+'" cy="'+a[1]+'" r="4.6" fill="#3dc97a"/>':'<path d="M'+(a[0]-4)+' '+(a[1]-4)+'l8 8M'+(a[0]+4)+' '+(a[1]-4)+'l-8 8" stroke="#e05252" stroke-width="2" stroke-linecap="round"/>';}).join('');
+  }
+  return'<svg viewBox="0 0 316 150" preserveAspectRatio="xMidYMin slice"><rect width="316" height="150" fill="#1a1815"/><g fill="none" stroke="#5a554c" stroke-width="1.4"><rect x="6" y="6" width="304" height="138" rx="6"/><rect x="108" y="6" width="100" height="62"/><circle cx="158" cy="68" r="26"/><path d="M62 6 V32 A96 96 0 0 0 254 32 V6"/><circle cx="158" cy="22" r="6"/></g>'+body+'</svg>';
+}
+function es18Paper(teamName){
+  var g=function(c){return'<div class="gr '+(c||'')+'">'+'<span></span>'.repeat(7)+'</div>';};
+  return'<div class="es18-sheetp"><span class="cap">Aperçu de la feuille</span><div class="es18-paper"><div class="pt"><i></i><b>'+xe((teamName||'ÉQUIPE').toUpperCase())+' · STATS</b><span>FIBA</span></div>'+g('h')+g()+g()+g()+g()+g()+g('t')+'<div style="height:9px;border-radius:3px;background:#2a2620;width:40%;margin-top:8px"></div></div></div>';
+}
+function es18Players(){
+  var sel=_esState.matchIds.map(gM).filter(Boolean).sort(function(a,b){return String(a.date||'')<String(b.date||'')?-1:1;});
+  var oursG=[],advG=[],oi={},ai={},hid=0;
+  sel.forEach(function(m){
+    var p=es18Parts(m);
+    if(p.team){var g=oi[p.team.id];if(!g){g=oi[p.team.id]={team:p.team,pl:{},list:[]};oursG.push(g);}p.ours.forEach(function(x){if(!g.pl[x.id]){g.pl[x.id]=x;g.list.push(x);}});}
+    if(p.opp&&p.adv.length){var h=ai[p.opp.id];if(!h){h=ai[p.opp.id]={team:p.opp,pl:{},list:[]};advG.push(h);}p.adv.forEach(function(x){if(!h.pl[x.id]){h.pl[x.id]=x;h.list.push(x);}});}
+  });
+  var ids=[];oursG.concat(advG).forEach(function(g){g.list.forEach(function(x){ids.push(x.id);});});
+  var h='<div class="es18-card" style="min-width:0"><div class="es18-ct"><span class="es18-n'+(sel.length?'':' off')+'">2</span><b>Joueurs</b><span class="es18-hint">· '+(sel.length>1?'cochés d’office : ceux qui ont joué · ● présent · ○ absent':'tous cochés d’office · décoche ceux que tu ne veux pas')+'</span><span class="es18-sp"></span>'+(sel.length?'<span class="es18-lk" onclick="es18PlayersAll(true)">Tous</span><span class="es18-lk mut" onclick="es18PlayersAll(false)">Aucun</span>':'')+'</div>';
+  if(!sel.length){return h+'<div class="es18-empty"><div class="ic">🏀</div><b>Choisis d’abord un ou plusieurs matchs</b><span>Seuls les joueurs qui ont participé<br>aux matchs choisis apparaissent ici.</span></div></div>';}
+  if(!ids.length){return h+'<div class="es18-empty"><div class="ic">👤</div><b>Aucun joueur suivi sur ce(s) match(s)</b><span>Les statistiques individuelles n’ont pas été saisies.</span></div></div>';}
+  oursG.forEach(function(g,gi){
+    var gids=g.list.map(function(x){return x.id;});
+    g.list.sort(_esSortNum);
+    h+='<div class="es18-gh'+(gi?' red':'')+(gi===0?' first':'')+'" style="'+(gi?'color:#8a8478;margin-top:22px':'')+'">'+xvLogo(g.team,g.team.name,18)+(gi===0?'Mon équipe · ':'')+xe(g.team.name)+'<span class="es18-sp"></span><i onclick="es18Group(['+gids.join(',')+'],true)">Tous</i><i onclick="es18Group(['+gids.join(',')+'],false)" style="color:#8a8478">Aucun</i></div><div class="es18-grid">'
+      +g.list.map(function(p){
+        var pres=sel.filter(function(m){return m.teamId===g.team.id;}).map(function(m){return{l:'J'+(m.round!==''&&m.round!=null?m.round:'?'),t:'J'+m.round+' '+m.date,v:es18Parts(m).ours.some(function(x){return x.id===p.id;})};});
+        return es18Card(p,false,pres);}).join('')+'</div>';
+  });
+  advG.forEach(function(g){
+    var gids=g.list.map(function(x){return x.id;});
+    g.list.sort(_esSortNum);
+    h+='<div class="es18-gh red">'+xvLogo(g.team,g.team.name,18)+'Équipe adverse · '+xe(g.team.name)+'<span class="es18-sp"></span><i onclick="es18Group(['+gids.join(',')+'],true)">Tous</i><i onclick="es18Group(['+gids.join(',')+'],false)">Aucun</i></div><div class="es18-grid">'+g.list.map(function(p){return es18Card(p,true,null);}).join('')+'</div>';
+  });
+  var noAdv=sel.filter(function(m){return m.oppTeamId&&!es18Parts(m).adv.length;}).map(function(m){var o=gT(m.oppTeamId);return o?o.name:m.opp;}).filter(function(v,i,a){return v&&a.indexOf(v)===i;});
+  var free=sel.filter(function(m){return !m.oppTeamId;}).length;
+  if(noAdv.length||free)h+='<div class="es18-nb">👁 '+(noAdv.length?xe(noAdv.join(' et '))+' : suivi collectif, rien à afficher côté adverse.':'Adversaire non saisi : rien à afficher côté adverse.')+'</div>';
+  return h+'</div>';
+}
+function es18Panel(ctx){
+  var shot=_esState.type==='shotchart',nm=_esState.matchIds.length,np=ctx.ourSel,na=ctx.advSel,a=es18Avail();
+  var z=function(v){return v?'':' class="z"';};
+  var h='<div class="es18-card es18-rp"><div class="es18-ct"><span class="es18-n">3</span><b>Exporter</b></div>'
+    +'<div class="es18-sm"><div'+z(nm)+'><b>'+nm+'</b><small>match'+(nm>1?'s':'')+'</small></div><div'+z(np)+'><b>'+np+'</b><small>joueur'+(np>1?'s':'')+'</small></div><div'+z(na)+'><b>'+na+'</b><small>adverse'+(na>1?'s':'')+'</small></div></div>';
+  h+='<div class="es18-lb">Périodes<span class="es18-sp"></span><i onclick="es18QAll(true)">Tout</i><i onclick="es18QAll(false)" style="margin-left:10px">Aucune</i></div><div class="es18-qts">'
+    +[['1',''],['2',''],['3',''],['4',''],['5',a[5].length?a[5].map(function(m){return'J'+m.round;}).join(' '):''],['6',a[6].length?a[6].map(function(m){return'J'+m.round;}).join(' '):'']].map(function(q){
+      var on=_esState.qts.indexOf(q[0])>=0,dis=(q[0]==='5'&&!a[5].length)||(q[0]==='6'&&!a[6].length);
+      return'<span class="'+(dis?'dis':on?'on':'')+'"'+(dis?'':' onclick="es18Q(\''+q[0]+'\')"')+'>'+_qtLab(+q[0])+(q[1]&&!dis?'<em>'+xe(q[1])+'</em>':'')+'</span>';}).join('')+'</div>';
+  if(a[5].length||a[6].length)h+='<div class="es18-auto">⏱ '+(a[6].length?'P1 et P2 cochées':'P1 cochée')+' d’office : prolongation jouée en '+a[5].concat(a[6]).filter(function(m,i,s){return s.indexOf(m)===i;}).map(function(m){return'J'+m.round;}).join(', ')+'.</div>';
+  else if(nm)h+='<div class="es18-auto">⏱ Pas de prolongation sur '+(nm>1?'ces matchs':'ce match')+' : P1 et P2 grisées.</div>';
+  if(!shot){
+    var hsN=(DB.hsEvents||[]).filter(function(e){return _esState.matchIds.indexOf(e.mid)>=0;}).length,on=_esState.hs!==false;
+    var can=nm>0&&_esState.playerIds.length>0;
+    var tn=ctx.firstTeam;
+    h+='<div class="es18-lb">Options</div><div class="es18-opt" onclick="es18Hs()"><span class="es18-sw'+(on?' on':'')+'"></span><div><b>🕵️ Stats cachées sous le tableau</b><small>'+(hsN?hsN+' saisie'+(hsN>1?'s':'')+' sur '+(nm>1?'ces matchs':'ce match'):'aucune saisie sur '+(nm>1?'ces matchs':'ce match'))+'</small></div></div>'
+      +es18Paper(tn)
+      +'<button class="es18-cta'+(can?'':' off')+'"'+(can?' onclick="generateStatsPDF()"':'')+'>📋 Générer le PDF</button><div class="es18-hintb">'+(!nm?'Sélectionne au moins un match':!_esState.playerIds.length?'Sélectionne au moins un joueur':'Feuille style FIBA · générée sur ton ordinateur')+'</div>';
+  }else{
+    var heat=!!_esState._heatMap;
+    var ourOk=nm>0&&np>0,advPl=na>0,advAny=ctx.advColl;
+    h+='<div class="es18-lb">Rendu des tirs</div><div class="es18-seg sm"><span class="'+(heat?'':'on')+'" onclick="es18Heat(false)">◉ Positions exactes</span><span class="'+(heat?'on':'')+'" onclick="es18Heat(true)">🔥 Heat map</span></div>'
+      +'<div class="es18-pv">'+es18Court(heat,'p')+'</div>'
+      +(heat?'<div class="es18-pvc"><span>Moins</span><div class="es18-heatbar"></div><span>Plus de tirs</span><span style="margin-left:auto">Exemple</span></div>':'<div class="es18-pvc"><span><i style="background:#3dc97a"></i>Réussi</span><span><b style="color:#e05252;margin-right:5px">✕</b>Manqué</span><span style="margin-left:auto">Exemple</span></div>');
+    h+='<div style="height:6px"></div><div class="es18-rowh">'+xvLogo(ctx.firstTeamObj,ctx.firstTeam||'',20)+'Mon équipe</div><div class="es18-mx">'
+      +'<div class="b'+(ourOk?'':' off')+'"'+(ourOk?' onclick="es18Gen(false,false)"':'')+'>📋 Par joueur<small>'+(ourOk?np+' feuille'+(np>1?'s':''):'—')+'</small></div>'
+      +'<div class="b p'+(ourOk?'':' off')+'"'+(ourOk?' onclick="es18Gen(true,false)"':'')+'>🏀 Collectif<small>'+(ourOk?'1 feuille':'—')+'</small></div></div>';
+    if(ctx.advShow){
+      var nc=ctx.advTeams.length;
+      h+='<div class="es18-rowh red">'+xvLogo(ctx.advTeams[0],ctx.advTeams[0]?ctx.advTeams[0].name:'',20)+'Équipe'+(nc>1?'s':'')+' adverse'+(nc>1?'s':'')+'</div><div class="es18-mx">'
+        +'<div class="b r'+(advPl?'':' off')+'"'+(advPl?' onclick="es18Gen(false,true)"':'')+'>📋 Par joueur<small>'+(advPl?na+' feuille'+(na>1?'s':''):'—')+'</small></div>'
+        +'<div class="b r p'+(advAny?'':' off')+'"'+(advAny?' onclick="es18Gen(true,true)"':'')+'>🏀 Collectif<small>'+(advAny?nc+' feuille'+(nc>1?'s':''):'—')+'</small></div></div>';
+    }
+    if(!nm)h+='<div class="es18-hintb">Sélectionne au moins un match</div>';
+    else if(!np)h+='<div class="es18-hintb">Sélectionne au moins un joueur de ton équipe</div>';
+  }
+  return h+'</div>';
+}
+
+renderExportStatsPage=function(){
+  if(!ES18.init){ES18.init=true;if(!_esState.matchIds.length)_esState.qts=['1','2','3','4'];}
+  ES18.pc={};
+  var ms=es18Sorted(),shot=_esState.type==='shotchart';
+  if(_esState.type!=='individual'&&!shot)_esState.type='individual';
+  var tf=(_esTeamFilter||[]);
+  var h='<div class="es18-head"><div><h1>Export statistiques PDF</h1><div class="es18-sub">Génère des feuilles de stats style FIBA directement sur ton ordinateur.</div></div><span class="es18-sp"></span><div class="es18-seg"><span class="'+(shot?'':'on')+'" onclick="es18Tab(\'individual\')">📊 Stats individuelles</span><span class="'+(shot?'on':'')+'" onclick="es18Tab(\'shotchart\')">🏀 Graphiques de tir</span></div></div>';
+  /* Matchs */
+  var tl='';
+  if(DB.teams&&DB.teams.length>1){
+    var shown=tf.length?DB.teams.filter(function(t){return tf.indexOf(t.id)>=0;}):DB.teams.filter(function(t){return (DB.matches||[]).some(function(m){return m.teamId===t.id;});});
+    tl='<span class="es18-dd" data-xvdd="es18" onclick="es18Teams(this)">Équipes <span class="es18-lgs">'+shown.slice(0,3).map(function(t){return xvLogo(t,t.name,18);}).join('')+'</span> ▾</span>';
+  }
+  h+='<div class="es18-card" style="padding:14px 20px 12px"><div class="es18-ct" style="margin-bottom:12px"><span class="es18-n">1</span><b>Matchs</b>'+tl+'<span class="es18-lk mut" style="cursor:default">'+_esState.matchIds.length+' sur '+ms.length+'</span><span class="es18-sp"></span><span class="es18-lk" onclick="es18MatchAll(\'video\')">Seulement avec vidéo</span><span class="es18-lk" onclick="es18MatchAll(\'all\')">Tout</span><span class="es18-lk mut" onclick="es18MatchAll(\'none\')">Aucun</span></div>'
+    +(ms.length?'<div class="es18-strip" id="es18Strip" onscroll="ES18.sl=this.scrollLeft">'+ms.map(es18MatchCard).join('')+'</div>':'<div style="padding:14px;text-align:center;color:var(--txt3);font-size:13px">Aucun match'+(tf.length?' pour les équipes sélectionnées':'')+'.</div>')+'</div>';
+  /* Contexte panneau */
+  var oursAll=[],advAll=[],advTeams=[],advColl=false,firstTeam=null;
+  _esState.matchIds.forEach(function(mid){var m=gM(mid);if(!m)return;var p=es18Parts(m);if(!firstTeam&&p.team)firstTeam=p.team;
+    p.ours.forEach(function(x){if(oursAll.indexOf(x.id)<0)oursAll.push(x.id);});p.adv.forEach(function(x){if(advAll.indexOf(x.id)<0)advAll.push(x.id);});
+    if(p.opp){if(advTeams.indexOf(p.opp)<0&&(p.adv.length||(DB.pStats&&DB.pStats[mid+'_collectifAdv'])))advTeams.push(p.opp);if(DB.pStats&&DB.pStats[mid+'_collectifAdv'])advColl=true;}});
+  var ctx={ourSel:_esState.playerIds.filter(function(id){return oursAll.indexOf(id)>=0;}).length,advSel:_esState.playerIds.filter(function(id){return advAll.indexOf(id)>=0;}).length,
+    firstTeam:firstTeam?firstTeam.name:'',firstTeamObj:firstTeam,advTeams:advTeams,advShow:advTeams.length>0,advColl:advColl||advAll.length>0};
+  h+='<div class="es18-cols">'+es18Players()+es18Panel(ctx)+'</div>';
+  setTimeout(es18Post,0);
+  return h;
+};
+function es18Post(){
+  var s=document.getElementById('es18Strip');if(s)s.scrollLeft=ES18.sl||0;
+  var nms=document.querySelectorAll('.es18-nm');
+  for(var i=0;i<nms.length;i++){var b=nms[i].querySelector('b');if(!b)continue;var sz=24;b.style.fontSize=sz+'px';
+    while(b.scrollWidth>nms[i].clientWidth+1&&sz>12){sz--;b.style.fontSize=sz+'px';}}
+}
 
 /*XV_END*/
 </script>
