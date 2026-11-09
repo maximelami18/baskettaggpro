@@ -460,7 +460,7 @@ document.addEventListener('DOMContentLoaded', function(){
 var _SB_URL="https://umuvirwbtpflizxupwbr.supabase.co";
 // Version de ce fichier — à incrémenter à chaque déploiement, en cohérence avec la valeur
 // mise à jour dans la table Supabase `app_version` (voir _checkAppVersion ci-dessous).
-var APP_VERSION = "2026-11-09-412";
+var APP_VERSION = "2026-11-09-413";
 var _SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtdXZpcndidHBmbGl6eHVwd2JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3MTI1MDEsImV4cCI6MjA5MDI4ODUwMX0.fFQaF-zP9dzcWITJDf6GBmvu0pdcuvlaUz0A0qW0kfo";
 var _LICENCE_KEY='btp_licence';
 var _MACHINE_KEY='btp_machine';
@@ -38586,6 +38586,7 @@ var ES18={sl:0,pc:{},init:false};
 .es18-pv{border-radius:14px;overflow:hidden;border:1px solid #3c3934;background:#1a1815;margin-top:10px}
 .es18-pv svg{width:100%;height:120px;display:block}
 .es18-pvc{display:flex;gap:14px;font-size:11.5px;color:#a89880;margin-top:8px;align-items:center}
+.es18-hl{width:58%}.es18-hb{height:9px;border-radius:5px;background:linear-gradient(90deg,hsl(0,68%,80%),hsl(25,68%,80%),hsl(50,68%,80%),hsl(85,68%,80%),hsl(120,68%,80%));border:1px solid #3c3934}.es18-hn{display:flex;justify-content:space-between;margin-top:4px;font-size:10.5px}
 .es18-pvc i{display:inline-block;width:11px;height:11px;border-radius:50%;vertical-align:-1px;margin-right:5px}
 .es18-heatbar{height:8px;width:90px;border-radius:6px;background:linear-gradient(90deg,#2a2723,#7a3b22,#e0643c,#ffd36a)}
 .es18-rowh{display:flex;align-items:center;gap:8px;margin:10px 0 6px;font-size:12.5px;font-weight:800;color:var(--txt)}
@@ -38605,7 +38606,7 @@ var ES18={sl:0,pc:{},init:false};
 function es18Sorted(){
   var f=_esTeamFilter||[];
   var ms=(DB.matches||[]).filter(function(m){return f.length===0||f.indexOf(m.teamId)>=0||f.indexOf(m.oppTeamId)>=0;});
-  return ms.map(function(m,i){return{m:m,i:i};}).sort(function(a,b){var da=String(a.m.date||''),db=String(b.m.date||'');return da<db?-1:da>db?1:a.i-b.i;}).map(function(x){return x.m;});
+  return ms.map(function(m,i){return{m:m,i:i};}).sort(function(a,b){var da=String(a.m.date||''),db=String(b.m.date||'');return da<db?1:da>db?-1:b.i-a.i;}).map(function(x){return x.m;});
 }
 function es18Parts(m){
   var ours=[],adv=[],t=gT(m.teamId),ot=m.oppTeamId?gT(m.oppTeamId):null;
@@ -38712,9 +38713,18 @@ function es18MatchCard(m){
   var ot=per[6]?'+ 2 PROLONG.':per[5]?'+ PROLONG.':'';
   return'<div class="es18-mc'+(on?' on':'')+'" onclick="es18Match('+m.id+')" title="'+xe(A.n+' – '+B.n)+'"><div class="h"><span>'+(dp[2]||'')+' '+xvShortMonth(dp[1])+(m.round!==''&&m.round!=null?' · J'+xe(m.round):'')+' · '+(home?'Dom.':'Ext.')+(ot?'<span class="es18-ot">'+ot+'</span>':'')+'</span><span class="r">'+(vid?'<span class="es18-vb" title="Vidéo disponible">🎬</span>':'')+'<span class="es18-ck'+(on?' on':'')+'">'+(on?'✓':'')+'</span></span></div><div class="b">'+xvLogo(A.t,A.n,48)+pill+xvLogo(B.t,B.n,48)+'</div></div>';
 }
+var ES18_HM=null;
+function es18HeatSvg(){
+  if(ES18_HM)return ES18_HM;
+  var sh=_shotZoneShapes(),W={paintL:[2,10],paintR:[14,24],cor3L:[0,4],cor3R:[0,3],midL:[0,2],midR:[0,2],midC:[0,1],atb3L:[2,6],atb3R:[0,2],atb3C:[3,6]},shots=[];
+  Object.keys(W).forEach(function(k){var c=_szCentroid(sh[k]);for(var i=0;i<W[k][1];i++)shots.push({x:c[0],y:c[1],made:i<W[k][0]});});
+  ES18_HM='<svg viewBox="0 0 1500 640" preserveAspectRatio="xMidYMin slice" style="height:152px" xmlns="http://www.w3.org/2000/svg">'+_scZoneChartSVGMarkup(shots)+'</svg>';
+  return ES18_HM;
+}
 function es18Court(heat,id){
+  if(heat)return es18HeatSvg();
   var body;
-  if(heat){
+  if(false){
     var b=[[158,36,34,.55],[158,30,20,.7],[112,62,24,.35],[204,60,24,.38],[76,36,20,.28],[240,36,20,.25],[158,100,30,.2],[140,84,16,.3]].map(function(a){return'<circle cx="'+a[0]+'" cy="'+a[1]+'" r="'+a[2]+'" fill="rgba(235,100,50,'+a[3]+')"/>';}).join('');
     body='<defs><filter id="es18bl'+id+'"><feGaussianBlur stdDeviation="8"/></filter></defs><g filter="url(#es18bl'+id+')">'+b+'</g>';
   }else{
@@ -38724,7 +38734,7 @@ function es18Court(heat,id){
 }
 function es18Paper(teamName){
   var g=function(c){return'<div class="gr '+(c||'')+'">'+'<span></span>'.repeat(7)+'</div>';};
-  return'<div class="es18-sheetp"><span class="cap">Aperçu de la feuille</span><div class="es18-paper"><div class="pt"><i></i><b>'+xe((teamName||'ÉQUIPE').toUpperCase())+' · STATS</b><span>FIBA</span></div>'+g('h')+g()+g()+g()+g()+g()+g('t')+'<div style="height:9px;border-radius:3px;background:#2a2620;width:40%;margin-top:8px"></div></div></div>';
+  return'<div class="es18-sheetp"><span class="cap">Aperçu de la feuille</span><div class="es18-paper"><div class="pt"><i></i><b>'+xe((teamName||'ÉQUIPE').toUpperCase())+' · STATS</b></div>'+g('h')+g()+g()+g()+g()+g()+g('t')+'<div style="height:9px;border-radius:3px;background:#2a2620;width:40%;margin-top:8px"></div></div></div>';
 }
 function es18Players(){
   var sel=_esState.matchIds.map(gM).filter(Boolean).sort(function(a,b){return String(a.date||'')<String(b.date||'')?-1:1;});
@@ -38773,13 +38783,13 @@ function es18Panel(ctx){
     var tn=ctx.firstTeam;
     h+='<div class="es18-lb">Options</div><div class="es18-opt" onclick="es18Hs()"><span class="es18-sw'+(on?' on':'')+'"></span><div><b>🕵️ Stats cachées sous le tableau</b><small>'+(hsN?hsN+' saisie'+(hsN>1?'s':'')+' sur '+(nm>1?'ces matchs':'ce match'):'aucune saisie sur '+(nm>1?'ces matchs':'ce match'))+'</small></div></div>'
       +es18Paper(tn)
-      +'<button class="es18-cta'+(can?'':' off')+'"'+(can?' onclick="generateStatsPDF()"':'')+'>📋 Générer le PDF</button><div class="es18-hintb">'+(!nm?'Sélectionne au moins un match':!_esState.playerIds.length?'Sélectionne au moins un joueur':'Feuille style FIBA · générée sur ton ordinateur')+'</div>';
+      +'<button class="es18-cta'+(can?'':' off')+'"'+(can?' onclick="generateStatsPDF()"':'')+'>📋 Générer le PDF</button><div class="es18-hintb">'+(!nm?'Sélectionne au moins un match':!_esState.playerIds.length?'Sélectionne au moins un joueur':'Feuille générée sur ton ordinateur')+'</div>';
   }else{
     var heat=!!_esState._heatMap;
     var ourOk=nm>0&&np>0,advPl=na>0,advAny=ctx.advColl;
     h+='<div class="es18-lb">Rendu des tirs</div><div class="es18-seg sm"><span class="'+(heat?'':'on')+'" onclick="es18Heat(false)">◉ Positions exactes</span><span class="'+(heat?'on':'')+'" onclick="es18Heat(true)">🔥 Heat map</span></div>'
       +'<div class="es18-pv">'+es18Court(heat,'p')+'</div>'
-      +(heat?'<div class="es18-pvc"><span>Moins</span><div class="es18-heatbar"></div><span>Plus de tirs</span><span style="margin-left:auto">Exemple</span></div>':'<div class="es18-pvc"><span><i style="background:#3dc97a"></i>Réussi</span><span><b style="color:#e05252;margin-right:5px">✕</b>Manqué</span><span style="margin-left:auto">Exemple</span></div>');
+      +(heat?'<div class="es18-pvc"><div class="es18-hl"><div class="es18-hb"></div><div class="es18-hn"><span>0 %</span><span>50 %</span><span>100 %</span></div></div><span style="margin-left:auto">Exemple</span></div>':'<div class="es18-pvc"><span><i style="background:#3dc97a"></i>Réussi</span><span><b style="color:#e05252;margin-right:5px">✕</b>Manqué</span><span style="margin-left:auto">Exemple</span></div>');
     h+='<div style="height:6px"></div><div class="es18-rowh">'+xvLogo(ctx.firstTeamObj,ctx.firstTeam||'',20)+'Mon équipe</div><div class="es18-mx">'
       +'<div class="b'+(ourOk?'':' off')+'"'+(ourOk?' onclick="es18Gen(false,false)"':'')+'>📋 Par joueur<small>'+(ourOk?np+' feuille'+(np>1?'s':''):'—')+'</small></div>'
       +'<div class="b p'+(ourOk?'':' off')+'"'+(ourOk?' onclick="es18Gen(true,false)"':'')+'>🏀 Collectif<small>'+(ourOk?'1 feuille':'—')+'</small></div></div>';
