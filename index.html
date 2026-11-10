@@ -460,7 +460,7 @@ document.addEventListener('DOMContentLoaded', function(){
 var _SB_URL="https://umuvirwbtpflizxupwbr.supabase.co";
 // Version de ce fichier — à incrémenter à chaque déploiement, en cohérence avec la valeur
 // mise à jour dans la table Supabase `app_version` (voir _checkAppVersion ci-dessous).
-var APP_VERSION = "2026-11-10-438";
+var APP_VERSION = "2026-11-10-441";
 var _SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtdXZpcndidHBmbGl6eHVwd2JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3MTI1MDEsImV4cCI6MjA5MDI4ODUwMX0.fFQaF-zP9dzcWITJDf6GBmvu0pdcuvlaUz0A0qW0kfo";
 var _LICENCE_KEY='btp_licence';
 var _MACHINE_KEY='btp_machine';
@@ -39342,7 +39342,10 @@ function advTapCard(key,fn,arg,label){
   var sel=ST.tapSel===key;
   return '<div class="ps2pc" onclick="'+tp(key,fn,arg)+'" style="cursor:pointer;align-items:center;justify-content:center;gap:8px;'+(sel?'border-color:#D4AA6A;background:#3a2a24;box-shadow:0 0 0 2px rgba(212,170,106,.4);':'border-color:#c94a4a;background:#2e1f20;')+'">'+advHead()+(label||sel?'<div style="font-size:16px;color:'+(sel?'#E8C88A':'#f6a0a0')+'">'+(sel?advAct(fn):label)+'</div>':'')+'</div>';
 }
-function advAct(fn){var m={ps2Reb:'a pris le rebond',ps2Who:{bp:'a perdu la balle',inter:'a intercepté',contre:'a contré',fc:'a commis la faute',fp:'a provoqué la faute'}[ST.step],ps2LfWho:'tire les lancers francs',ps2AdvShot:'a tiré'};return advName()+' '+(m[fn]||'');}
+function advAct(fn){var m={ps2Reb:'a pris le rebond',ps2Who:{bp:'a perdu la balle',inter:'a intercepté',contre:'a contré',fc:'a commis la faute',fp:'a provoqué la faute'}[ST.step],ps2LfWho:'tire les lancers francs',ps2AdvShot:ST.shotMade?'a marqué':'a loupé son tir',ps2AdvWho:ST.advMade?'a marqué':'a loupé son tir'};return advName()+' '+(m[fn]||'');}
+function advWhoPh(p){var u=advName()+(p?' ('+advNum(p)+')':'');return u+' '+(ST.advMade?'a marqué':'a loupé son tir');}
+function advLine(t){return '<div style="width:100%;text-align:center;color:#E8C88A;font-size:15px;height:20px;line-height:20px">'+t+'</div>';}
+function selRoster(){var k=ST.tapSel;if(!k||k[0]!=='c')return null;var id=k.slice(1);return advRoster().filter(function(p){return String(p.id)===id;})[0]||null;}
 function advInert(){return '<div class="ps2pc" style="align-items:center;justify-content:center;border-color:rgba(201,74,74,.45);background:#2a1f20">'+advHead()+'</div>';}
 function neutralTap(key,fn,arg,label){var sel=ST.tapSel===key;return '<div class="ps2pc" onclick="'+tp(key,fn,arg)+'" style="cursor:pointer;align-items:center;justify-content:center;'+(sel?'border-color:#D4AA6A;'+SELXS:'')+'"><div style="font-size:19px;font-weight:500;color:#F0E8D8">'+label+'</div></div>';}
 function chipTap(key,fn,arg,txt,red){var sel=ST.tapSel===key;return '<div onclick="'+tp(key,fn,arg)+'" style="cursor:pointer;text-align:center;width:92px"><div style="width:70px;height:70px;margin:0 auto;border-radius:50%;border:3px solid '+(sel?'#D4AA6A':'#c94a4a')+';background:'+(sel?'#3a3122':'#3a2a2b')+';color:#F0E8D8;font-size:26px;font-weight:500;display:flex;align-items:center;justify-content:center">'+E(txt[0])+'</div><div style="font-size:12px;color:#a89c88;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+E(txt[1]||'')+'</div></div>';}
@@ -39425,7 +39428,7 @@ function stripHtml(){
   if(step==='rebound'){
     var byTeam=(window._lastShotTarget==='player'||window._lastShotTarget==='collectif'||window._lastShotTarget==null);
     h=stripHead('Rebond — qui le prend ?','<span style="font-size:13px;color:#8a7e6c">Dès que le rebond est validé, le chrono repart</span>'+'<button class="ps2h" style="height:34px" onclick="ps2Reb(\'skip\')">Passer</button>','#f08585');
-    return h+'<div style="'+cols+'">'+oc.map(function(p){return cardTap(p,'ps2Reb',p.id);}).join('')+advTapCard('adv','ps2Reb','adv',byTeam?'Rebond défensif':'Rebond')+'</div>';
+    return h+'<div style="'+cols+'">'+oc.map(function(p){return cardTap(p,'ps2Reb',p.id);}).join('')+advTapCard('adv','ps2Reb','adv',ST.lastAdvMiss?advName()+' a loupé son tir':(byTeam?'Rebond défensif':'Rebond'))+'</div>';
   }
   var simple={bp:['Qui a perdu la balle ?','Balle perdue','pl'],inter:['Qui a intercepté ?','Interception','pl'],contre:['Qui a contré ?','Contre','pl'],fc:['Qui a fait la faute ?','Faute commise','pl'],fp:['Qui a provoqué la faute ?','Faute provoquée','pl']};
   if(simple[step]){
@@ -39441,14 +39444,14 @@ function stripHtml(){
   if(step==='advWho'){
     h=stripHead((ST.advMade?'Marqué':'Raté')+' · qui a tiré ?','<button class="ps2h" style="height:34px;color:#f08585" onclick="ps2Cancel()">✕ Annuler</button>','#f08585');
     var ros=advRoster();
-    return h+'<div style="'+cols+'"><div style="grid-column:1/'+(oc.length+1)+';display:flex;flex-wrap:wrap;align-content:center;justify-content:center;gap:14px;border-radius:18px;border:2px solid rgba(201,74,74,.5);background:#2a1f20;padding:12px">'+ros.map(function(p){return chipTap('c'+p.id,'ps2AdvWho',p.id,[advNum(p),p.last||p.first||'']);}).join('')+'</div>'+advTapCard('n','ps2AdvWho',null,'Équipe / inconnue')+'</div>';
+    return h+'<div style="'+cols+'"><div style="grid-column:1/'+(oc.length+1)+';display:flex;flex-wrap:wrap;align-content:center;justify-content:center;gap:14px;border-radius:18px;border:2px solid rgba(201,74,74,.5);background:#2a1f20;padding:12px">'+advLine(ST.tapSel==='n'?advWhoPh(null):(selRoster()?advWhoPh(selRoster()):''))+ros.map(function(p){return chipTap('c'+p.id,'ps2AdvWho',p.id,[advNum(p),p.last||p.first||'']);}).join('')+'</div>'+advTapCard('n','ps2AdvWho',null,'Équipe / inconnue')+'</div>';
   }
   if(step==='advAssist'){
     h=stripHead('Passe décisive ?','<button class="ps2h" style="height:34px;color:#f08585" onclick="ps2Cancel()">✕ Annuler</button>','#f08585');
     var shn=ST.advShooter,rs=shn!=null?advRoster().filter(function(p){return p.id!==shn;}):[];
     var chipsA=rs.map(function(p){return chipTap('c'+p.id,'ps2AdvAssist',p.id,[advNum(p),p.last||p.first||'']);}).join('');
     var gen=!rs.length;
-    var leftA=gen?'<div style="color:#8a7e6c;font-size:15px">Contexte du tir et passe décisive : à droite, sous le terrain</div>':chipsA;
+    var shp=shn!=null?advRoster().filter(function(p){return p.id===shn;})[0]:null;var al=ST.tapSel==='none'?advName()+' : sans passe décisive':(selRoster()?advName()+' ('+advNum(selRoster())+') a fait la passe décisive':advName()+(shp?' ('+advNum(shp)+')':'')+' a marqué');var leftA=gen?advLine(advName()+' a marqué')+'<div style="color:#8a7e6c;font-size:15px">Contexte du tir et passe décisive : à droite, sous le terrain</div>':advLine(al)+chipsA;
     return h+'<div style="'+cols+'"><div style="grid-column:1/'+(oc.length+1)+';display:flex;flex-wrap:wrap;align-content:center;justify-content:center;gap:14px;border-radius:18px;border:2px solid rgba(201,74,74,.5);background:#2a1f20;padding:12px">'+leftA+'</div>'+(gen?advInert():advTapCard('none','ps2AdvAssist',null,'Sans passe'))+'</div>';
   }
   if(step==='advBpq'||step==='advInter'){
@@ -39731,7 +39734,7 @@ window.ps2AdvWho=function(pid){
   doAdvShot(pid,false,null);
 };
 window.ps2AdvAssist=function(a){doAdvShot(ST.advShooter,true,a);};
-function doAdvShot(advPid,made,assist){
+function doAdvShot(advPid,made,assist){ST.lastShooter=null;ST.lastAdvMiss=!made;
   var sv=S('shotSvg');sv._px=ST.pos.x;sv._py=ST.pos.y;
   CS.statsTarget=advPid!=null?advPid:advTg();CS.statPlayer=null;
   window._assistPid=null;window._assistAdv=assist==null?null:assist;
@@ -39770,7 +39773,7 @@ window.ps2Shot=function(pid,made){
 window.ps2Flag=function(k){ST.flags[k]=!ST.flags[k];P.render();};
 window.ps2Assist=function(pid){doShot(ST.shooter,true,pid);};
 function doShot(pid,made,assist){
-  ST.lastShooter=pid;
+  ST.lastShooter=pid;ST.lastAdvMiss=false;
   var sv=S('shotSvg');sv._px=ST.pos.x;sv._py=ST.pos.y;
   CS.statsTarget='player';CS.statPlayer=pid;
   window._assistPid=assist||null;window._assistAdv=null;
@@ -39814,7 +39817,7 @@ function lfFinalize(L){
   // tous les lancers sont renseignés : on enregistre
   var adv=L.who==='adv',m=curMatch();
   var tg=adv?(m&&m.oppTeamId?'collectifAdv':'adverse'):'player';
-  var k;
+  var k;ST.lastShooter=adv?null:L.who;ST.lastAdvMiss=!!adv;
   for(k=0;k<L.n;k++){
     var ok=L.res[k],last=(k===L.n-1);
     ST.noReb=!(last&&!ok);
