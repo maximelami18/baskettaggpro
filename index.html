@@ -460,7 +460,7 @@ document.addEventListener('DOMContentLoaded', function(){
 var _SB_URL="https://umuvirwbtpflizxupwbr.supabase.co";
 // Version de ce fichier — à incrémenter à chaque déploiement, en cohérence avec la valeur
 // mise à jour dans la table Supabase `app_version` (voir _checkAppVersion ci-dessous).
-var APP_VERSION = "2026-11-10-443";
+var APP_VERSION = "2026-11-10-444";
 var _SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtdXZpcndidHBmbGl6eHVwd2JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3MTI1MDEsImV4cCI6MjA5MDI4ODUwMX0.fFQaF-zP9dzcWITJDf6GBmvu0pdcuvlaUz0A0qW0kfo";
 var _LICENCE_KEY='btp_licence';
 var _MACHINE_KEY='btp_machine';
@@ -4824,7 +4824,7 @@ function _mxRow(m,cnt){
   return '<div class="mxRow"><div class="bar" style="background:'+col+'"></div>'
    +'<div class="mxC1"><b>'+dd+'</b><i>'+mm+'</i></div>'
    +'<div class="mxC2"><div class="mxTm">'+L.join('')+'<span class="vs">vs</span>'+R.join('')+'</div></div>'
-   +'<div class="mxC2b"><div class="mxSub">'+sub.join('')+'</div></div><div class="mxC3">'+sc+'<span class="mxVid" title="Vidéo disponible sur cet appareil"'+(window._vidHere&&_vidHere(m)?'':' style="visibility:hidden"')+'>🎬</span>'+'</div>'
+   +'<div class="mxC2b"><div class="mxSub">'+sub.join('')+'</div></div><div class="mxC3">'+sc+(((m.videos&&m.videos.length)||m.videoURL||m.videoFile)?'<span class="mxVid" title="Vidéo chargée">🎬</span>':'')+'</div>'
    +'<div class="mxB">'
    +'<div class="mxBt g mxK4 k1"><button onclick="openCoding(\'codage\','+m.id+')">Codage</button></div>'
    +'<div class="mxBt g mxK5 k2"><button onclick="openCoding(\'instats\','+m.id+')">InStats</button></div>'
@@ -35715,7 +35715,7 @@ window.xvToggleMatch=function(id){
 window.xvMatchesAll=function(k){var list=xvMatchesList();
   if(k==='all')_expState.matchIds=[];
   else if(k==='none')_expState.matchIds=[0];
-  else{var ids=list.filter(function(x){return xvMatchHasVideo(x.m);}).map(function(x){return x.m.id;});_expState.matchIds=ids.length?ids:[0];}
+  else{var ids=list.filter(function(x){var m=x.m;return(m.videos&&m.videos.length)||m.videoFile||m.videoURL;}).map(function(x){return x.m.id;});_expState.matchIds=ids.length?ids:[0];}
   _expSelectedIds=null;renderPage();};
 function xvMatchCard(m,n,on){
   var t=gT(m.teamId),o=m.oppTeamId?gT(m.oppTeamId):null,home=m.home!==false;
@@ -36012,7 +36012,7 @@ function xvListHtml(){
 }
 
 /* ── matchs : TOUS les matchs de l'équipe choisie, 🎬 si une vidéo existe ── */
-function xvMatchHasVideo(m){return window._vidHere?_vidHere(m):!!((m.videos&&m.videos.length)||m.videoURL||m.videoFile);}
+function xvMatchHasVideo(m){return !!((m.videos&&m.videos.length)||m.videoURL||m.videoFile);}
 function xvMatchesList(){
   var tf=xvTeamFilter(),cnt={};
   (DB.sequences||[]).forEach(function(s){if(s.mode!=='instats')cnt[s.matchId]=(cnt[s.matchId]||0)+1;});
@@ -38944,11 +38944,10 @@ function avatar(p,sz,ringW){
   return '<div style="width:'+sz+'px;height:'+sz+'px;border-radius:50%;flex-shrink:0;'+ph+'border:'+(ringW||3)+'px solid '+c+';display:flex;align-items:center;justify-content:center;">'+ini+'</div>';
 }
 P.avatar=avatar;
-function hereVid(){var m=curMatch();try{if(isLiveMatch())return true;}catch(e){}return !!(m&&(window._vidHere?window._vidHere(m):((m.videos&&m.videos.length)||m.videoURL||m.videoFile||m.liveUrl)));}
 function hasVideo(){
   var m=curMatch();
   try{if(isLiveMatch())return true;}catch(e){}
-  if(m&&(window._vidHere?window._vidHere(m):((m.videos&&m.videos.length)||m.videoURL||m.videoFile||m.liveUrl)))return true;
+  if(m&&((m.videos&&m.videos.length)||m.videoURL||m.videoFile||m.liveUrl))return true;
   try{var v=document.getElementById('mainVideo');if(v&&(v.getAttribute('src')||v.currentSrc))return true;}catch(e){}
   return false;
 }
@@ -39062,7 +39061,7 @@ function ensureDom(){
     var back=hd.querySelector('button[onclick*="exitCoding"]');if(back)back.classList.add('ps2k');
     var t1=S('codingTitle');if(t1)t1.classList.add('ps2k');
     var t2=S('codingMatchLabel');if(t2)t2.classList.add('ps2k');
-    var d=document.createElement('div');d.id='ps2Hdr';d.className='ps2k';d.style.cssText='margin-left:auto;align-items:center;gap:9px;flex-wrap:nowrap;min-width:0';
+    var d=document.createElement('div');d.id='ps2Hdr';d.className='ps2k';d.style.cssText='margin-left:auto;align-items:center;gap:9px';
     hd.appendChild(d);
   }
   return r;
@@ -39076,11 +39075,10 @@ function renderHdr(){
     +'<button class="ps2h" onclick="ps2Open(\'stats\')">📋 Stats</button>'
     +'<button class="ps2h" onclick="ps2Open(\'shot\')">🏀 Shot chart</button>'
     +'<button class="ps2h" onclick="ps2Open(\'edit\')">✎ Modifier</button>'
-    +(hereVid()?'<button class="ps2h gold" onclick="ps2ToggleVideo()">🎥 '+(vo?'Masquer la vidéo':'Afficher la vidéo')+'</button>':'')
+    +'<button class="ps2h gold" onclick="ps2ToggleVideo()">🎥 '+(vo?'Masquer la vidéo':'Afficher la vidéo')+'</button>'
     +'<button class="ps2h" onclick="ps2Open(\'saisie\')">⋯ Saisie manuelle</button>'
     +'<button class="ps2h grn" onclick="ps2Close()">🏁 Clôturer</button>'
     +'<button class="ps2h gold" style="padding:0 10px" title="Masquer la barre du haut" onclick="toggleCodingHeader()">👁</button>';
-  d.innerHTML=d.innerHTML.replace(/(<button class="ps2h[^>]*>)([^\sA-Za-z0-9<>À-ÿ]+) /g,'$1<span class="ic">$2</span> ');
 }
 window.ps2Open=function(w){
   if(w==='saisie'){try{openSaisieManuelle();}catch(e){toast('Saisie manuelle indisponible','red');}return;}
@@ -39147,13 +39145,14 @@ function renderTop(force){
   w.style.cssText='position:relative;background:#0A0A0A;border-bottom:3px solid #D4AA6A;padding:10px 22px;display:flex;align-items:center;gap:14px;flex-shrink:0;min-height:100px';
   var nm=function(x){return '<div style="font-size:12px;letter-spacing:.14em;font-weight:500;color:#a89c88;text-transform:uppercase;white-space:nowrap">'+x+'</div>';};
   var sc=function(x){return '<div class="ps2sc" style="font-size:40px;font-weight:500;color:#F0E8D8;line-height:1;font-variant-numeric:tabular-nums">'+x+'</div>';};
-  var nm2=function(x,al){return '<div class="ps2tn" style="font-size:11px;letter-spacing:.1em;color:#a89c88;text-transform:uppercase;white-space:nowrap;line-height:1.2;text-align:'+al+'">'+x+'</div>';};
+  var nm2=function(x,al){return '<div style="font-size:11px;letter-spacing:.1em;color:#a89c88;text-transform:uppercase;white-space:nowrap;line-height:1.2;text-align:'+al+'">'+x+'</div>';};
   w.innerHTML='<div style="display:flex;align-items:center;gap:12px">'+circle((t.name||'?').charAt(0).toUpperCase(),t.color||'#c9363e',t.logo)+nm2(tn,'left')+'</div>'
     +scChip(ourScore(),oppScore())
     +'<div style="display:flex;align-items:center;gap:12px">'+nm2(E(m.opp||''),'right')+circle((m.opp||'?').charAt(0).toUpperCase(),'#2DBD7A',opp&&opp.logo)+'</div>'
-    +'<div class="ps2qt" style="display:flex;gap:8px;margin-left:26px">'+qb+'</div>'
+    +'<div style="display:flex;gap:8px;margin-left:26px">'+qb+'</div>'
     +'<div class="ps2ub" style="margin-left:14px;flex:1;min-width:0;display:flex;align-items:center;gap:8px;padding:4px 6px 4px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.08);background:#161513;height:50px"><span style="flex:1;min-width:0;font-size:11.5px;line-height:1.3;color:#cfc4b0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">'+(ut||'<span style="color:#6f675a">—</span>')+'</span>'+(ut?'<button onclick="ps2Undo()" title="Supprimer toute la ligne" style="flex:none;width:34px;height:34px;border-radius:9px;border:1px solid rgba(224,82,82,.4);background:#2a1c1d;color:#f08585;cursor:pointer;font-size:15px;line-height:1">🗑</button>':'')+'</div>'
-    +'<div id="ps2Chr" style="flex:none;display:flex;align-items:center;gap:10px;margin:-4px 48px -4px 26px">'+adj(-5)+adj(-3)+adj(-1)
+    +'<div style="width:572px;flex:none"></div>'
+    +'<div id="ps2Chr" style="position:absolute;right:318px;top:50%;transform:translate(50%,-50%);display:flex;align-items:center;gap:10px">'+adj(-5)+adj(-3)+adj(-1)
     +'<div id="ps2ChrMid" style="width:176px;text-align:center"><div id="qtClockLabel" style="font-size:42px;font-weight:500;color:'+(paused?'#F0A030':'#fff')+';font-family:\'JetBrains Mono\',monospace;line-height:1;letter-spacing:.02em">'+mm(sec)+'</div>'
     +'<button id="qtClockBtn" onclick="toggleQtClock()" style="margin-top:6px;height:32px;width:150px;border-radius:10px;border:1.5px solid '+(run?'#e05252':'#D4AA6A')+';background:'+(run?'#432a2e':'#3a3122')+';color:'+(run?'#f08585':'#E8C88A')+';font-size:13.5px;font-weight:500;cursor:pointer;font-family:inherit">'+(run?'❚❚ Pause':'▶ Lancer')+'</button></div>'
     +adj(1)+adj(3)+adj(5)+'</div>';
@@ -39303,19 +39302,19 @@ window.ps2DelEv=function(i){var m=CSm();if(!m)return;try{logEventDelete(m.id,i);
 // ───────── Cartes joueuses (bande du bas) ─────────
 function foulDots(pid){var f=Math.min(5,(pst(pid).fc||0)),h='',i,c=f>=5?'#e05252':f>=3?'#F0A030':'#3DC97A';for(i=0;i<5;i++)h+='<i style="width:7px;height:7px;border-radius:50%;display:inline-block;background:'+(i<f?c:'#4a463f')+'"></i>';return '<span style="display:inline-flex;gap:3px;margin-right:6px">'+h+'</span>';}
 function nameBlock(p,extra){
-  return '<div class="pcNm" style="flex:1;min-width:0;line-height:1.15"><small style="font-size:12px;letter-spacing:.1em;font-weight:500;color:#a89c88"><span style="color:#E8C88A;font-size:14px">'+E(_nh(p)||'')+'</span> · '+E((p.first||'').toUpperCase())+'</small><div class="pcLn" style="font-size:19px;font-weight:500;color:#F0E8D8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+E((p.last||p.name||p.first||'').toUpperCase())+'</div>'+(extra||'')+'</div>';
+  return '<div style="flex:1;min-width:0;line-height:1.15"><small style="font-size:12px;letter-spacing:.1em;font-weight:500;color:#a89c88"><span style="color:#E8C88A;font-size:14px">'+E(_nh(p)||'')+'</span> · '+E((p.first||'').toUpperCase())+'</small><div style="font-size:19px;font-weight:500;color:#F0E8D8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+E((p.last||p.name||p.first||'').toUpperCase())+'</div>'+(extra||'')+'</div>';
 }
-function ptsBlock(pid){return '<div class="pcPts" style="text-align:right"><div style="font-size:22px;font-weight:500;line-height:1;color:#F0E8D8">'+(pst(pid).pts||0)+'</div><div style="font-size:10px;letter-spacing:.14em;color:#6f675a;font-weight:500">PTS</div></div>';}
+function ptsBlock(pid){return '<div style="text-align:right"><div style="font-size:22px;font-weight:500;line-height:1;color:#F0E8D8">'+(pst(pid).pts||0)+'</div><div style="font-size:10px;letter-spacing:.14em;color:#6f675a;font-weight:500">PTS</div></div>';}
 function cardWrap(pid,inner,cls,border){return '<div class="ps2pc" data-pid="'+pid+'" style="'+(border?'border-color:'+border+';':'')+(cls||'')+'">'+inner+'</div>';}
 function stintBlock(p,sv){
   var sec=P.stintOf(p.id),lvl=P.levelColor(sv.on,sec/60);
   var col=lvl||'#D4AA6A',maxm=(sv.on[2].min||sv.on[1].min||10)*1.3;
   var pct=Math.min(100,Math.round(sec/60/maxm*100));
-  return '<div><div style="display:flex;align-items:baseline;gap:6px"><span class="pcSt" style="font-size:11px;letter-spacing:.1em;font-weight:500;white-space:nowrap;color:'+(lvl||'#a89c88')+'">⏱ SUR LE TERRAIN</span><span data-stint="'+p.id+'" style="margin-left:auto;font-family:\'JetBrains Mono\',monospace;font-weight:500;font-size:21px;color:'+(lvl||'#F0E8D8')+'">'+mm(sec)+'</span></div><div style="height:6px;border-radius:3px;background:#3a3732;margin-top:5px;overflow:hidden"><div data-bar="'+p.id+'" style="width:'+pct+'%;height:100%;background:'+col+'"></div></div></div>';
+  return '<div><div style="display:flex;align-items:baseline;gap:6px"><span style="font-size:11px;letter-spacing:.1em;font-weight:500;color:'+(lvl||'#a89c88')+'">⏱ SUR LE TERRAIN</span><span data-stint="'+p.id+'" style="margin-left:auto;font-family:\'JetBrains Mono\',monospace;font-weight:500;font-size:21px;color:'+(lvl||'#F0E8D8')+'">'+mm(sec)+'</span></div><div style="height:6px;border-radius:3px;background:#3a3732;margin-top:5px;overflow:hidden"><div data-bar="'+p.id+'" style="width:'+pct+'%;height:100%;background:'+col+'"></div></div></div>';
 }
 function cardBase(p,sv,bottom,border,dim,xs){
   var sec=pst(p.id).secPlayed||0;
-  var top='<div class="pcTop" style="display:flex;align-items:center;gap:12px"><span class="pcAv" style="display:flex;flex:none">'+P.avatar(p,58)+'</span>'+nameBlock(p,'<div class="pcMn" style="margin-top:3px;font-size:12px;color:#8a7e6c;display:flex;align-items:center;white-space:nowrap;min-width:0">'+foulDots(p.id)+'<span data-pmin="'+p.id+'">'+mm(sec)+'</span>&nbsp;jouées</div>')+ptsBlock(p.id)+'</div>';
+  var top='<div style="display:flex;align-items:center;gap:12px">'+P.avatar(p,58)+nameBlock(p,'<div style="margin-top:3px;font-size:12px;color:#8a7e6c;display:flex;align-items:center">'+foulDots(p.id)+'<span data-pmin="'+p.id+'">'+mm(sec)+'</span>&nbsp;jouées</div>')+ptsBlock(p.id)+'</div>';
   return cardWrap(p.id,top+stintBlock(p,sv)+bottom,(dim?'opacity:.6;':'')+(xs||''),border);
 }
 var EMPTYBAR='<div style="height:54px;border-radius:12px;border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.02)"></div>';
@@ -40799,88 +40798,22 @@ function mountSaisie(){
 }
 })();
 
-/* ===== xv22 : affichage adaptatif (tous appareils) + vidéo présente sur CET appareil ===== */
+/* ===== xv22 : sur tablette, on garde exactement la mise en page de l'ordinateur (largeur de référence) et tout est réduit proportionnellement ===== */
 (function(){
-  /* 1) Vidéo réellement disponible sur l'appareil (les fichiers vidéo restent dans IndexedDB de chaque appareil) */
-  var LOC={};window._vidLocal=LOC;
-  window._vidHere=function(m){
-    if(!m)return false;
-    if(m.liveMode&&m.liveUrl)return true;
-    if(m.liveUrl||m.videoURL)return true;
-    if(m.videos&&m.videos.some(function(v){return v&&v.url;}))return true;
-    return !!LOC[String(m.id)];
-  };
-  var _scanBusy=false;
-  function scan(){
-    if(_scanBusy)return;_scanBusy=true;
+  var REF=1900;
+  function apply(){
     try{
-      openVideoDB(function(db){
-        if(!db){_scanBusy=false;return;}
-        var pre=_vidStorageKey(''),n={},ch=false;
-        try{
-          var st=db.transaction('blobsV2','readonly').objectStore('blobsV2'),rq=st.getAllKeys();
-          rq.onsuccess=function(){
-            (rq.result||[]).forEach(function(k){k=String(k);if(k.indexOf(pre)===0){n[k.slice(pre.length).split('_')[0]]=true;}});
-            Object.keys(n).forEach(function(k){if(!LOC[k]){LOC[k]=true;ch=true;}});
-            Object.keys(LOC).forEach(function(k){if(!n[k]){delete LOC[k];ch=true;}});
-            _scanBusy=false;
-            if(ch){try{if(!document.querySelector('.modal-bg')&&['matches','export'].indexOf(window.currentPage)>=0&&document.getElementById('mainView').style.display!=='none')renderPage();}catch(e){}}
-          };
-          rq.onerror=function(){_scanBusy=false;};
-        }catch(e){_scanBusy=false;}
-      });
-    }catch(e){_scanBusy=false;}
+      var mv=document.querySelector('meta[name=viewport]');if(!mv)return;
+      var touch=window.matchMedia&&matchMedia('(pointer:coarse)').matches;
+      var land=(screen.width>screen.height)||(window.innerWidth>window.innerHeight);
+      var want='width=device-width,initial-scale=1.0';
+      if(touch&&land)want='width='+REF;
+      if(mv.getAttribute('content')!==want)mv.setAttribute('content',want);
+    }catch(e){}
   }
-  window._vidScan=scan;
-  [300,1500,4000].forEach(function(t){setTimeout(scan,t);});
-  window.addEventListener('focus',function(){setTimeout(scan,200);});
-  ['saveVideoBlob','deleteVideoBlob'].forEach(function(f){
-    var o=window[f];if(typeof o!=='function')return;
-    window[f]=function(){var r=o.apply(this,arguments);setTimeout(scan,1500);setTimeout(scan,5000);return r;};
-  });
-
-  /* 2) Zone de sécurité de l'iPad (heure / batterie / bandeau) : rien ne passe sous la barre du haut */
-  try{
-    var mv=document.querySelector('meta[name=viewport]');
-    if(mv&&mv.content.indexOf('viewport-fit')<0)mv.content+=',viewport-fit=cover';
-  }catch(e){}
-
-  /* 3) Règles d'affichage adaptatif */
-  var css=document.createElement('style');css.id='xv22css';
-  css.textContent=
-  ':root{--btp-top:env(safe-area-inset-top,0px);--btp-bot:env(safe-area-inset-bottom,0px)}'
-  +'@media (display-mode:standalone) and (pointer:coarse){:root{--btp-top:max(env(safe-area-inset-top,0px),44px)}}'
-  +'#mainView,#codingView{padding-top:var(--btp-top);box-sizing:border-box}'
-  +'html,body{max-width:100vw;overflow-x:hidden}'
-  +'img,video,canvas{max-width:100%}'
-  /* prise de stats : en-tête */
-  +'body.ps2on #codingHeader{gap:8px;padding:0 10px}'
-  +'body.ps2on #codingHeader button{white-space:nowrap;flex:none}'
-  +'.ps2h .ic{margin-right:-3px}#ps2Hdr{overflow-x:auto;scrollbar-width:none}#ps2Hdr::-webkit-scrollbar{display:none}'
-  +'@media (max-width:1500px){body.ps2on #codingMatchLabel{display:none!important}.ps2h .ic{margin-right:0}.ps2h{padding:0 9px;font-size:12.5px;gap:5px}#ps2Hdr{gap:6px!important}}'
-  +'@media (max-width:1200px){#ps2Hdr>span:first-child{font-size:0!important;margin-right:0!important}.ps2h .ic{display:none}body.ps2on #codingTitle{font-size:13px!important}.ps2h{height:30px;padding:0 7px;font-size:12px}}'
-  /* prise de stats : bandeau score / chrono */
-  +'#ps2Top{flex-wrap:nowrap}#ps2Top .ps2ub{min-width:120px}'
-  +'@media (max-width:1500px){#ps2Top{padding:8px 14px!important;gap:10px!important;min-height:86px!important}#ps2Chr{margin-right:8px!important;margin-left:0!important;gap:5px!important}.ps2adj{min-width:34px;height:34px;padding:0 4px;font-size:11.5px}#ps2ChrMid{width:140px!important}#qtClockLabel{font-size:36px!important}#qtClockBtn{width:130px!important}#ps2Top .ps2qt{margin-left:10px!important;gap:5px!important}#ps2Top .ps2qt .ps2cb{min-width:34px!important;height:36px!important;padding:0 6px}#ps2Top .ps2ub{margin-left:6px!important}}'
-  +'@media (max-width:1250px){#ps2Chr .ps2adj:nth-child(2),#ps2Chr .ps2adj:nth-child(6){display:none}#ps2Top .ps2sc{font-size:30px!important}#ps2Top .ps2ci{width:38px!important;height:38px!important;font-size:17px!important}#ps2Top .ps2ub{min-width:120px!important}.ps2tn{display:none!important}}'
-  +'@media (max-width:1100px){#ps2Top .ps2qt .ps2cb{min-width:30px!important;padding:0 4px}#ps2ChrMid{width:120px!important}#qtClockLabel{font-size:32px!important}#qtClockBtn{width:110px!important}}'
-  /* prise de stats : cartes joueuses */
-  +'#ps2StripCard{container:ps2s/inline-size}'
-  +'.pcNm small{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}'
-  +'.pcMn{overflow:hidden}.pcMn span{white-space:nowrap}'
-  +'@container ps2s (max-width:1450px){.pcAv>div{width:44px!important;height:44px!important}.pcLn{font-size:15.5px!important}.pcTop{gap:9px!important}.ps2pc{padding:8px 10px!important;gap:6px!important}}'
-  +'@container ps2s (max-width:1250px){.pcAv>div{width:42px!important;height:42px!important}.pcLn{font-size:16px!important}.pcMn{font-size:11px!important}.pcSt{font-size:10px!important;letter-spacing:.05em!important}[data-stint]{font-size:18px!important}}'
-  +'@container ps2s (max-width:1120px){.pcTop{flex-wrap:wrap}.pcAv>div{width:36px!important;height:36px!important;border-width:2px!important}.pcPts{order:2;margin-left:auto}.pcNm{order:3;flex:1 1 100%!important}.pcSt{font-size:0!important}.pcSt::before{content:"⏱ TERRAIN";font-size:10px;letter-spacing:.05em}[data-stint]{font-size:16px!important}}'
-  /* Scout : barre de filtres sur une seule ligne */
-  +'@media (max-width:1500px){.sc-row{flex-wrap:nowrap!important}.sc-search{flex:1 1 120px!important;min-width:90px!important;width:auto!important}.sc-row>*{flex-shrink:0}.sc-row>.sc-search{flex-shrink:1}}'
-  +'@media (max-width:1500px){.sc-h315{flex-wrap:nowrap!important;gap:10px!important;padding:14px 18px!important}.sc-h315 .sc-h1{font-size:34px!important}.sc-h315 .sc-h1:before{height:32px!important}.sc-h315 .sc-act{flex-wrap:nowrap!important;gap:6px!important;min-width:0}.sc-h315 .sc-act .sc-btn{padding:8px 10px!important;font-size:12px!important;white-space:nowrap}.sc-h315 .sc-kpis{gap:6px!important}.sc-h315 .sc-kpi{padding:6px 10px!important;gap:6px!important}.sc-h315 .sc-kpi .ic{display:none!important}.sc-h315 .sc-kpi b{font-size:20px!important}.sc-h315 .sc-kpi span{font-size:9px!important;letter-spacing:.08em!important}.sc-h315 .sc-kick{font-size:9px!important;letter-spacing:.2em!important}}'
-  /* Export vidéo : barre de montage qui passe à la ligne au lieu d'être coupée */
-  +'@media (max-width:1500px){.xvmh{flex-wrap:wrap!important;row-gap:6px}.xv-sticky .xvid{width:150px!important;height:84px!important}}'
-  /* Mes matchs : icône vidéo dans le flux */
-  +'@container (max-width:1500px){.mxC3{align-items:center;gap:12px}.mxVid{position:static!important;transform:none!important;flex:none;margin:0!important}}'
-  ;
-  document.head.appendChild(css);
-  var _rs;window.addEventListener('resize',function(){clearTimeout(_rs);_rs=setTimeout(function(){try{if(window.__ps2&&__ps2.active&&__ps2.active()){__ps2.render();}}catch(e){}},150);});
+  apply();
+  window.addEventListener('orientationchange',function(){setTimeout(apply,200);});
+  window.addEventListener('resize',function(){setTimeout(apply,200);});
 })();
 
 /*XV_END*/
