@@ -460,7 +460,7 @@ document.addEventListener('DOMContentLoaded', function(){
 var _SB_URL="https://umuvirwbtpflizxupwbr.supabase.co";
 // Version de ce fichier — à incrémenter à chaque déploiement, en cohérence avec la valeur
 // mise à jour dans la table Supabase `app_version` (voir _checkAppVersion ci-dessous).
-var APP_VERSION = "2026-11-11-450";
+var APP_VERSION = "2026-11-11-451";
 var _SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtdXZpcndidHBmbGl6eHVwd2JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3MTI1MDEsImV4cCI6MjA5MDI4ODUwMX0.fFQaF-zP9dzcWITJDf6GBmvu0pdcuvlaUz0A0qW0kfo";
 var _LICENCE_KEY='btp_licence';
 var _MACHINE_KEY='btp_machine';
@@ -40657,9 +40657,18 @@ PG.editHtml=function(c){
 };
 
 // ----- brouillon d'édition -----
+// tir adverse « équipe » (sans joueuse identifiée) : tir + ligne jumelle du journal + éventuelle passe + éventuel rebond
+function isAdvCol(ev){return !!ev&&ev.type==='shot'&&ev.pid==='collectifAdv'&&ev.shotIdx!=null;}
+function advDup(log,r){var e=log[r+1],ev=log[r];return (e&&e.type==='stat'&&e.target==='adverse'&&e.pid==null&&e.key===ev.key)?r+1:-1;}
+function advFollow(log,r,key){var i=(advDup(log,r)>=0?r+2:r+1);for(;i<log.length;i++){var e=log[i];if(e.type==='stat'&&FOLLOW[e.key]){if(key==='reb'?(e.key==='rebo'||e.key==='rebd'):e.key===key)return i;}else break;}return -1;}
 function findReb(log,r){for(var i=r+1;i<log.length;i++){var e=log[i];if(e.type==='stat'&&FOLLOW[e.key]){if(e.key==='rebo'||e.key==='rebd')return i;}else break;}return -1;}
 function makeDraft(c,r){
   var log=getLog(c.m.id),ev=log[r];if(!ev)return null;
+  if(isAdvCol(ev)){
+    var shA=shotObj(c,ev,r)||{},rbA=advFollow(log,r,'reb'),rebA=null;
+    if(rbA>=0){var eA=log[rbA];rebA=(eA.advTeam||eA.target==='adverse')?{k:'adv'}:{k:'p',pid:eA.pid};}
+    return{kind:'shot',adv:true,advCol:true,who:'collectifAdv',pts:(ev.key.indexOf('pts3')===0?3:2),made:!!ev.made,x:shA.x,y:shA.y,assist:advFollow(log,r,'pd')>=0?true:null,reb:rebA,rebOrig:rebA?JSON.stringify(rebA):'',ctx:{scp:!!ev.isSCP,papb:!!ev.isPAPB,fb8:!!ev.isFB8},qt:parseInt(ev.qt)||1};
+  }
   if(isFull(ev)){
     var sh=shotObj(c,ev,r)||{};
     var rb=findReb(log,r),reb=null;
@@ -40679,7 +40688,7 @@ function qtRow(d){
 window.pgDr=function(k,v){
   var d=PG.draft;if(!d)return;
   if(k==='ctx'){d.ctx[v]=!d.ctx[v];}
-  else if(k==='made'){d.made=v;if(v){d.reb=null;}else{d.assist=null;d.ctx={scp:false,papb:false,fb8:false};}}
+  else if(k==='made'){d.made=v;if(v){d.reb=null;}else{d.assist=null;}}
   else if(k==='assist'){d.assist=(d.assist===v)?null:v;}
   else if(k==='who'){d.who=v;if(d.kind==='shot'&&d.assist===v)d.assist=null;}
   else if(k==='reb'){var cur=d.reb&&JSON.stringify(d.reb)===JSON.stringify(v);d.reb=cur?null:v;}
@@ -40693,12 +40702,14 @@ function panelHtml(c){
   var head='<div class="pglab" style="margin-bottom:10px">Modifier le bloc · '+t.replace('QT','QT')+'</div>';
   if(d.kind==='shot'){
     var r=rosterOf(c,d.adv),ours=!d.adv;
-    var tire='<div class="pglab" style="margin-bottom:6px;color:#a89c88">'+(d.adv?'Tireur':'Tireuse')+'</div><div class="pgrow" style="gap:8px">'+r.map(function(p){return chipP(p,d.who===p.id,'pgDr(\'who\','+p.id+')',d.adv);}).join('')+'</div>';
+    var tire=d.advCol?'<div class="pglab" style="margin-bottom:6px;color:#a89c88">Équipe</div><div class="pgrow" style="gap:8px">'+chipT(E((c.opp&&c.opp.name)||c.m.opp||'Adversaire'),true,'void 0',true)+'</div>':'<div class="pglab" style="margin-bottom:6px;color:#a89c88">'+(d.adv?'Tireur':'Tireuse')+'</div><div class="pgrow" style="gap:8px">'+r.map(function(p){return chipP(p,d.who===p.id,'pgDr(\'who\','+p.id+')',d.adv);}).join('')+'</div>';
     var tp='<div class="pgrow" style="gap:8px;margin:12px 0 4px"><button class="pgbig'+(d.pts===3?' on':'')+'" onclick="pgDr(\'pts\',3)">3 pts</button><button class="pgbig'+(d.pts===2?' on':'')+'" onclick="pgDr(\'pts\',2)">2 pts</button><button class="pgbig ok'+(d.made?' on':'')+'" onclick="pgDr(\'made\',true)">✓ Marqué</button><button class="pgbig ko'+(!d.made?' on':'')+'" onclick="pgDr(\'made\',false)">✕ Raté</button></div>';
     var pos='<div class="pglab" style="margin:10px 0 6px;color:#a89c88">Position · touche pour déplacer le tir</div><div style="width:250px;margin:0 auto"><svg id="pgEdCourt" viewBox="0 0 1500 1400" style="display:block;width:100%;border-radius:6px;cursor:crosshair">'+BG+LN+(d.x!=null?dot(d.x,d.y,d.made,1.25):'')+'</svg></div>'
       +'<div class="pgmut" style="text-align:center;margin-top:4px">'+(d.x!=null?zoneName(d.x,d.y):'Pas de position')+'</div>';
     var asr='';
-    if(d.made){
+    if(d.made&&d.advCol){
+      asr='<div class="pglab" style="margin:12px 0 6px;color:#a89c88">Passe décisive</div><div class="pgrow" style="gap:8px">'+chipT('Sans passe',d.assist!==true,'pgDr(\'assist\',null)')+chipT('Avec passe décisive',d.assist===true,'pgDr(\'assist\',true)',true)+'</div>';
+    }else if(d.made){
       var ar=rosterOf(c,d.adv).filter(function(p){return p.id!==d.who;});
       asr='<div class="pglab" style="margin:12px 0 6px;color:#a89c88">Passe décisive</div><div class="pgrow" style="gap:8px">'+chipT('Sans passe',d.assist==null,'pgDr(\'assist\',null)')+ar.map(function(p){return chipP(p,d.assist===p.id,'pgDr(\'assist\','+p.id+')',d.adv);}).join('')+'</div>';
     }
@@ -40708,7 +40719,7 @@ function panelHtml(c){
       rb='<div class="pglab" style="margin:12px 0 6px;color:#a89c88">Rebond</div><div class="pgrow" style="gap:8px">'+rr.map(function(p){return chipP(p,d.reb&&d.reb.k==='p'&&d.reb.pid===p.id,'pgDr(\'reb\',{k:\'p\',pid:'+p.id+'})',false);}).join('')
         +chipT('ADV · '+(d.adv?'rebond off.':'rebond déf.'),d.reb&&d.reb.k==='adv','pgDr(\'reb\',{k:\'adv\'})',true)+chipT('Sans rebond',!d.reb,'pgDr(\'reb\',null)')+'</div>';
     }
-    var cx='<div class="pglab" style="margin:12px 0 6px;color:#a89c88">Contexte</div><div class="pgrow" style="gap:8px;'+(d.made?'':'opacity:.4;pointer-events:none')+'">'
+    var cx='<div class="pglab" style="margin:12px 0 6px;color:#a89c88">Contexte</div><div class="pgrow" style="gap:8px">'
       +[['scp','Après rebond off.','#F0A030'],['papb','Après BP','#5B8DEF'],['fb8','Jeu rapide','#A06BF0']].map(function(x){var on=d.ctx[x[0]];return '<button class="pgchip t" style="'+(on?'border-color:'+x[2]+';background:rgba(255,255,255,.06);color:'+x[2]:'color:'+x[2]+';opacity:.7')+'" onclick="pgDr(\'ctx\',\''+x[0]+'\')">'+x[1]+'</button>';}).join('')+'</div>';
     return head+tire+tp+pos+asr+rb+cx+qtRow(d)+'<div class="pgrow" style="margin-top:12px;position:sticky;bottom:-14px;background:#262321;padding:10px 0 4px;border-top:1px solid rgba(255,255,255,.08)"><button class="pgbig" style="background:linear-gradient(180deg,#E8C88A,#D4AA6A);color:#1a1408;border:none" onclick="pgEdSave()">Enregistrer</button><button class="pgbig" style="color:#f08585;border-color:rgba(224,82,82,.4)" onclick="pgEdDel('+PG.sel+')">🗑 Supprimer le bloc (tir + '+(d.made?'passe':'rebond')+')</button></div>';
   }
@@ -40761,6 +40772,7 @@ function saveShot(c,log,r,ev,d){
   var m=c.m,team=gT(m.teamId);
   var oldPid=ev.pid,oldS=gPS(m.id,oldPid),sh=oldS.shots[ev.shotIdx];
   if(!sh)throw new Error('tir introuvable');
+  var _oldSv=ev.made?(ev.key.indexOf('pts3')===0?3:2):0;
   // 1) défaire le tir (compteurs, tentés, score, +/-, passe)
   applyLogEvent(m.id,ev,team,m,-1);
   if(ev.isSCP)oldS.scp=Math.max(0,(oldS.scp||0)-(ev.scpVal||0));
@@ -40774,26 +40786,40 @@ function saveShot(c,log,r,ev,d){
     var ns=gPS(m.id,d.who);ns.shots=ns.shots||[];ev.shotIdx=ns.shots.length;ns.shots.push(sh);ev.pid=d.who;
   }
   var nk=(d.pts===3?'pts3':'pts2')+(d.made?'m':'r'),sv=d.made?(d.pts===3?3:2):0;
-  sh.key=nk;sh.made=d.made;sh.is3pt=(d.pts===3);sh.qt=d.qt;sh.x=d.x;sh.y=d.y;sh.assistPid=d.made?d.assist:null;
+  var aCol=isAdvCol(ev),dupI=aCol?advDup(log,r):-1;
+  sh.key=nk;sh.made=d.made;sh.is3pt=(d.pts===3);sh.qt=d.qt;sh.x=d.x;sh.y=d.y;sh.assistPid=aCol?null:(d.made?d.assist:null);
   ev.key=nk;ev.made=d.made;ev.qt=d.qt;
-  ev.isSCP=(sv>0&&d.ctx.scp)||undefined;ev.isPAPB=(sv>0&&d.ctx.papb)||undefined;ev.isFB8=(sv>0&&d.ctx.fb8)||undefined;
+  ev.isSCP=d.ctx.scp||undefined;ev.isPAPB=d.ctx.papb||undefined;ev.isFB8=d.ctx.fb8||undefined;
   ev.scpVal=(ev.isSCP||ev.isPAPB||ev.isFB8)?sv:undefined;
   var cs=gPS(m.id,ev.pid);
   if(ev.isSCP)cs.scp=(cs.scp||0)+sv;if(ev.isPAPB)cs.papb=(cs.papb||0)+sv;if(ev.isFB8)cs.fb8=(cs.fb8||0)+sv;
   // 3) refaire le tir
   applyLogEvent(m.id,ev,team,m,+1);
+  // +/- du camp d'en face (le camp du tireur est déjà géré ci-dessus) — même règle qu'à la saisie et à la suppression
+  try{var _dP=sv-_oldSv;if(_dP&&CS.matchId===m.id){(ev.advTeam?(CS.onCourt||[]):(CS.onCourtAdv||[])).forEach(function(q){var sq=gPS(m.id,q);sq.pm=(sq.pm||0)-_dP;recalc(m.id,q);});}}catch(e){}
+  if(aCol){
+    // ligne jumelle du journal : mêmes infos que le tir
+    if(dupI>=0){var du=log[dupI];du.key=nk;du.qt=d.qt;du.isSCP=ev.isSCP;du.isPAPB=ev.isPAPB;du.isFB8=ev.isFB8;du.scpVal=ev.scpVal;}
+    // passe décisive de l'équipe adverse : fait partie du bloc
+    var pdI=advFollow(log,r,'pd'),wantPd=!!(d.made&&d.assist===true);
+    if(pdI>=0&&!wantPd){applyLogEvent(m.id,log[pdI],team,m,-1);logRemove(log,pdI);}
+    else if(pdI<0&&wantPd){var ePd={type:'stat',pid:null,key:'pd',qt:d.qt,target:'adverse',advTeam:true,ts:ev.ts,clk:ev.clk};applyLogEvent(m.id,ePd,team,m,+1);logInsert(log,(dupI>=0?r+2:r+1),ePd);}
+    else if(pdI>=0){log[pdI].qt=d.qt;}
+    recalc(m.id,'collectifAdv');
+  }
   if(d.made&&sh.assistPid!=null){var a=gPS(m.id,sh.assistPid);a.pd=(a.pd||0)+1;recalc(m.id,sh.assistPid);}
   recalc(m.id,ev.pid);
   // 4) rebond (tir raté seulement)
   var want=d.made?null:d.reb,wantS=want?JSON.stringify(want):'';
   if(wantS!==(d.rebOrig||'')||d.made){
-    var rb=findReb(log,r);
+    var rb=aCol?advFollow(log,r,'reb'):findReb(log,r);
     if(rb>=0){var old=log[rb];applyLogEvent(m.id,old,team,m,-1);logRemove(log,rb);}
     if(want){
       var oursKey=d.adv?'rebd':'rebo',advKey=d.adv?'rebo':'rebd',e2;
       if(want.k==='p'){var sp=gPS(m.id,want.pid);sp[oursKey]=(sp[oursKey]||0)+1;recalc(m.id,want.pid);e2={type:'stat',pid:want.pid,key:oursKey,qt:d.qt,target:'player',ts:ev.ts,clk:ev.clk};}
       else{e2={type:'stat',pid:null,key:advKey,qt:d.qt,target:'adverse',ts:ev.ts,clk:ev.clk};}
-      logInsert(log,r+1,e2);
+      if(e2.target==='adverse'&&c.opp){e2.advTeam=true;applyLogEvent(m.id,e2,team,m,+1);}
+      logInsert(log,(aCol&&advDup(log,r)>=0)?r+2:r+1,e2);
     }
   }
 }
