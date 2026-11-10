@@ -460,7 +460,7 @@ document.addEventListener('DOMContentLoaded', function(){
 var _SB_URL="https://umuvirwbtpflizxupwbr.supabase.co";
 // Version de ce fichier — à incrémenter à chaque déploiement, en cohérence avec la valeur
 // mise à jour dans la table Supabase `app_version` (voir _checkAppVersion ci-dessous).
-var APP_VERSION = "2026-11-10-427";
+var APP_VERSION = "2026-11-10-429";
 var _SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtdXZpcndidHBmbGl6eHVwd2JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3MTI1MDEsImV4cCI6MjA5MDI4ODUwMX0.fFQaF-zP9dzcWITJDf6GBmvu0pdcuvlaUz0A0qW0kfo";
 var _LICENCE_KEY='btp_licence';
 var _MACHINE_KEY='btp_machine';
@@ -39201,7 +39201,7 @@ window.ps2CourtClick=function(e){
   var sv=S('ps2Court');if(!sv)return;
   var pt=sv.createSVGPoint();pt.x=e.clientX;pt.y=e.clientY;var q=pt.matrixTransform(sv.getScreenCTM().inverse());
   var x=Math.max(0,Math.min(1500,Math.round(q.x))),y=Math.max(0,Math.min(1400,Math.round(q.y)));
-  if(!ST.pos){try{CS._statT=currentTime();stopClockLF();pauseVideo();}catch(_e){}}
+  if(!ST.pos){try{CS._statT=currentTime();if(P.vidOn())stopClockLF();pauseVideo();}catch(_e){}}
   ST.pos={x:x,y:y};
   P.render();
 };
@@ -39234,7 +39234,7 @@ function tileF(k){
 }
 function actionsFill(){
   return '<div style="flex:1;min-height:0;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:auto 1fr 1fr;gap:8px">'
-    +'<div style="grid-column:1/-1;height:52px">'+tileRow('lf','height:100%','chrono en pause')+'</div>'
+    +'<div style="grid-column:1/-1;height:52px">'+tileRow('lf','height:100%;justify-content:center')+'</div>'
     +tileF('bp')+tileF('inter')+tileF('contre')+tileF('fc')+tileF('fp')+tileF('hs')+'</div>';
 }
 function actionsVideo(){return actionsFill();}
@@ -39255,7 +39255,7 @@ function ynFill(){
 }
 function actionsBig(){
   var lab=function(t){return '<div style="font-size:12px;letter-spacing:.14em;font-weight:500;color:#a89c88;margin:12px 0 6px">'+t+'</div>';};
-  return '<div style="display:flex;flex-direction:column;height:100%;min-height:0">'+tileRow('lf','flex:.9;min-height:56px','chrono en pause')
+  return '<div style="display:flex;flex-direction:column;height:100%;min-height:0">'+tileRow('lf','flex:.9;min-height:56px;justify-content:center')
     +lab('BALLON')+'<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;flex:2;min-height:0">'+tile('bp','')+tile('inter','')+tile('contre','')+'</div>'
     +lab('FAUTES')+'<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;flex:1.8;min-height:0">'+tile('fc','')+tile('fp','')+'</div>'
     +'<div style="margin-top:12px;flex:.8;display:flex;min-height:52px">'+tileRow('hs','flex:1','tes propres stats')+'</div></div>';
@@ -39292,7 +39292,7 @@ window.ps2Undo=function(){
 window.ps2DelEv=function(i){var m=CSm();if(!m)return;try{logEventDelete(m.id,i);}catch(e){}P.render();};
 
 // ───────── Cartes joueuses (bande du bas) ─────────
-function foulDots(pid){var f=Math.min(5,(pst(pid).fc||0)),h='',i;for(i=0;i<5;i++)h+='<i style="width:7px;height:7px;border-radius:50%;display:inline-block;background:'+(i<f?(f>=4?'#e05252':'#F0A030'):'#4a463f')+'"></i>';return '<span style="display:inline-flex;gap:3px;margin-right:6px">'+h+'</span>';}
+function foulDots(pid){var f=Math.min(5,(pst(pid).fc||0)),h='',i,c=f>=5?'#e05252':f>=3?'#F0A030':'#3DC97A';for(i=0;i<5;i++)h+='<i style="width:7px;height:7px;border-radius:50%;display:inline-block;background:'+(i<f?c:'#4a463f')+'"></i>';return '<span style="display:inline-flex;gap:3px;margin-right:6px">'+h+'</span>';}
 function nameBlock(p,extra){
   return '<div style="flex:1;min-width:0;line-height:1.15"><small style="font-size:12px;letter-spacing:.1em;font-weight:500;color:#a89c88"><span style="color:#E8C88A;font-size:14px">'+E(_nh(p)||'')+'</span> · '+E((p.first||'').toUpperCase())+'</small><div style="font-size:19px;font-weight:500;color:#F0E8D8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+E((p.last||p.name||p.first||'').toUpperCase())+'</div>'+(extra||'')+'</div>';
 }
@@ -39415,9 +39415,9 @@ function stripHtml(){
   if(step==='hs'){
     var n=Object.keys(HSS().pids).length;
     h=stripHead('② Joueuses concernées — touche pour sélectionner (plusieurs possibles)',benchPills(false)+remplacerBtn(),'#3DC97A');
-    var cs=oc.map(function(p){var on=!!HSS().pids[p.id];return cardWrap(p.id,'<div style="display:flex;align-items:center;gap:12px">'+P.avatar(p,58)+nameBlock(p)+'</div><button class="ps2btn '+(on?'ok':'pl')+'" style="flex:none;height:54px;font-size:16px" onclick="ps2HsTog('+p.id+')">'+(on?'✓ Sélectionnée':'Touche')+'</button>','',on?'#D4AA6A':'');}).join('');
+    var cs=oc.map(function(p){var on=!!HSS().pids[p.id];return cardBase(p,P.seuilsGet(),'<button class="ps2btn '+(on?'ok':'pl')+'" style="flex:none;height:54px;font-size:17px" onclick="ps2HsTog('+p.id+')">'+(on?'✓ Sélectionnée':'Touche')+'</button>',on?'#D4AA6A':'');}).join('');
     var okb=HSS().sid&&n>0;
-    cs+='<div class="ps2pc" style="align-items:stretch;justify-content:center"><button class="ps2btn go" style="flex:none;height:64px;'+(okb?'':'opacity:.4')+'" '+(okb?'':'disabled ')+'onclick="ps2HsOk()">Valider'+(n?'<div style="font-size:13px">('+n+' joueuse'+(n>1?'s':'')+')</div>':'')+'</button><button class="ps2btn pl" style="flex:none;height:46px" onclick="ps2Cancel()">Annuler</button></div>';
+    cs+='<div class="ps2pc" style="align-items:stretch;justify-content:stretch"><button class="ps2btn go" style="flex:1.4;height:auto;font-size:19px;'+(okb?'':'opacity:.4')+'" '+(okb?'':'disabled ')+'onclick="ps2HsOk()">Valider'+(n?'<div style="font-size:13px">('+n+' joueuse'+(n>1?'s':'')+')</div>':'')+'</button><button class="ps2btn pl" style="flex:1;height:auto;font-size:17px" onclick="ps2Cancel()">Annuler</button></div>';
     return h+'<div style="display:grid;grid-template-columns:repeat('+Math.max(1,oc.length)+',1fr) 1.05fr;gap:12px;align-items:stretch">'+cs+'</div>';
   }
   return'';
@@ -39484,26 +39484,17 @@ function midHtml(){
   var step=ST.step,vo=P.vidOn(),SIMPLE=['bp','bpq','inter','interq','contre','fc','fp','fpLF'],shotStep=(step==='idle'||step==='assist'||SIMPLE.indexOf(step)>=0);
   var courtBlock=function(fl){return '<div style="flex:'+(fl||'1')+';min-height:0;display:flex;justify-content:center;align-items:center;position:relative">'+courtSvg()+'</div>';};
   var RW='width:600px;flex:none;';
-  if(vo){
-    var right;
-    if(shotStep){
-      right='<div style="position:absolute;right:10px;top:10px;z-index:2">'+chipHtml()+'</div>'+courtBlock('1.15 1 0')+'<div style="height:10px;flex:none"></div>'+(step==='bpq'?ynFill():step!=='assist'?actionsFill():ctxFill());
-    }else if(step==='rebound'){
-      right=courtBlock('1.15 1 0')+'<div style="height:10px;flex:none"></div><div style="flex:1;min-height:0;border-radius:16px;background:#242321;display:flex;align-items:center;justify-content:center;color:#6f675a;font-size:13px">Actions masquées pendant le rebond</div>';
-    }else{
-      right='<div style="flex:1;min-height:0;overflow:auto">'+stepPanel()+'</div>';
-    }
-    return '<div class="ps2card" style="flex:1;padding:10px;display:flex;min-width:0"><div id="ps2VidSlot" style="flex:1;min-height:0;position:relative"></div></div>'
-      +'<div class="ps2card" style="'+RW+'display:flex;flex-direction:column;padding:10px;position:relative">'+right+'</div>';
-  }
-  // sans vidéo
+  var right;
   if(shotStep){
-    var left='<div style="display:flex;align-items:center;margin-bottom:8px"><span class="ps2lab" style="color:#a89c88">TIR · TOUCHE L’ENDROIT</span><span style="flex:1"></span>'+chipHtml()+'</div>'+courtBlock('1');
-    var rc=step==='bpq'?ynFill():step!=='assist'?actionsFill():ctxFill();
-    return '<div class="ps2card" style="flex:1;display:flex;flex-direction:column;min-width:0;padding:10px">'+left+'</div><div class="ps2card" style="'+RW+'display:flex;flex-direction:column;padding:10px">'+rc+'</div>';
+    right=(vo?'<div style="position:absolute;right:10px;top:10px;z-index:2">'+chipHtml()+'</div>'+courtBlock('1.15 1 0')+'<div style="height:10px;flex:none"></div>':'')+(step==='bpq'?ynFill():step!=='assist'?actionsFill():ctxFill());
+  }else if(step==='rebound'){
+    right=(vo?courtBlock('1.15 1 0')+'<div style="height:10px;flex:none"></div>':'')+'<div style="flex:1;min-height:0;border-radius:16px;background:#242321;display:flex;align-items:center;justify-content:center;color:#6f675a;font-size:13px">Actions masquées pendant le rebond</div>';
+  }else{
+    right='<div style="flex:1;min-height:0;overflow:auto">'+stepPanel()+'</div>';
   }
-  return '<div class="ps2card" style="flex:1.1;display:flex;flex-direction:column;overflow:auto;padding:18px">'+stepPanel().replace(/^/,P.vidOn()?'':'<div style="margin-bottom:12px">'+chronoBadge()+'</div>')+'</div>'
-    +'<div class="ps2card" style="flex:1;display:flex;flex-direction:column;overflow:auto;min-width:0"><div class="ps2lab" style="color:#a89c88;margin:4px 0 0">ACTIONS</div>'+actionsCompact(step==='bpq'?'bp':step==='lfCount'||step==='lfShoot'?'lf':step==='fpLF'?'fp':step)+lastActions(5)+'</div>';
+  var left=vo?'<div class="ps2card" style="flex:1;padding:10px;display:flex;min-width:0"><div id="ps2VidSlot" style="flex:1;min-height:0;position:relative"></div></div>'
+    :'<div class="ps2card" style="flex:1;padding:10px;display:flex;flex-direction:column;min-width:0;position:relative"><div style="position:absolute;right:10px;top:10px;z-index:2">'+chipHtml()+'</div>'+courtBlock('1')+'</div>';
+  return left+'<div class="ps2card" style="'+RW+'display:flex;flex-direction:column;padding:10px;position:relative">'+right+'</div>';
 }
 var _sig='';
 function sigNow(){return [(CS.onCourt||[]).join(','),ST.step,ST.pos?ST.pos.x+','+ST.pos.y:'',ST.shooter,ST.lf?ST.lf.res.join(''):'',getLog(CS.matchId).length,CS.qt,P.vidOn(),ourScore(),oppScore()].join('|');}
@@ -39614,7 +39605,7 @@ window.ps2Act=function(k){
   }
   ST.pos=null;
   if(k==='lf'){reset();ST.step='lfCount';ST.lfN=ST.lfN||2;stopClockLF();P.render();return;}
-  try{CS._statT=currentTime();stopClockLF();pauseVideo();}catch(e){}
+  try{CS._statT=currentTime();if(P.vidOn()||k==='fc'||k==='fp')stopClockLF();pauseVideo();}catch(e){}
   if(k==='hs'){reset();HS_RESET();ST.step='hs';P.render();return;}
   reset();ST.step=k;P.render();
 };
