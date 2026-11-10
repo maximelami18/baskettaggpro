@@ -460,7 +460,7 @@ document.addEventListener('DOMContentLoaded', function(){
 var _SB_URL="https://umuvirwbtpflizxupwbr.supabase.co";
 // Version de ce fichier — à incrémenter à chaque déploiement, en cohérence avec la valeur
 // mise à jour dans la table Supabase `app_version` (voir _checkAppVersion ci-dessous).
-var APP_VERSION = "2026-11-10-422";
+var APP_VERSION = "2026-11-10-425";
 var _SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtdXZpcndidHBmbGl6eHVwd2JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3MTI1MDEsImV4cCI6MjA5MDI4ODUwMX0.fFQaF-zP9dzcWITJDf6GBmvu0pdcuvlaUz0A0qW0kfo";
 var _LICENCE_KEY='btp_licence';
 var _MACHINE_KEY='btp_machine';
@@ -38919,8 +38919,13 @@ P.active=active;
 function team(){return curTeam();}
 function plr(pid){var t=team();return t?t.players.find(function(p){return p.id===pid;}):null;}
 P.plr=plr;
-function onCourt(){return _byNum((CS.onCourt||[]).map(plr).filter(Boolean));}
-function bench(){var t=team(),m=curMatch();if(!t||!m)return[];var ids=m.players&&m.players.length?m.players:t.players.map(function(p){return p.id;});return _byNum(t.players.filter(function(p){return ids.indexOf(p.id)>=0&&(CS.onCourt||[]).indexOf(p.id)<0;}));}
+window.xvByPos=function(list){
+  var rk=function(p){var r=String(p.pos||'').trim().toLowerCase(),m=/^([1-5])/.exec(r);if(m)return +m[1];var t={pg:1,sg:2,sf:3,pf:4,c:5},w=r.split(/[\/\s]/)[0];if(t[w])return t[w];if(/meneu/.test(r))return 1;if(/arri/.test(r))return 2;if(/ailier fort/.test(r))return 4;if(/ailier/.test(r))return 3;if(/pivot/.test(r))return 5;return 9;};
+  var nb=function(p){var n=parseInt(String(p.num!=null?p.num:'').replace(/\D/g,''),10);return isNaN(n)?999:n;};
+  return list.slice().sort(function(a,b){return rk(a)-rk(b)||nb(a)-nb(b);});
+};
+function onCourt(){return xvByPos((CS.onCourt||[]).map(plr).filter(Boolean));}
+function bench(){var t=team(),m=curMatch();if(!t||!m)return[];var ids=m.players&&m.players.length?m.players:t.players.map(function(p){return p.id;});return xvByPos(t.players.filter(function(p){return ids.indexOf(p.id)>=0&&(CS.onCourt||[]).indexOf(p.id)<0;}));}
 P.onCourt=onCourt;P.bench=bench;
 function ring(p){var raw=String((p&&p.pos)||'').trim();try{if(window.scPosColor)return window.scPosColor(raw)||'#6B7280';}catch(e){}return '#6B7280';}
 P.ring=ring;
@@ -39017,7 +39022,7 @@ body.ps2on.coding-header-hidden #ps2{top:0}
 .ps2lab{font-size:12px;letter-spacing:.14em;font-weight:500;color:#D4AA6A;text-transform:uppercase}
 .ps2act{border-radius:16px;border:2px solid;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;font-family:inherit;color:#fff;font-weight:500;text-align:center;padding:0 6px}
 .ps2act:active{transform:scale(.98)}
-.ps2pc{border-radius:18px;border:2px solid rgba(255,255,255,.1);background:#2a2622;padding:10px 12px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.ps2pc{justify-content:space-between;border-radius:18px;border:2px solid rgba(255,255,255,.1);background:#2a2622;padding:10px 12px;display:flex;flex-direction:column;gap:8px;min-width:0}
 .ps2btn{height:42px;border-radius:12px;border:2px solid;font-size:16px;font-weight:500;cursor:pointer;font-family:inherit;background:transparent;color:#fff;flex:1;min-width:0;white-space:nowrap}
 .ps2btn.ok{border-color:#2fb86e;color:#3DC97A;background:rgba(61,201,122,.08)}
 .ps2btn.ko{border-color:#c94a4a;color:#f08585;background:rgba(224,82,82,.08)}
@@ -39107,6 +39112,12 @@ function lastLineHtml(m,log){
   }
   return parts.join('<span style="color:#4a463f;margin:0 5px">│</span>');
 }
+function scChip(a,b,col){
+  var h=String(col||'#D4AA6A').replace('#',''),rgb='212,170,106';
+  if(/^[0-9a-f]{6}$/i.test(h))rgb=parseInt(h.slice(0,2),16)+','+parseInt(h.slice(2,4),16)+','+parseInt(h.slice(4,6),16);
+  var n=function(v,c){return '<span style="font-size:30px;font-weight:900;letter-spacing:-.03em;line-height:1;font-variant-numeric:tabular-nums;color:'+c+'">'+v+'</span>';};
+  return '<div style="display:flex;align-items:center;justify-content:center;gap:10px;border-radius:14px;padding:6px 12px;min-width:0;background:linear-gradient(180deg,rgba('+rgb+',.16),rgba('+rgb+',.05));border:1px solid rgba('+rgb+',.45)">'+n(a,col||'#E8C88A')+'<span style="width:2px;height:26px;border-radius:2px;transform:skewX(-14deg);background:rgba('+rgb+',.5)"></span>'+n(b,'#a89c88')+'</div>';
+}
 function renderTop(force){
   var w=S('ps2Top');if(!w)return;
   var m=curMatch(),t=team();if(!m||!t)return;
@@ -39125,11 +39136,12 @@ function renderTop(force){
   w.style.cssText='position:relative;background:#0A0A0A;border-bottom:3px solid #D4AA6A;padding:10px 22px;display:flex;align-items:center;gap:14px;flex-shrink:0;min-height:100px';
   var nm=function(x){return '<div style="font-size:12px;letter-spacing:.14em;font-weight:500;color:#a89c88;text-transform:uppercase;white-space:nowrap">'+x+'</div>';};
   var sc=function(x){return '<div class="ps2sc" style="font-size:40px;font-weight:500;color:#F0E8D8;line-height:1;font-variant-numeric:tabular-nums">'+x+'</div>';};
-  w.innerHTML='<div style="display:flex;align-items:center;gap:14px">'+circle((t.name||'?').charAt(0).toUpperCase(),t.color||'#c9363e',t.logo)+'<div>'+nm(tn)+sc(ourScore())+'</div></div>'
-    +'<div style="font-size:30px;color:#555;font-weight:500">–</div>'
-    +'<div style="display:flex;align-items:center;gap:14px"><div>'+nm(E(m.opp||''))+sc(oppScore())+'</div>'+circle((m.opp||'?').charAt(0).toUpperCase(),'#2DBD7A',opp&&opp.logo)+'</div>'
+  var nm2=function(x,al){return '<div style="font-size:11px;letter-spacing:.1em;color:#a89c88;text-transform:uppercase;white-space:nowrap;line-height:1.2;text-align:'+al+'">'+x+'</div>';};
+  w.innerHTML='<div style="display:flex;align-items:center;gap:12px">'+circle((t.name||'?').charAt(0).toUpperCase(),t.color||'#c9363e',t.logo)+nm2(tn,'left')+'</div>'
+    +scChip(ourScore(),oppScore(),t.color||'#D4AA6A')
+    +'<div style="display:flex;align-items:center;gap:12px">'+nm2(E(m.opp||''),'right')+circle((m.opp||'?').charAt(0).toUpperCase(),'#2DBD7A',opp&&opp.logo)+'</div>'
     +'<div style="display:flex;gap:8px;margin-left:26px">'+qb+'</div>'
-    +'<div class="ps2ub" style="margin-left:14px;flex:1;min-width:0;max-width:max(230px,calc(100vw - 1400px));display:flex;align-items:center;gap:8px;padding:4px 6px 4px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.08);background:#161513;height:50px"><span style="flex:1;min-width:0;font-size:11.5px;line-height:1.3;color:#cfc4b0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">'+(ut||'<span style="color:#6f675a">—</span>')+'</span>'+(ut?'<button onclick="ps2Undo()" title="Supprimer toute la ligne" style="flex:none;width:34px;height:34px;border-radius:9px;border:1px solid rgba(224,82,82,.4);background:#2a1c1d;color:#f08585;cursor:pointer;font-size:15px;line-height:1">🗑</button>':'')+'</div>'
+    +'<div class="ps2ub" style="margin-left:14px;flex:1;min-width:0;max-width:max(130px,calc(100vw - 1380px));display:flex;align-items:center;gap:8px;padding:4px 6px 4px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.08);background:#161513;height:50px"><span style="flex:1;min-width:0;font-size:11.5px;line-height:1.3;color:#cfc4b0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">'+(ut||'<span style="color:#6f675a">—</span>')+'</span>'+(ut?'<button onclick="ps2Undo()" title="Supprimer toute la ligne" style="flex:none;width:34px;height:34px;border-radius:9px;border:1px solid rgba(224,82,82,.4);background:#2a1c1d;color:#f08585;cursor:pointer;font-size:15px;line-height:1">🗑</button>':'')+'</div>'
     +'<div id="ps2Chr" style="position:absolute;right:318px;top:50%;transform:translate(50%,-50%);display:flex;align-items:center;gap:10px">'+adj(-5)+adj(-3)+adj(-1)
     +'<div id="ps2ChrMid" style="width:176px;text-align:center"><div id="qtClockLabel" style="font-size:42px;font-weight:500;color:'+(paused?'#F0A030':'#fff')+';font-family:\'JetBrains Mono\',monospace;line-height:1;letter-spacing:.02em">'+mm(sec)+'</div>'
     +'<button id="qtClockBtn" onclick="toggleQtClock()" style="margin-top:6px;height:32px;width:150px;border-radius:10px;border:1.5px solid '+(run?'#e05252':'#D4AA6A')+';background:'+(run?'#432a2e':'#3a3122')+';color:'+(run?'#f08585':'#E8C88A')+';font-size:13.5px;font-weight:500;cursor:pointer;font-family:inherit">'+(run?'❚❚ Pause':'▶ Lancer')+'</button></div>'
@@ -39289,15 +39301,24 @@ function stintBlock(p,sv){
   var pct=Math.min(100,Math.round(sec/60/maxm*100));
   return '<div><div style="display:flex;align-items:baseline;gap:6px"><span style="font-size:11px;letter-spacing:.1em;font-weight:500;color:'+(lvl||'#a89c88')+'">⏱ SUR LE TERRAIN</span><span data-stint="'+p.id+'" style="margin-left:auto;font-family:\'JetBrains Mono\',monospace;font-weight:500;font-size:21px;color:'+(lvl||'#F0E8D8')+'">'+mm(sec)+'</span></div><div style="height:6px;border-radius:3px;background:#3a3732;margin-top:5px;overflow:hidden"><div data-bar="'+p.id+'" style="width:'+pct+'%;height:100%;background:'+col+'"></div></div></div>';
 }
-function cardIdle(p,sv){
-  var sec=pst(p.id).secPlayed||0,lvl=P.levelColor(sv.on,P.stintOf(p.id)/60);
+function cardBase(p,sv,bottom,border,dim){
+  var sec=pst(p.id).secPlayed||0;
   var top='<div style="display:flex;align-items:center;gap:12px">'+P.avatar(p,58)+nameBlock(p,'<div style="margin-top:3px;font-size:12px;color:#8a7e6c;display:flex;align-items:center">'+foulDots(p.id)+'<span data-pmin="'+p.id+'">'+mm(sec)+'</span>&nbsp;jouées</div>')+ptsBlock(p.id)+'</div>';
-  return cardWrap(p.id,top+stintBlock(p,sv)+(ST.pos?'<div style="display:flex;gap:8px"><button class="ps2btn ok" style="height:54px;font-size:17px" onclick="ps2Shot('+p.id+',true)">✓ Marqué</button><button class="ps2btn ko" style="height:54px;font-size:17px" onclick="ps2Shot('+p.id+',false)">✕ Raté</button></div>':'<div style="height:54px;border-radius:12px;border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.02)"></div>'),'','');
+  return cardWrap(p.id,top+stintBlock(p,sv)+bottom,dim?'opacity:.6;':'',border);
+}
+var EMPTYBAR='<div style="height:54px;border-radius:12px;border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.02)"></div>';
+function cardIdle(p,sv){
+  return cardBase(p,sv,ST.pos?'<div style="display:flex;gap:8px"><button class="ps2btn ok" style="height:54px;font-size:17px" onclick="ps2Shot('+p.id+',true)">✓ Marqué</button><button class="ps2btn ko" style="height:54px;font-size:17px" onclick="ps2Shot('+p.id+',false)">✕ Raté</button></div>':EMPTYBAR,'');
 }
 function cardAct(p,label,cls,fn,opts){
   opts=opts||{};
-  var top='<div style="display:flex;align-items:center;gap:12px">'+P.avatar(p,58)+nameBlock(p)+(opts.pts?ptsBlock(p.id):'')+'</div>';
-  return cardWrap(p.id,top+'<button class="ps2btn '+cls+'" style="flex:none;height:54px;font-size:17px" onclick="'+fn+'">'+label+'</button>','',opts.border);
+  return cardBase(p,P.seuilsGet(),'<button class="ps2btn '+cls+'" style="flex:none;height:54px;font-size:17px" onclick="'+fn+'">'+label+'</button>',opts.border);
+}
+function cardNote(p,txt,border,dim){
+  return cardBase(p,P.seuilsGet(),'<div style="height:54px;display:flex;align-items:center;justify-content:center;font-size:17px;color:'+(border?'#E8C88A':'#8a7e6c')+'">'+txt+'</div>',border,dim);
+}
+function advBtn(label,fn){
+  return '<button class="ps2h" style="height:40px;border-color:#c94a4a;color:#f6a0a0;gap:8px" onclick="'+fn+'">'+oppBadge().replace('width:34px;height:34px','width:26px;height:26px')+label+'</button>';
 }
 function oppBadge(){
   var m=CSm(),opp=m&&m.oppTeamId?gT(m.oppTeamId):null;
@@ -39338,7 +39359,7 @@ function numOf(p){var n=parseInt(String(p.num!=null?p.num:_nh(p)||'').replace(/\
 function sortedOnCourt(){return P.onCourt().slice().sort(function(a,b){return posRank(a)-posRank(b)||numOf(a)-numOf(b);});}
 P.sortedOnCourt=sortedOnCourt;
 function stripHtml(){
-  var sv=P.seuilsGet(),oc=sortedOnCourt(),h='',cols='display:grid;grid-template-columns:repeat('+Math.max(1,oc.length)+',1fr)'+(['rebound','lfCount','lfShoot','assist'].indexOf(ST.step)>=0?' 1.05fr':'')+';gap:12px;align-items:stretch';
+  var sv=P.seuilsGet(),oc=sortedOnCourt(),h='',cols='display:grid;grid-template-columns:repeat('+Math.max(1,oc.length)+',1fr)'+(['rebound','lfCount','lfShoot','assist'].indexOf(ST.step)>=0?' 1.05fr':'')+';gap:12px;align-items:stretch;flex:1;min-height:0';
   var step=ST.step;
   var cardsIdle=function(){return oc.map(function(p){return cardIdle(p,sv);}).join('');};
   if(step==='idle'){
@@ -39348,15 +39369,15 @@ function stripHtml(){
   }
   if(step==='assist'){
     h=stripHead('Passe décisive ?','<button class="ps2h" style="height:34px;color:#f08585" onclick="ps2Cancel()">✕ Annuler</button>');
-    var none='<div class="ps2pc" style="align-items:stretch"><div style="text-align:center;font-size:13px;letter-spacing:.14em;font-weight:500;color:#a89c88">AUCUNE PASSE</div><button class="ps2btn pl" style="flex:1;height:auto;min-height:54px;font-size:18px" onclick="ps2Assist(null)">Sans passe</button></div>';
+    var none='<div class="ps2pc" style="align-items:stretch"><div style="text-align:center;font-size:13px;letter-spacing:.14em;color:#a89c88">AUCUNE PASSE</div><button class="ps2btn pl" style="flex:1;height:auto;min-height:54px;font-size:18px" onclick="ps2Assist(null)">Sans passe</button></div>';
     return h+'<div style="'+cols+'">'+oc.map(function(p){
-      if(p.id===ST.shooter)return cardWrap(p.id,'<div style="display:flex;align-items:center;gap:12px;opacity:.5">'+P.avatar(p,58)+nameBlock(p)+'</div><div style="text-align:center;font-weight:500;color:#8a7e6c;height:54px;display:flex;align-items:center;justify-content:center">Tireur</div>','');
-      return cardAct(p,'Passe décisive','go','ps2Assist('+p.id+')',{pts:true});}).join('')+none+'</div>';
+      if(p.id===ST.shooter)return cardNote(p,'Tireur','#D4AA6A');
+      return cardAct(p,'Passe décisive','go','ps2Assist('+p.id+')');}).join('')+none+'</div>';
   }
   if(step==='rebound'){
     var byTeam=(window._lastShotTarget==='player'||window._lastShotTarget==='collectif'||window._lastShotTarget==null);
-    h=stripHead('Rebond — qui le prend ?','<span style="font-size:13px;color:#8a7e6c">Dès que le rebond est validé, le chrono repart</span><button class="ps2h" style="height:34px" onclick="ps2Reb(\'skip\')">Passer</button>','#f08585');
-    return h+'<div style="'+cols+'">'+oc.map(function(p){return cardAct(p,'Rebond','go','ps2Reb('+p.id+')',{pts:true});}).join('')+advCard(byTeam?'Rebond défensif':'Rebond offensif','ps2Reb(\'adv\')')+'</div>';
+    h=stripHead('Rebond — qui le prend ?','<span style="font-size:13px;color:#8a7e6c">Dès que le rebond est validé, le chrono repart</span>'+'<button class="ps2h" style="height:34px" onclick="ps2Reb(\'skip\')">Passer</button>','#f08585');
+    return h+'<div style="'+cols+'">'+oc.map(function(p){return cardAct(p,'Rebond','go','ps2Reb('+p.id+')');}).join('')+advCard(byTeam?'Rebond défensif':'Rebond offensif','ps2Reb(\'adv\')')+'</div>';
   }
   var simple={bp:['Qui a perdu la balle ?','Balle perdue','pl'],inter:['Qui a intercepté ?','Interception','pl'],contre:['Qui a contré ?','Contre','pl'],fc:['Qui a fait la faute ?','Faute commise','pl'],fp:['Qui a provoqué la faute ?','Faute provoquée','pl']};
   if(simple[step]){
@@ -39367,7 +39388,7 @@ function stripHtml(){
   if(step==='bpq'||step==='interq'){
     var isI=(step==='interq'),fn=isI?'ps2Interq':'ps2Bpq';
     h=stripHead(isI?'Interception':'Balle perdue — interception de l’adversaire ?','');
-    return h+'<div style="'+cols+'">'+oc.map(function(p){var sel=(ST.bp&&ST.bp.pid===p.id);return sel?cardWrap(p.id,'<div style="display:flex;align-items:center;gap:12px">'+P.avatar(p,58)+nameBlock(p)+'</div><div style="text-align:center;font-weight:500;color:#E8C88A;height:54px;display:flex;align-items:center;justify-content:center">'+(isI?'a intercepté':'a perdu la balle')+'</div>','','#D4AA6A'):cardWrap(p.id,'<div style="display:flex;align-items:center;gap:12px;opacity:.4">'+P.avatar(p,58)+nameBlock(p)+'</div><div style="height:54px"></div>','');}).join('')+'</div>';
+    return h+'<div style="'+cols+'">'+oc.map(function(p){var sel=(ST.bp&&ST.bp.pid===p.id);return sel?cardNote(p,(isI?'a intercepté':'a perdu la balle'),'#D4AA6A'):cardBase(p,P.seuilsGet(),EMPTYBAR,'',true);}).join('')+'</div>';
   }
   if(step==='lfCount'){
     h=stripHead('Qui tire les lancers francs ?','');
@@ -39379,9 +39400,9 @@ function stripHtml(){
     h=stripHead((who?(who.first||'').toUpperCase():'ADVERSAIRE')+' tire · '+(nxt>=0?'en attente du lancer '+(nxt+1):'terminé'),'<span style="font-size:13px;color:#8a7e6c">La saisie est au même endroit qu’avec la vidéo</span><button class="ps2h" style="color:#f08585" onclick="ps2Cancel()">✕ Annuler</button>');
     var recap=L.res.map(function(r,i){return 'LF'+(i+1)+' '+(r===true?'<b style="color:#3DC97A">✓</b>':r===false?'<b style="color:#f08585">✕</b>':'…');}).join(' &nbsp; ');
     return h+'<div style="'+cols+'">'+oc.map(function(p){
-      if(L.who===p.id)return cardWrap(p.id,'<div style="display:flex;align-items:center;gap:12px">'+P.avatar(p,58)+nameBlock(p)+ptsBlock(p.id)+'</div><div style="text-align:center;font-weight:500;font-size:17px;color:#E8C88A;height:44px;display:flex;align-items:center;justify-content:center">'+recap+'</div>','','#D4AA6A');
-      return cardWrap(p.id,'<div style="display:flex;align-items:center;gap:12px;opacity:.45">'+P.avatar(p,58)+nameBlock(p)+'</div><div style="height:54px;display:flex;align-items:center;justify-content:center;color:#5a5448">—</div>','');}).join('')
-      +'<div class="ps2pc" style="border-color:'+(L.who==='adv'?'#c94a4a':'rgba(255,255,255,.1)')+';align-items:stretch"><div style="text-align:center;font-size:13px;letter-spacing:.14em;font-weight:500;color:#f08585">ADVERSAIRE</div><div style="height:54px;display:flex;align-items:center;justify-content:center;font-weight:500;color:'+(L.who==='adv'?'#f6a0a0':'#5a5448')+'">'+(L.who==='adv'?recap:'—')+'</div></div></div>';
+      if(L.who===p.id)return cardNote(p,recap,'#D4AA6A');
+      return cardBase(p,P.seuilsGet(),EMPTYBAR,'',true);}).join('')
+      +'<div class="ps2pc" style="border-color:'+(L.who==='adv'?'#c94a4a':'rgba(255,255,255,.1)')+';align-items:stretch"><div style="display:flex;align-items:center;gap:10px">'+oppBadge()+'<span style="font-size:13px;letter-spacing:.14em;color:#f08585">ADVERSAIRE</span></div><div style="flex:1;display:flex;align-items:center;justify-content:center;color:'+(L.who==='adv'?'#f6a0a0':'#5a5448')+'">'+(L.who==='adv'?recap:'—')+'</div></div></div>';
   }
   if(step==='fpLF'){
     var fp=P.plr(ST.fpPid),b=function(n,l){return '<button class="ps2btn go" style="flex:1;height:76px;font-size:22px" onclick="ps2FpLf('+n+')">'+l+'</button>';};
@@ -39496,7 +39517,7 @@ P.render=function(){
   P.renderTop(true);
   S('ps2Mid').innerHTML=midHtml();
   var stp=S('ps2Strip');
-  stp.innerHTML='<div class="ps2card" id="ps2StripCard" style="padding:12px 14px;box-sizing:border-box;overflow:auto">'+stripHtml()+'</div>';
+  stp.innerHTML='<div class="ps2card" id="ps2StripCard" style="padding:12px 14px;box-sizing:border-box;overflow:auto;display:flex;flex-direction:column">'+stripHtml()+'</div>';
   var sc=S('ps2StripCard');
   if(ST.step==='idle'&&!ST.pos){P._sh=sc.offsetHeight;}
   else if(P._sh){sc.style.height=P._sh+'px';}
@@ -39665,7 +39686,14 @@ window.ps2LfWho=function(who){
 window.ps2LfRes=function(i,made){
   var L=ST.lf;if(!L||i<0||i>=L.n)return;
   L.res[i]=made;
-  if(L.res.indexOf(null)>=0){P.render();return;}
+  P.render();
+  if(L.res.indexOf(null)>=0)return;
+  // tous les lancers renseignés : on laisse voir le dernier choix ~0,8 s, puis on enregistre
+  if(L._t)clearTimeout(L._t);
+  L._t=setTimeout(function(){lfFinalize(L);},800);
+};
+function lfFinalize(L){
+  if(ST.lf!==L||L.res.indexOf(null)>=0)return;
   // tous les lancers sont renseignés : on enregistre
   var adv=L.who==='adv',m=curMatch();
   var tg=adv?(m&&m.oppTeamId?'collectifAdv':'adverse'):'player';
@@ -39719,8 +39747,8 @@ window.renderSubModal=function(){
   var teamObj=adv?opp:t;if(!teamObj)return;
   var onIds=adv?(CS.onCourtAdv||[]):(CS.onCourt||[]);
   var ids=adv?(m.oppPlayers&&m.oppPlayers.length?m.oppPlayers:opp.players.map(function(p){return p.id;})):(m.players&&m.players.length?m.players:t.players.map(function(p){return p.id;}));
-  var onP=_byNum(onIds.map(function(id){return teamObj.players.find(function(p){return p.id===id;});}).filter(Boolean));
-  var bn=_byNum(teamObj.players.filter(function(p){return ids.indexOf(p.id)>=0&&onIds.indexOf(p.id)<0;}));
+  var onP=(adv?_byNum:xvByPos)(onIds.map(function(id){return teamObj.players.find(function(p){return p.id===id;});}).filter(Boolean));
+  var bn=(adv?_byNum:xvByPos)(teamObj.players.filter(function(p){return ids.indexOf(p.id)>=0&&onIds.indexOf(p.id)<0;}));
   var outs=adv?subOutA:_subOut,ins=adv?subInA:_subIn;
   var card=function(p,state,isOn){
     var col={out:['#e05252','#432a2e'],in:['#3DC97A','#25402f'],none:['rgba(255,255,255,.1)','#262422']}[state||'none'];
@@ -39955,13 +39983,18 @@ function renderHead(c){
   var tt=TITLES[PG.page](c);
   S('pgHead').innerHTML='<button class="pgback" onclick="pgClose()">← Retour à la saisie</button><span class="pgtt">'+tt[0]+'</span><span class="pgsub">'+tt[1]+'</span><span style="flex:1"></span>';
 }
+function scChip(a,b,col){
+  var h=String(col||'#D4AA6A').replace('#',''),rgb='212,170,106';
+  if(/^[0-9a-f]{6}$/i.test(h))rgb=parseInt(h.slice(0,2),16)+','+parseInt(h.slice(2,4),16)+','+parseInt(h.slice(4,6),16);
+  var n=function(v,c){return '<span style="font-size:34px;font-weight:900;letter-spacing:-.03em;line-height:1;font-variant-numeric:tabular-nums;color:'+c+'">'+v+'</span>';};
+  return '<div style="display:flex;align-items:center;justify-content:center;gap:14px;border-radius:14px;padding:8px 18px;min-width:150px;background:linear-gradient(180deg,rgba('+rgb+',.16),rgba('+rgb+',.05));border:1px solid rgba('+rgb+',.45)">'+n(a,col||'#E8C88A')+'<span style="width:2px;height:26px;border-radius:2px;transform:skewX(-14deg);background:rgba('+rgb+',.5)"></span>'+n(b,'#a89c88')+'</div>';
+}
 function renderStrip(c){
   var sec=(CS.qtClockSec==null?(CS.qtClockDuration||600):CS.qtClockSec);
   var tn=E(c.t.name||''),on=E(c.m.opp||'');
   var lgo=function(t,col,l){return t&&t.logo?'<div class="lg" style="background-color:#fff;background-image:url('+E(t.logo)+');background-size:cover;background-position:center"></div>':'<div class="lg" style="background:'+col+'">'+E(l)+'</div>';};
   S('pgStrip').innerHTML=lgo(c.t,c.t.color||'#c9363e',(c.t.name||'?').charAt(0).toUpperCase())
-    +'<div><small>'+tn+'</small><b>'+ourScore(c)+'</b></div><div style="font-size:30px;color:#555;font-weight:500;margin:0 4px">–</div>'
-    +'<div><small>'+on+'</small><b>'+oppScore(c)+'</b></div>'+lgo(c.opp,'#2DBD7A',(c.m.opp||'?').charAt(0).toUpperCase())
+    +'<small>'+tn+'</small>'+scChip(ourScore(c),oppScore(c),c.t.color||'#D4AA6A')+'<small>'+on+'</small>'+lgo(c.opp,'#2DBD7A',(c.m.opp||'?').charAt(0).toUpperCase())
     +'<span style="flex:1"></span>'
     +[1,2,3,4,5,6].filter(function(q){return q<=4||CS.qt>=q;}).map(function(q){return '<span class="pgq'+(CS.qt===q?' on':'')+'">'+(q>4?'P'+(q-4):q)+'</span>';}).join('')
     +'<span id="pgClk" style="font-size:54px;font-weight:500;color:#fff;font-family:\'JetBrains Mono\',monospace;line-height:1;margin-left:12px;letter-spacing:.02em">'+mm(sec)+'</span>';
@@ -40260,7 +40293,7 @@ css.textContent=`
 .pgsm>div:nth-child(2) button[style*="solid var(--red)"]{border-color:#e07a85!important;background:#3b2428!important;color:#f2a0a8!important}
 .pgsm>div:nth-child(2){margin-top:0!important;gap:8px!important;margin-bottom:12px}
 .pgsm .btn{height:46px;border-radius:12px;padding:0 18px;font-size:15px;font-weight:500}
-.pgsm th,.pgsm td{padding-left:3px!important;padding-right:3px!important}.pgsm td{padding-top:var(--smp,2px)!important;padding-bottom:var(--smp,2px)!important}.pgsm .pgsfoot{position:sticky;bottom:0;z-index:5;background:#0d0c0b;padding:8px 4px;border-top:1px solid rgba(255,255,255,.08);margin-top:auto}
+.pgsm th,.pgsm td{padding-left:3px!important;padding-right:3px!important}.pgsm td{padding-top:var(--smp,2px)!important;padding-bottom:var(--smp,2px)!important}.pgsm .pgsfoot{position:sticky;bottom:0;z-index:5;background:#1a1a1a;padding:8px 4px;margin-top:auto;border-radius:0!important}
 .pgsm th[style*="min-width"]{min-width:0!important}
 .pgsm input[type=number]{width:44px!important;height:var(--smh,32px)!important;border-radius:10px!important;background:#14120f!important;border:1px solid rgba(255,255,255,.16)!important;color:#F0E8D8!important;font-size:15px!important}
 .pgsm input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
