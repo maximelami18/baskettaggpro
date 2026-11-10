@@ -460,7 +460,7 @@ document.addEventListener('DOMContentLoaded', function(){
 var _SB_URL="https://umuvirwbtpflizxupwbr.supabase.co";
 // Version de ce fichier — à incrémenter à chaque déploiement, en cohérence avec la valeur
 // mise à jour dans la table Supabase `app_version` (voir _checkAppVersion ci-dessous).
-var APP_VERSION = "2026-11-10-446";
+var APP_VERSION = "2026-11-10-447";
 var _SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtdXZpcndidHBmbGl6eHVwd2JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3MTI1MDEsImV4cCI6MjA5MDI4ODUwMX0.fFQaF-zP9dzcWITJDf6GBmvu0pdcuvlaUz0A0qW0kfo";
 var _LICENCE_KEY='btp_licence';
 var _MACHINE_KEY='btp_machine';
@@ -39120,12 +39120,12 @@ function lastLineHtml(m,log){
   }
   return parts.join('<span style="color:#4a463f;margin:0 5px">│</span>');
 }
-function scChip(a,b){
+function scChip(a,b,swap){
   a=+a||0;b=+b||0;
   var win=a>b,lose=a<b;
   var c=win?'#4BE08C':lose?'#FF6B6B':'#a89c88',bg=win?'61,201,122':lose?'224,82,82':'255,255,255';
   var n=function(v,col){return '<span style="font-size:34px;font-weight:900;letter-spacing:-.03em;line-height:1;font-variant-numeric:tabular-nums;color:'+col+'">'+v+'</span>';};
-  return '<div style="display:flex;align-items:center;justify-content:center;gap:14px;border-radius:14px;padding:8px 16px;background:linear-gradient(180deg,rgba('+bg+',.16),rgba('+bg+',.05));border:1px solid rgba('+bg+',.45);flex-shrink:0">'+n(a,c)+'<span style="width:2px;height:26px;border-radius:2px;transform:skewX(-14deg);background:rgba('+bg+',.5)"></span>'+n(b,(win||lose)?'#a89c88':c)+'</div>';
+  return '<div style="display:flex;align-items:center;justify-content:center;gap:14px;border-radius:14px;padding:8px 16px;background:linear-gradient(180deg,rgba('+bg+',.16),rgba('+bg+',.05));border:1px solid rgba('+bg+',.45);flex-shrink:0">'+(swap?n(b,(win||lose)?'#a89c88':c):n(a,c))+'<span style="width:2px;height:26px;border-radius:2px;transform:skewX(-14deg);background:rgba('+bg+',.5)"></span>'+(swap?n(a,c):n(b,(win||lose)?'#a89c88':c))+'</div>';
 }
 function renderTop(force){
   var w=S('ps2Top');if(!w)return;
@@ -39146,9 +39146,12 @@ function renderTop(force){
   var nm=function(x){return '<div style="font-size:12px;letter-spacing:.14em;font-weight:500;color:#a89c88;text-transform:uppercase;white-space:nowrap">'+x+'</div>';};
   var sc=function(x){return '<div class="ps2sc" style="font-size:40px;font-weight:500;color:#F0E8D8;line-height:1;font-variant-numeric:tabular-nums">'+x+'</div>';};
   var nm2=function(x,al,mine){return '<div style="font-size:19px;letter-spacing:-.01em;font-weight:'+(mine?800:600)+';color:'+(mine?'#F0E8D8':'#a89c88')+';white-space:nowrap;line-height:1.2;text-align:'+al+'">'+x+'</div>';};
-  w.innerHTML='<div style="display:flex;align-items:center;gap:12px">'+circle((t.name||'?').charAt(0).toUpperCase(),t.color||'#c9363e',t.logo)+nm2(tn,'left',true)+'</div>'
-    +scChip(ourScore(),oppScore())
-    +'<div style="display:flex;align-items:center;gap:12px">'+nm2(E(m.opp||''),'right',false)+circle((m.opp||'?').charAt(0).toUpperCase(),'#2DBD7A',opp&&opp.logo)+'</div>'
+  var _us='<div style="display:flex;align-items:center;gap:12px">'+circle((t.name||'?').charAt(0).toUpperCase(),t.color||'#c9363e',t.logo)+nm2(tn,'left',true)+'</div>',
+      _th='<div style="display:flex;align-items:center;gap:12px">'+nm2(E(m.opp||''),'right',false)+circle((m.opp||'?').charAt(0).toUpperCase(),'#2DBD7A',opp&&opp.logo)+'</div>',
+      _away=(m.home===false);
+  w.innerHTML=(_away?'<div style="display:flex;align-items:center;gap:12px">'+circle((m.opp||'?').charAt(0).toUpperCase(),'#2DBD7A',opp&&opp.logo)+nm2(E(m.opp||''),'left',false)+'</div>':_us)
+    +scChip(ourScore(),oppScore(),_away)
+    +(_away?'<div style="display:flex;align-items:center;gap:12px">'+nm2(tn,'right',true)+circle((t.name||'?').charAt(0).toUpperCase(),t.color||'#c9363e',t.logo)+'</div>':_th)
     +'<div style="display:flex;gap:8px;margin-left:26px">'+qb+'</div>'
     +'<div class="ps2ub" style="margin-left:14px;flex:1;min-width:0;display:flex;align-items:center;gap:8px;padding:4px 6px 4px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.08);background:#161513;height:50px"><span style="flex:1;min-width:0;font-size:11.5px;line-height:1.3;color:#cfc4b0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">'+(ut||'<span style="color:#6f675a">—</span>')+'</span>'+(ut?'<button onclick="ps2Undo()" title="Supprimer toute la ligne" style="flex:none;width:34px;height:34px;border-radius:9px;border:1px solid rgba(224,82,82,.4);background:#2a1c1d;color:#f08585;cursor:pointer;font-size:15px;line-height:1">🗑</button>':'')+'</div>'
     +'<div style="width:572px;flex:none"></div>'
