@@ -460,7 +460,7 @@ document.addEventListener('DOMContentLoaded', function(){
 var _SB_URL="https://umuvirwbtpflizxupwbr.supabase.co";
 // Version de ce fichier — à incrémenter à chaque déploiement, en cohérence avec la valeur
 // mise à jour dans la table Supabase `app_version` (voir _checkAppVersion ci-dessous).
-var APP_VERSION = "2026-11-10-447";
+var APP_VERSION = "2026-11-11-450";
 var _SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtdXZpcndidHBmbGl6eHVwd2JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3MTI1MDEsImV4cCI6MjA5MDI4ODUwMX0.fFQaF-zP9dzcWITJDf6GBmvu0pdcuvlaUz0A0qW0kfo";
 var _LICENCE_KEY='btp_licence';
 var _MACHINE_KEY='btp_machine';
@@ -819,7 +819,7 @@ var vid=document.getElementById('mainVideo');
 vid.addEventListener('timeupdate',function(){if(!vid.duration)return;document.getElementById('progFill').style.width=(vid.currentTime/vid.duration*100)+'%';var m=Math.floor(vid.currentTime/60),s=Math.floor(vid.currentTime%60);document.getElementById('timeLabel').textContent=String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');if(_tlWin&&!_tlWin.closed){_tlWin.postMessage({type:'btp_time',t:vid.currentTime},'*');}});
 vid.addEventListener('play',function(){var b=document.getElementById('playBtn');b.textContent='⏸';b.classList.remove('act');
   if(_qtVidSyncing){_qtVidSyncing=false;return;} // ce play vient du chrono (déjà traité côté chrono) : rien à refaire
-  if(CS.mode==='stats'&&!CS.qtClockRunning&&(CS.qtClockSec==null||CS.qtClockSec>0))toggleQtClock(true);
+  if(CS.mode==='stats'&&!window._gameStop&&!CS.qtClockRunning&&(CS.qtClockSec==null||CS.qtClockSec>0))toggleQtClock(true);
 });
 vid.addEventListener('pause',function(){var b=document.getElementById('playBtn');b.textContent='▶';b.classList.add('act');
   if(_qtVidSyncing){_qtVidSyncing=false;return;} // ce pause vient du chrono (déjà traité côté chrono) : rien à refaire
@@ -39133,13 +39133,13 @@ function renderTop(force){
   var sec=(CS.qtClockSec==null?(CS.qtClockDuration||600):CS.qtClockSec);
   var run=!!CS.qtClockRunning;
   var ut=undoText();
-  var sig=[CS.qt,run,ourScore(),oppScore(),P.st.step,ut,vidOn(),CS.qtClockSec==null?'':run?'':CS.qtClockSec].join('|');
+  var sig=[CS.qt,run,ourScore(),oppScore(),P.st.step,ut,vidOn(),!!window._gameStop,CS.qtClockSec==null?'':run?'':CS.qtClockSec].join('|');
   if(!force&&sig===_topSig){var l=S('qtClockLabel');if(l)l.textContent=mm(sec);return;}
   _topSig=sig;
   var qts=[1,2,3,4,5,6],ql=['1','2','3','4','P1','P2'];
   var qb=qts.map(function(n,i){return '<button class="ps2cb'+(CS.qt===n?' on':'')+'" style="height:40px;min-width:40px" onclick="setQt('+n+')">'+ql[i]+'</button>';}).join('');
   var adj=function(d){return '<button class="ps2adj"'+(run?' disabled':'')+' onclick="adjustQtClock('+d+')">'+(d>0?'+':'−')+Math.abs(d)+'s</button>';};
-  var paused=(!run&&P.st.step!=='idle');
+  var paused=(!run&&(P.st.step!=='idle'||!!window._gameStop));
   var tn=E(t.name||'');
   var opp=m.oppTeamId?gT(m.oppTeamId):null;
   w.style.cssText='position:relative;background:#0A0A0A;border-bottom:3px solid #D4AA6A;padding:10px 22px;display:flex;align-items:center;gap:14px;flex-shrink:0;min-height:100px';
@@ -39161,6 +39161,31 @@ function renderTop(force){
     +adj(1)+adj(3)+adj(5)+'</div>';
 }
 P.renderTop=renderTop;
+// « Arrêt de jeu » : le chrono s'arrête, la vidéo continue (touche, arbitre…). « Reprise du jeu » relance le chrono.
+window._gameStop=false;
+function ajBtn(){
+  var row=S('videoCtrlRow'),t=S('timeLabel');if(!row||!t)return;
+  var b=S('ps2AJ');
+  if(!b){b=document.createElement('button');b.id='ps2AJ';b.className='vcb';b.onclick=function(){ps2GameStop();};t.after(b);}
+  var on=!!window._gameStop;
+  b.style.cssText='margin-left:10px;padding:0 12px;width:auto;font-weight:700;font-size:12.5px;white-space:nowrap;border:1.5px solid '+(on?'#D4AA6A':'rgba(224,82,82,.55)')+';background:'+(on?'rgba(212,170,106,.22)':'rgba(224,82,82,.14)')+';color:'+(on?'#E8C88A':'#f08585');
+  b.textContent=on?'▶ Reprise du jeu':'⏸ Arrêt de jeu';
+}
+P.ajBtn=ajBtn;
+window.ps2GameStop=function(){
+  if(CS.mode!=='stats')return;
+  if(!window._gameStop){
+    window._gameStop=true;
+    if(CS.qtClockRunning){try{toggleQtClock(true);}catch(e){}}
+  }else{
+    window._gameStop=false;
+    try{if(!CS.qtClockRunning&&(CS.qtClockSec==null||CS.qtClockSec>0)&&P.st.step==='idle')toggleQtClock();}catch(e){}
+  }
+  ajBtn();renderTop(true);
+};
+(function(){var _tq=window.toggleQtClock;if(typeof _tq!=='function')return;
+  window.toggleQtClock=function(fromSync){var was=window._gameStop;if(!fromSync&&was)window._gameStop=false;var r=_tq.apply(this,arguments);if(was!==window._gameStop){try{ajBtn();if(P.active())renderTop(true);}catch(e){}}return r;};
+})();
 var _rqs0=window.renderQtScoreboardBar;
 window.renderQtScoreboardBar=function(){if(CS.mode!=='stats')return _rqs0.apply(this,arguments);if(active()){renderTop(false);}};
 window._renderQtClock=function(){if(CS.mode!=='stats')return _rqs0.apply(this,arguments);if(active()){renderTop(false);}};
@@ -39244,9 +39269,9 @@ function tileF(k){
   return '<div class="ps2act" onclick="ps2Act(\''+k+'\')" style="border-color:'+a[2]+';background:'+a[3]+';gap:8px;min-height:0;'+selStyle(k,a)+'"><span style="font-size:30px;line-height:1">'+a[0]+'</span><span style="font-size:15px">'+a[1]+'</span></div>';
 }
 function actionsFill(){
-  return '<div style="flex:1;min-height:0;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:auto 1fr 1fr;gap:8px">'
+  return '<div style="flex:1;min-height:0;display:grid;grid-template-columns:repeat(2,1fr);grid-template-rows:auto 1fr 1fr;gap:8px">'
     +'<div style="grid-column:1/-1;height:52px">'+tileRow('lf','height:100%;justify-content:center')+'</div>'
-    +tileF('bp')+tileF('inter')+tileF('contre')+tileF('fc')+tileF('fp')+tileF('hs')+'</div>';
+    +tileF('bp')+tileF('contre')+tileF('fp')+tileF('hs')+'</div>';
 }
 function actionsVideo(){return actionsFill();}
 function ctxBtn(k,ico,lab){
@@ -39336,7 +39361,7 @@ function SLOT(t){return '<div style="height:16px;line-height:16px;text-align:cen
 function tp(key,fn,arg){return 'ps2Tap(\''+key+'\',\''+fn+'\','+(typeof arg==='string'?'\''+arg+'\'':String(arg))+')';}
 function addClick(html,oc){return html.replace('<div class="ps2pc"','<div class="ps2pc" onclick="'+oc+'"').replace('style="','style="cursor:pointer;');}
 function phr(fn){
-  var st=ST.step,m={ps2ShotPick:ST.shotMade?'a marqué':'a loupé son tir',ps2Assist:'a fait la passe décisive',ps2Reb:'a pris le rebond',ps2LfWho:'tire les lancers francs',ps2AdvLost:'a perdu la balle',ps2AdvBp:'a intercepté'};
+  var st=ST.step,m={ps2ShotPick:ST.shotMade?'a marqué':'a loupé son tir',ps2Assist:'a fait la passe décisive',ps2Reb:'a pris le rebond',ps2LfWho:'tire les lancers francs',ps2AdvLost:'a perdu la balle',ps2AdvBp:'a intercepté',ps2AdvFp:'a commis la faute'};
   if(fn==='ps2Who')return {bp:'a perdu la balle',inter:'a intercepté',contre:'a contré',fc:'a commis la faute',fp:'a provoqué la faute'}[st]||'';
   return m[fn]||'';
 }
@@ -39457,19 +39482,23 @@ function stripHtml(){
     var shp=shn!=null?advRoster().filter(function(p){return p.id===shn;})[0]:null;var al=ST.tapSel==='none'?advName()+' : sans passe décisive':(selRoster()?advName()+' ('+advNum(selRoster())+') a fait la passe décisive':advName()+(shp?' ('+advNum(shp)+')':'')+' a marqué');var leftA=gen?advLine(advName()+' a marqué')+'<div style="color:#8a7e6c;font-size:15px">Contexte du tir et passe décisive : à droite, sous le terrain</div>':advLine(al)+chipsA;
     return h+'<div style="'+cols+'"><div style="grid-column:1/'+(oc.length+1)+';display:flex;flex-wrap:wrap;align-content:center;justify-content:center;gap:14px;border-radius:18px;border:2px solid rgba(201,74,74,.5);background:#2a1f20;padding:12px">'+leftA+'</div>'+(gen?advInert():advTapCard('none','ps2AdvAssist',null,'Sans passe'))+'</div>';
   }
+  if(step==='advFp'){
+    h=stripHead('Faute provoquée par '+E(advName())+' — qui a fait la faute ?','<button class="ps2h" onclick="ps2AdvFp(\'col\')">Équipe (collectif)</button><button class="ps2h" style="height:34px;color:#f08585" onclick="ps2Cancel()">✕ Annuler</button>');
+    return h+'<div style="'+cols+'">'+oc.map(function(p){return cardTap(p,'ps2AdvFp',p.id);}).join('')+advInert()+'</div>';
+  }
   if(step==='advBpq'||step==='advInter'){
     var isI=(step==='advInter');
     h=stripHead(isI?'Qui a perdu la balle ?':'Balle perdue — interception de laquelle de nos joueuses ?',isI?'<button class="ps2h" onclick="ps2AdvLost(\'col\')">Équipe (collectif)</button>':'');
-    return h+'<div style="'+cols+'">'+oc.map(function(p){return cardTap(p,isI?'ps2AdvLost':'ps2AdvBp',p.id);}).join('')+(isI?advInert():advTapCard('none','ps2AdvBp',null,'Aucune'))+'</div>';
+    return h+'<div style="'+cols+'">'+oc.map(function(p){return cardTap(p,isI?'ps2AdvLost':'ps2AdvBp',p.id);}).join('')+(isI?advInert():advTapCard('none','ps2AdvBp',null,'Pas d’interception'))+'</div>';
   }
   if(step==='lfCount'){
-    h=stripHead('Qui tire les lancers francs ?','');
+    h=stripHead('Qui tire les lancers francs ?',remplacerBtn());
     return h+'<div style="'+cols+'">'+oc.map(function(p){return cardTap(p,'ps2LfWho',p.id);}).join('')+advTapCard('adv','ps2LfWho','adv','')+'</div>';
   }
   if(step==='lfShoot'){
     var L=ST.lf,who=L.who==='adv'?null:P.plr(L.who);
     var nxt=L.res.indexOf(null);
-    h=stripHead((who?(who.first||'').toUpperCase():advName().toUpperCase())+' tire · '+(nxt>=0?'en attente du lancer '+(nxt+1):'terminé'),'<span style="font-size:13px;color:#8a7e6c">La saisie est au même endroit qu’avec la vidéo</span><button class="ps2h" style="color:#f08585" onclick="ps2Cancel()">✕ Annuler</button>');
+    h=stripHead((who?(who.first||'').toUpperCase():advName().toUpperCase())+' tire · '+(nxt>=0?'en attente du lancer '+(nxt+1):'terminé'),'<span style="font-size:13px;color:#8a7e6c">La saisie est au même endroit qu’avec la vidéo</span>'+remplacerBtn()+'<button class="ps2h" style="color:#f08585" onclick="ps2Cancel()">✕ Annuler</button>');
     var recap=L.res.map(function(r,i){return 'LF'+(i+1)+' '+(r===true?'<b style="color:#3DC97A">✓</b>':r===false?'<b style="color:#f08585">✕</b>':'…');}).join(' &nbsp; ');
     return h+'<div style="'+cols+'">'+oc.map(function(p){
       if(L.who===p.id)return cardBase(p,P.seuilsGet(),SLOT(recap),'#D4AA6A',false,SELXS);
@@ -39478,7 +39507,7 @@ function stripHtml(){
   }
   if(step==='fpLF'){
     var fp=P.plr(ST.fpPid),b=function(n,l){return '<button class="ps2btn go" style="flex:1;height:76px;font-size:22px" onclick="ps2FpLf('+n+')">'+l+'</button>';};
-    h=stripHead('Faute provoquée enregistrée'+(fp?' · '+E(fp.first||''):'')+' — lancers francs ?','');
+    h=stripHead('Faute provoquée enregistrée'+(fp?' · '+E(fp.first||''):(ST.fpPid==='adv'?' · '+E(advName()):''))+' — lancers francs ?',remplacerBtn());
     return h+'<div style="display:flex;gap:12px"><button class="ps2btn pl" style="flex:1.2;height:76px;font-size:20px" onclick="ps2FpLf(0)">Pas de lancer franc</button>'+b(1,'1 LF')+b(2,'2 LF')+b(3,'3 LF')+'</div>';
   }
   if(step==='hs'){
@@ -39550,7 +39579,7 @@ function stepPanel(){
 
 // ───────── Assemblage ─────────
 function midHtml(){
-  var step=ST.step,vo=P.vidOn(),SIMPLE=['bp','bpq','inter','interq','contre','fc','fp','fpLF','who','advWho','advAssist','advBpq','advInter'],shotStep=(step==='idle'||step==='assist'||SIMPLE.indexOf(step)>=0);
+  var step=ST.step,vo=P.vidOn(),SIMPLE=['bp','bpq','inter','interq','contre','fc','fp','fpLF','who','advWho','advAssist','advBpq','advInter','advFp'],shotStep=(step==='idle'||step==='assist'||SIMPLE.indexOf(step)>=0);
   var courtBlock=function(fl){return '<div style="flex:'+(fl||'1')+';min-height:0;display:flex;justify-content:center;align-items:center;position:relative">'+courtSvg()+'</div>';};
   var RW='width:600px;flex:none;';
   var right;
@@ -39585,6 +39614,7 @@ P.render=function(){
   if(ST.step==='idle'&&!ST.pos){P._sh=sc.offsetHeight;var shh=S('ps2sh');if(shh)P._hh=shh.offsetHeight;}
   else if(P._sh){sc.style.height=P._sh+'px';}
   _sig=sigNow();
+  try{P.ajBtn();}catch(e){}
   P.popup();
   P.layoutVideo();
 };
@@ -39628,6 +39658,7 @@ P.layoutVideo=function(){
   }
 };
 P.cleanup=function(){
+  window._gameStop=false;var _aj=document.getElementById('ps2AJ');if(_aj)_aj.remove();
   var _po=document.getElementById('ps2Pop');if(_po)_po.remove();
   document.body.classList.remove('ps2on');
   var vw=S('videoWrap'),vc=S('videoControls');
@@ -39668,17 +39699,17 @@ function afterRebound(){ST.step='idle';ST.pos=null;ST.fpFlow=false;restartClock(
 
 // ───────── Chrono : les lancers francs l'arrêtent (avec ou sans vidéo), la vidéo continue ─────────
 function stopClockLF(){if(CS.qtClockRunning){ST.lfClock=true;toggleQtClock(true);}}
-function restartClock(){if(ST.lfClock){ST.lfClock=false;if(!CS.qtClockRunning&&(CS.qtClockSec==null||CS.qtClockSec>0))toggleQtClock(true);}}
+function restartClock(){if(window._gameStop&&!ST.lfClock&&P.vidOn()){try{if(typeof vid!=='undefined'&&vid.paused){_qtVidSyncing=true;setTimeout(function(){_qtVidSyncing=false;},500);resumeVideo();}}catch(e){}return;}if(ST.lfClock){ST.lfClock=false;if(!CS.qtClockRunning&&(CS.qtClockSec==null||CS.qtClockSec>0))toggleQtClock(true);}}
 function reset(){clearTimeout(ST.tapT);ST.tapSel=null;ST.fpFlow=false;ST.step='idle';ST.pos=null;ST.shooter=null;ST.lf=null;ST.bp=null;ST.fpPid=null;ST.flags={SCP:false,PAPB:false,FB8:false};}
 P.reset=reset;
 
 // ───────── Actions ─────────
-function curAct(){var s=ST.step;return s==='bpq'||s==='advBpq'?'bp':s==='advInter'?'inter':s==='interq'?'inter':(s==='lfCount'||s==='lfShoot')?'lf':s==='fpLF'?'fp':s;}
+function curAct(){var s=ST.step;return s==='bpq'||s==='advBpq'?'bp':s==='advInter'?'inter':s==='interq'?'inter':(s==='lfCount'||s==='lfShoot')?'lf':(s==='fpLF'||s==='advFp')?'fp':s;}
 window.ps2Act=function(k){
   // re-clic sur la stat sélectionnée = désélection (pas de bouton Annuler)
   if(curAct()===k&&['bp','inter','contre','fc','fp','lf','hs'].indexOf(k)>=0&&(ST.step!=='lfShoot'||!ST.fpFlow)&&ST.step!=='fpLF'){ps2Cancel();return;}
   if(ST.step!=='idle'&&ST.step!=='assist'){
-    if(['bp','bpq','inter','interq','contre','fc','fp','lfCount','lfShoot','hs','advBpq','advInter'].indexOf(ST.step)<0)return;
+    if(['bp','bpq','inter','interq','contre','fc','fp','lfCount','lfShoot','hs','advBpq','advInter','advFp'].indexOf(ST.step)<0)return;
     // changer de stat : on repart proprement sans relancer chrono/vidéo
     var keepClk=ST.lfClock;reset();HS_RESET();ST.lfClock=keepClk;
   }
@@ -39692,7 +39723,7 @@ window.ps2Tap=function(key,fn,arg){
   clearTimeout(ST.tapT);
   if(ST.tapSel===key){ST.tapSel=null;P.render();return;}
   ST.tapSel=key;P.render();
-  ST.tapT=setTimeout(function(){ST.tapSel=null;var f=window[fn];if(f)f(arg);},1000);
+  ST.tapT=setTimeout(function(){ST.tapSel=null;var f=window[fn];if(f)f(arg);},500);
 };
 window.ps2ShotPick=function(pid){ps2Shot(pid,!!ST.shotMade);};
 window.ps2PM=function(made){if(!ST.pos)return;ST.shotMade=made;ST.step='who';P.render();};
@@ -39725,6 +39756,7 @@ function advCommit(key,keep){
 }
 window.ps2AdvBp=function(pid){if(pid==null){advCommit('bp');return;}commit('inter',pid);};
 window.ps2AdvLost=function(pid){commit('bp_inter',pid);};
+window.ps2AdvFp=function(pid){commit('fc',pid,true);ST.step='fpLF';ST.fpPid='adv';P.render();};
 window.ps2AdvShot=function(made){
   if(!ST.pos){toast('Touche d’abord l’endroit du tir sur le terrain','red');return;}
   ST.advMade=made;ST.advShooter=null;
@@ -39756,7 +39788,7 @@ window.ps2Who=function(pid){
     if(s==='inter'){ST.step='advInter';P.render();return;}
     if(s==='contre'){advCommit('contre');return;}
     if(s==='fc'){advCommit('fc');return;}
-    if(s==='fp'){advCommit('fi',true);ST.step='fpLF';ST.fpPid='adv';P.render();return;}
+    if(s==='fp'){ST.step='advFp';P.render();return;}
     return;
   }
   if(s==='bp'){ST.bp={pid:pid};ST.step='bpq';P.render();return;}
@@ -39813,7 +39845,7 @@ window.ps2LfRes=function(i,made){
   if(L.res.indexOf(null)>=0)return;
   // tous les lancers renseignés : on laisse voir le dernier choix ~0,8 s, puis on enregistre
   if(L._t)clearTimeout(L._t);
-  L._t=setTimeout(function(){lfFinalize(L);},800);
+  L._t=setTimeout(function(){lfFinalize(L);},500);
 };
 function lfFinalize(L){
   if(ST.lf!==L||L.res.indexOf(null)>=0)return;
