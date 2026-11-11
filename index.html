@@ -460,7 +460,7 @@ document.addEventListener('DOMContentLoaded', function(){
 var _SB_URL="https://umuvirwbtpflizxupwbr.supabase.co";
 // Version de ce fichier — à incrémenter à chaque déploiement, en cohérence avec la valeur
 // mise à jour dans la table Supabase `app_version` (voir _checkAppVersion ci-dessous).
-var APP_VERSION = "2026-11-11-453";
+var APP_VERSION = "2026-11-11-454";
 var _SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtdXZpcndidHBmbGl6eHVwd2JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3MTI1MDEsImV4cCI6MjA5MDI4ODUwMX0.fFQaF-zP9dzcWITJDf6GBmvu0pdcuvlaUz0A0qW0kfo";
 var _LICENCE_KEY='btp_licence';
 var _MACHINE_KEY='btp_machine';
@@ -16375,6 +16375,7 @@ function rythmeStatsPlusHtml(selTeam,matches,sec,card){
     +card('Adversaire / match',R.totOpp>0?f1(paceOp):'—',R.totOpp>0?'':'stats adverses non codées')
     +card('QT le plus rapide',fastest?'QT'+fastest.q:'—',fastest?f1(fastest.v)+' possessions (les deux équipes)':'')
     +card('Qui impose son rythme',R.totOpp>0?(paceMe>paceOp+1?'Moi':paceOp>paceMe+1?'L\'adversaire':'Équilibré'):'—','')+'</div>';
+  if(window.xvSeriesHtml)h+=xvSeriesHtml(selTeam,matches,sec);
   if(_ry.view==='qt'){
     var qs=Object.keys(R.qt).map(Number).sort();
     var g='grid-template-columns:1.2fr 1fr 1fr 1fr 1fr;';
@@ -21309,13 +21310,20 @@ function renderStatsPlusPage(){
     // ── Second Chance + Points après BP + Points sur jeu rapide ────────────
     var totalSCP=0,totalPAPB=0,totalBP=0,totalBPAdv=0,totalFB8=0,totalFB8Adv=0;
     var totalSCPAdv=0,totalPAPBAdv=0;
+    var _ctxN={scp:[[0,0],[0,0]],papb:[[0,0],[0,0]],fb8:[[0,0],[0,0]]};
+    var _ctxS=function(k,i){var o=_ctxN[k][i];return o[1]?' <span style="font-size:11.5px;font-weight:500;color:#8a7e6c">('+o[0]+'/'+o[1]+')</span>':'';};
     filteredMatches.forEach(function(m){
       var isOppPerspectiveSCP=(m.oppTeamId==selTeam.id&&m.teamId!=selTeam.id);
       var log=DB.statLogs&&DB.statLogs[m.id]||[];
-      log.forEach(function(ev){
+      log.forEach(function(ev,_ci){
+        var _pv=_ci>0?log[_ci-1]:null;
+        if(_pv&&_pv.type==='shot'&&_pv.pid==='collectifAdv'&&ev.type==='stat'&&ev.pid==null&&ev.target==='adverse'&&ev.key===_pv.key)return; // même tir, déjà compté
         // "Nous" = l'équipe consultée. En perspective normale, ev.target!=='adverse' = nous.
         // En perspective inversée (équipe consultée = oppTeamId), c'est l'inverse : ev.target==='adverse' (ou advTeam) = nous.
         var isOurs=isOppPerspectiveSCP?(ev.target==='adverse'||ev.advTeam):(ev.target!=='adverse'&&!ev.advTeam);
+        var _ck=function(k){var o=_ctxN[k][isOurs?0:1];o[1]++;if((ev.scpVal||0)>0)o[0]++;};
+        if(ev.isSCP)_ck('scp');if(ev.isPAPB)_ck('papb');if(ev.isFB8)_ck('fb8');
+        if(ev.key==='scp'||ev.key==='papb'||ev.key==='fb8'){var _lo=_ctxN[ev.key][isOurs?0:1];_lo[0]++;_lo[1]++;}
         if(ev.isSCP){var _sv1=ev.scpVal||0;if(isOurs)totalSCP+=_sv1;else totalSCPAdv+=_sv1;}
         if(ev.isPAPB){var _sv2=ev.scpVal||0;if(isOurs)totalPAPB+=_sv2;else totalPAPBAdv+=_sv2;}
         if(ev.isFB8){var _sv3=ev.scpVal||0;if(isOurs)totalFB8+=_sv3;else totalFB8Adv+=_sv3;}
@@ -21335,12 +21343,12 @@ function renderStatsPlusPage(){
      +'<div style="'+thStyle+'text-align:center;">'+selTeam.name+'</div>'
      +'<div style="'+thStyle+'text-align:center;">Adverse</div>'
      +'<div style="'+thStyle+'text-align:center;">Différence</div>';
-    function statRow(label,own,adv){
+    function statRow(label,own,adv,so,sa){
       var diff=own-adv;var diffC=diff>=0?'#3DC97A':'#E05252';
       var rs='padding:9px 12px;font-size:13px;border-bottom:1px solid rgba(255,255,255,0.03);';
       return '<div style="'+rs+'font-weight:600;color:#D4AA6A;">'+label+'</div>'
-        +'<div style="'+rs+'text-align:center;font-weight:700;color:#F0E8D8;">'+own+'</div>'
-        +'<div style="'+rs+'text-align:center;color:#A89880;">'+adv+'</div>'
+        +'<div style="'+rs+'text-align:center;font-weight:700;color:#F0E8D8;">'+own+(so||'')+'</div>'
+        +'<div style="'+rs+'text-align:center;color:#A89880;">'+adv+(sa||'')+'</div>'
         +'<div style="'+rs+'text-align:center;font-weight:700;color:'+diffC+';">'+(diff>=0?'+':'')+diff+'</div>';
     }
     function statRowF(label,own,adv){
@@ -21351,12 +21359,12 @@ function renderStatsPlusPage(){
         +'<div style="'+rs+'text-align:center;color:#A89880;">'+adv.toFixed(1)+'</div>'
         +'<div style="'+rs+'text-align:center;font-weight:700;color:'+diffC+';">'+(diff>=0?'+':'')+diff.toFixed(1)+'</div>';
     }
-    h+=statRow('SCP (Second Chance Points)',totalSCP,totalSCPAdv);
-    h+=statRowF('SCP/G',nm>0?totalSCP/nm:0,nm>0?totalSCPAdv/nm:0);
-    h+=statRow('PAPB (Pts après perte de balle)',totalPAPB,totalPAPBAdv);
-    h+=statRowF('PAPB/G',nm>0?totalPAPB/nm:0,nm>0?totalPAPBAdv/nm:0);
-    h+=statRow('Jeu rapide -8s (points)',totalFB8,totalFB8Adv);
-    h+=statRowF('Jeu rapide -8s/G',nm>0?totalFB8/nm:0,nm>0?totalFB8Adv/nm:0);
+    h+=statRow('SCP (Second Chance Points)',totalSCP,totalSCPAdv,_ctxS('scp',0),_ctxS('scp',1));
+    if(nm>1)h+=statRowF('SCP / match',nm>0?totalSCP/nm:0,nm>0?totalSCPAdv/nm:0);
+    h+=statRow('PAPB (Pts après perte de balle)',totalPAPB,totalPAPBAdv,_ctxS('papb',0),_ctxS('papb',1));
+    if(nm>1)h+=statRowF('PAPB / match',nm>0?totalPAPB/nm:0,nm>0?totalPAPBAdv/nm:0);
+    h+=statRow('Jeu rapide -8s (points)',totalFB8,totalFB8Adv,_ctxS('fb8',0),_ctxS('fb8',1));
+    if(nm>1)h+=statRowF('Jeu rapide -8s / match',nm>0?totalFB8/nm:0,nm>0?totalFB8Adv/nm:0);
     h+='</div></div>';
 
     h+=sec('📐 Formules');
@@ -39584,7 +39592,7 @@ function midHtml(){
   var RW='width:600px;flex:none;';
   var right;
   if(shotStep){
-    right=(vo?'<div style="position:absolute;right:10px;top:10px;z-index:2">'+chipHtml()+'</div>'+courtBlock('1.15 1 0')+'<div style="height:10px;flex:none"></div>':'')+(step==='bpq'?ynFill():(step==='assist'||step==='advAssist'||step==='who')?ctxFill(step==='advAssist'&&!(ST.advShooter!=null&&advRoster().length>1)?advAssistRow():''):actionsFill());
+    right=(vo?'<div style="position:absolute;right:10px;top:10px;z-index:2">'+chipHtml()+'</div>'+courtBlock('1.15 1 0')+'<div style="height:10px;flex:none"></div>':'')+(step==='bpq'?ynFill():(step==='assist'||step==='advAssist'||step==='who')?ctxFill((step==='who'&&ST.shotMade?and1Row():'')+(step==='advAssist'&&!(ST.advShooter!=null&&advRoster().length>1)?advAssistRow():'')):actionsFill());
   }else if(step==='rebound'){
     right=(vo?courtBlock('1.15 1 0')+'<div style="height:10px;flex:none"></div>':'')+'<div style="flex:1;min-height:0;border-radius:16px;background:#242321;display:flex;align-items:center;justify-content:center;color:#6f675a;font-size:13px">Actions masquées pendant le rebond</div>';
   }else{
@@ -39700,7 +39708,7 @@ function afterRebound(){ST.step='idle';ST.pos=null;ST.fpFlow=false;restartClock(
 // ───────── Chrono : les lancers francs l'arrêtent (avec ou sans vidéo), la vidéo continue ─────────
 function stopClockLF(){if(CS.qtClockRunning){ST.lfClock=true;toggleQtClock(true);}}
 function restartClock(){if(window._gameStop&&!ST.lfClock&&P.vidOn()){try{if(typeof vid!=='undefined'&&vid.paused){_qtVidSyncing=true;setTimeout(function(){_qtVidSyncing=false;},500);resumeVideo();}}catch(e){}return;}if(ST.lfClock){ST.lfClock=false;if(!CS.qtClockRunning&&(CS.qtClockSec==null||CS.qtClockSec>0))toggleQtClock(true);}}
-function reset(){clearTimeout(ST.tapT);ST.tapSel=null;ST.fpFlow=false;ST.step='idle';ST.pos=null;ST.shooter=null;ST.lf=null;ST.bp=null;ST.fpPid=null;ST.flags={SCP:false,PAPB:false,FB8:false};}
+function reset(){clearTimeout(ST.tapT);ST.tapSel=null;ST.auto=null;ST.and1=false;ST.and1Adv=false;ST.fpFlow=false;ST.step='idle';ST.pos=null;ST.shooter=null;ST.lf=null;ST.bp=null;ST.fpPid=null;ST.flags={SCP:false,PAPB:false,FB8:false};}
 P.reset=reset;
 
 // ───────── Actions ─────────
@@ -39725,8 +39733,31 @@ window.ps2Tap=function(key,fn,arg){
   ST.tapSel=key;P.render();
   ST.tapT=setTimeout(function(){ST.tapSel=null;var f=window[fn];if(f)f(arg);},500);
 };
-window.ps2ShotPick=function(pid){ps2Shot(pid,!!ST.shotMade);};
-window.ps2PM=function(made){if(!ST.pos)return;ST.shotMade=made;ST.step='who';P.render();};
+window.ps2ShotPick=function(pid){autoCtxTeam('us');ps2Shot(pid,!!ST.shotMade);};
+// Contexte prérempli d'après l'action juste avant : rebond offensif -> « Après RO », balle perdue -> « Après BP » (pour l'équipe concernée)
+function evSide(e){return (e.advTeam||e.target==='adverse')?'adv':'us';}
+function autoCtx(){
+  var log=getLog(CS.matchId)||[],i=log.length-1,o={};
+  while(i>=0&&log[i].type==='sub')i--;
+  if(i<0)return o;
+  var e=log[i];if(e.qt!=null&&CS.qt!=null&&parseInt(e.qt)!==parseInt(CS.qt))return o;
+  if(e.type!=='stat')return o;
+  if(e.key==='rebo'){o.SCP=evSide(e);}
+  else if(e.key==='bp'){o.PAPB=(evSide(e)==='us'?'adv':'us');}
+  else if(e.key==='inter'&&e.linkedTo!=null&&log[e.linkedTo]&&log[e.linkedTo].key==='bp'){o.PAPB=evSide(e);}
+  return o;
+}
+function autoCtxTeam(team){var a=ST.auto||{};['SCP','PAPB'].forEach(function(k){if(a[k]&&a[k]!==team){ST.flags[k]=false;}});ST.auto=null;}
+window.ps2PM=function(made){if(!ST.pos)return;ST.shotMade=made;ST.step='who';ST.and1=false;
+  var a=autoCtx();ST.auto=a;ST.flags={SCP:!!a.SCP,PAPB:!!a.PAPB,FB8:false};
+  P.render();};
+window.ps2And1=function(){ST.and1=!ST.and1;P.render();};
+function and1Row(){
+  var on=!!ST.and1;
+  return '<div class="ps2act" onclick="ps2And1()" style="flex:none;flex-direction:row;gap:12px;height:56px;margin-top:10px;border-color:'+(on?'#D4AA6A':'rgba(212,170,106,.4)')+';background:'+(on?'#3a3122':'#2c2a27')+';'+(on?'box-shadow:0 0 0 3px rgba(212,170,106,.25)':'')+'"><span style="font-size:24px;line-height:1">🟡</span><span style="font-size:17px">Panier + faute</span><span style="font-size:12px;font-weight:500;color:#8a7e6c">1 lancer franc</span></div>';
+}
+// après l'enregistrement du tir (y compris si la question 2/3 points est posée), on enchaîne
+function afterShot(n0,fn){var t=0,iv=setInterval(function(){t++;if(getLog(CS.matchId).length>n0&&!document.getElementById('xv19ask')){clearInterval(iv);fn();}else if(t>600)clearInterval(iv);},100);}
 window.ps2Cancel=function(){
   var wasLF=(ST.step==='lfCount'||ST.step==='lfShoot');
   var lfdone=ST.lf&&ST.lf.res.some(function(r){return r!=null;});
@@ -39756,9 +39787,10 @@ function advCommit(key,keep){
 }
 window.ps2AdvBp=function(pid){if(pid==null){advCommit('bp');return;}commit('inter',pid);};
 window.ps2AdvLost=function(pid){commit('bp_inter',pid);};
-window.ps2AdvFp=function(pid){commit('fc',pid,true);ST.step='fpLF';ST.fpPid='adv';P.render();};
+window.ps2AdvFp=function(pid){var a1=!!ST.and1Adv;commit('fc',pid,true);ST.fpPid='adv';ST.step='fpLF';P.render();if(a1){setTimeout(function(){if(ST.step==='fpLF'&&ST.fpPid==='adv')ps2FpLf(1);},250);}};
 window.ps2AdvShot=function(made){
   if(!ST.pos){toast('Touche d’abord l’endroit du tir sur le terrain','red');return;}
+  autoCtxTeam('adv');
   ST.advMade=made;ST.advShooter=null;
   if(advRoster().length){ST.step='advWho';P.render();return;}
   if(made){ST.step='advAssist';P.render();return;}
@@ -39768,7 +39800,15 @@ window.ps2AdvWho=function(pid){
   if(ST.advMade){ST.advShooter=pid;ST.step='advAssist';P.render();return;}
   doAdvShot(pid,false,null);
 };
-window.ps2AdvAssist=function(a){doAdvShot(ST.advShooter,true,a);};
+window.ps2AdvAssist=function(a){
+  var a1=!!ST.and1,n0=getLog(CS.matchId).length;
+  doAdvShot(ST.advShooter,true,a);
+  if(a1)afterShot(n0,function(){
+    // panier adverse + faute : on demande seulement qui a fait la faute chez nous, puis 1 lancer franc adverse
+    try{CS._statT=currentTime();stopClockLF();pauseVideo();}catch(e){}
+    reset();ST.and1Adv=true;ST.step='advFp';P.render();
+  });
+};
 function doAdvShot(advPid,made,assist){ST.lastShooter=null;ST.lastAdvMiss=!made;
   var sv=S('shotSvg');sv._px=ST.pos.x;sv._py=ST.pos.y;
   CS.statsTarget=advPid!=null?advPid:advTg();CS.statPlayer=null;
@@ -39805,8 +39845,20 @@ window.ps2Shot=function(pid,made){
   if(made){ST.step='assist';ST.shooter=pid;ST.shotMade=true;P.render();return;}
   doShot(pid,false,null);
 };
-window.ps2Flag=function(k){ST.flags[k]=!ST.flags[k];P.render();};
-window.ps2Assist=function(pid){doShot(ST.shooter,true,pid);};
+window.ps2Flag=function(k){ST.flags[k]=!ST.flags[k];if(ST.auto)delete ST.auto[k];P.render();};
+window.ps2Assist=function(pid){
+  var a1=!!ST.and1,sh=ST.shooter,n0=getLog(CS.matchId).length;
+  doShot(sh,true,pid);
+  if(a1)afterShot(n0,function(){
+    // faute provoquée par la tireuse (faute commise adverse liée), puis 1 lancer franc
+    try{CS._statT=currentTime();}catch(e){}
+    CS.statsTarget='player';CS.statPlayer=sh;
+    try{_commitLinkedStat('fi',1,0,sh,'player',null,null);}catch(e){}
+    reset();
+    // comme les lancers francs : le chrono s'arrête, la vidéo continue
+    ST.fpPid=sh;ST.fpFlow=true;ST.lfN=1;ST.lf={who:sh,n:1,res:[null]};ST.step='lfShoot';stopClockLF();P.render();
+  });
+};
 function doShot(pid,made,assist){
   ST.lastShooter=pid;ST.lastAdvMiss=false;
   var sv=S('shotSvg');sv._px=ST.pos.x;sv._py=ST.pos.y;
@@ -40416,13 +40468,16 @@ function statsHtml(c){
   var top='<div class="pgrow" style="justify-content:space-between;margin-bottom:12px">'+teamTabs(c)+qtPills(c,q,'pgQt')+'</div>';
   var d=statsData(c,adv,q);
   var th='<tr><th style="text-align:left;padding-left:12px">Joueuse</th>'+SCOLS.map(function(x){return '<th>'+x[0]+'</th>';}).join('')+'</tr>';
+  var st5=(window.xvStarters?xvStarters(c.m.id,adv):[])||[],benchPts=0,startPts=0;
+  d.rows.forEach(function(x){if(!x.p)return;var pp=(x.r&&+x.r.pts)||0;if(st5.indexOf(x.p.id)>=0)startPts+=pp;else benchPts+=pp;});
+  var pill5='<span style="margin-left:8px;padding:2px 8px;border-radius:999px;border:1px solid rgba(212,170,106,.55);background:rgba(212,170,106,.12);color:#E8C88A;font-size:10.5px;font-weight:500;letter-spacing:.06em;white-space:nowrap">5 MAJEUR</span>';
   var body=d.rows.map(function(x){
-    var who=x.p?'<div style="display:flex;align-items:center;gap:11px">'+avA(x.p,38,!!x.adv)+'<span style="font-size:16px;font-weight:500;white-space:nowrap;color:#F0E8D8"><span style="color:#E8C88A">'+E(_nh(x.p)||'')+'</span> '+nameOf(x.p)+'</span></div>':'<span style="font-size:16px;font-weight:500;color:#F0E8D8">'+x.name+'</span>';
+    var who=x.p?'<div style="display:flex;align-items:center;gap:11px">'+avA(x.p,38,!!x.adv)+'<span style="font-size:16px;font-weight:500;white-space:nowrap;color:#F0E8D8"><span style="color:#E8C88A">'+E(_nh(x.p)||'')+'</span> '+nameOf(x.p)+'</span>'+(st5.indexOf(x.p.id)>=0?pill5:'')+'</div>':'<span style="font-size:16px;font-weight:500;color:#F0E8D8">'+x.name+'</span>';
     return '<tr><td style="text-align:left;padding-left:10px">'+who+'</td>'+SCOLS.map(function(k){return cell(k[1],x.r[k[1]],false);}).join('')+'</tr>';
   }).join('');
   var tot=d.total?'<tr style="background:rgba(212,170,106,.08);border-top:2px solid rgba(212,170,106,.35)"><td style="text-align:left;padding-left:12px;color:#D4AA6A;font-weight:500;letter-spacing:.06em">'+d.label+'</td>'+SCOLS.map(function(k){return cell(k[1],d.total[k[1]],true);}).join('')+'</tr>':'';
   var note=q?'Filtre par quart-temps : les minutes viennent des remplacements et du chrono ; le +/- n’est calculé que sur le match entier.':'Mêmes colonnes que la feuille de stats actuelle · le filtre par quart-temps est ajouté.';
-  return top+'<div class="pgcard" style="padding:6px 8px;overflow-x:auto"><table class="pgt"><thead>'+th+'</thead><tbody>'+body+tot+'</tbody></table></div><div class="pgmut" style="margin-top:10px">'+note+'</div>';
+  return top+'<div class="pgcard" style="padding:6px 8px;overflow-x:auto"><table class="pgt"><thead>'+th+'</thead><tbody>'+body+tot+'</tbody></table></div>'+(st5.length?'<div class="pgrow" style="margin-top:12px;gap:10px"><span class="pgp sm" style="cursor:default">Points du 5 majeur · <b style="color:#F0E8D8;margin-left:6px">'+startPts+'</b></span><span class="pgp sm" style="cursor:default">Points du banc · <b style="color:#F0E8D8;margin-left:6px">'+benchPts+'</b></span></div>':'')+'<div class="pgmut" style="margin-top:10px">'+note+'</div>';
 }
 })();
 
@@ -40972,6 +41027,77 @@ function mountSaisie(){
   apply();
   window.addEventListener('orientationchange',function(){setTimeout(apply,200);});
   window.addEventListener('resize',function(){setTimeout(apply,200);});
+})();
+
+/* ===== xv23 : cinq majeur / points du banc + séries du match (rien n'est saisi en plus : tout vient du journal) ===== */
+(function(){
+  function E(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+  /* Titulaires = les 5 sur le terrain au début du match : on part des 5 actuels et on remonte tous les remplacements. */
+  window.xvStarters=function(matchId,adv){
+    try{
+      var cur=null;
+      if(window.CS&&CS.matchId===matchId)cur=(adv?CS.onCourtAdv:CS.onCourt);
+      if(!cur||!cur.length){var o=DB.onCourtState&&DB.onCourtState[matchId];cur=o?(adv?o.onCourtAdv:o.onCourt):null;}
+      if(!cur||!cur.length)return [];
+      var set=cur.slice(),log=getLog(matchId)||[];
+      for(var i=log.length-1;i>=0;i--){var e=log[i];if(e.type!=='sub'||(!!e.advTeam)!==(!!adv))continue;var ix=set.indexOf(e.inId);if(ix>=0)set[ix]=e.outId;}
+      return set;
+    }catch(e){return [];}
+  };
+  /* Séries : points marqués d'affilée par une équipe sans que l'autre marque. */
+  function runsOf(m,flip){
+    var log=(DB.statLogs&&DB.statLogs[m.id])||[],out=[],cur=null,sc=[0,0];
+    log.forEach(function(ev,i){
+      var pts=0;
+      if(ev.type==='shot'){if(ev.made)pts=ev.key==='pts3m'?3:ev.key==='lfm'?1:2;}
+      else if(ev.type==='stat'){
+        if(ev.key==='lfm')pts=1;
+        else if(ev.key==='pts2m'||ev.key==='pts3m'){
+          var pv=i>0?log[i-1]:null;
+          if(pv&&pv.type==='shot'&&pv.pid==='collectifAdv'&&ev.pid==null&&ev.target==='adverse'&&ev.key===pv.key)return;
+          pts=ev.key==='pts3m'?3:2;
+        }
+      }
+      if(!pts)return;
+      var advSide=!!(ev.advTeam||ev.target==='adverse');if(flip)advSide=!advSide;
+      var s=advSide?1:0;
+      if(!cur||cur.s!==s){cur={s:s,pts:0,qt:parseInt(ev.qt)||1,from:sc.slice(),to:null,m:m};out.push(cur);}
+      cur.pts+=pts;sc[s]+=pts;cur.to=sc.slice();cur.qtEnd=parseInt(ev.qt)||1;
+    });
+    return out;
+  }
+  function qtL(q){return q>4?'P'+(q-4):'QT'+q;}
+  window.xvSeriesHtml=function(selTeam,matches,sec){
+    try{
+      var all=[];
+      (matches||[]).forEach(function(m){var flip=(m.oppTeamId==selTeam.id&&m.teamId!=selTeam.id);runsOf(m,flip).forEach(function(r){r.flip=flip;all.push(r);});});
+      if(!all.length)return '';
+      var best=[null,null];all.forEach(function(r){if(!best[r.s]||r.pts>best[r.s].pts)best[r.s]=r;});
+      var nameOpp=function(m,flip){var t=gT(m.teamId);return flip?(t?t.name:'?'):(m.opp||'?');};
+      var where=function(r){var m=r.m;return qtL(r.qt)+(r.qtEnd!==r.qt?'–'+qtL(r.qtEnd):'')+((matches.length>1)?' · '+(m.round!==''&&m.round!=null?'J'+E(m.round)+' ':'')+'vs '+E(nameOpp(m,r.flip)):'');};
+      var cardS=function(lab,r,col){return '<div style="background:#2A2A2A;border:1px solid rgba(212,170,106,0.12);border-radius:14px;padding:14px 16px;"><div style="font-size:11px;font-weight:700;color:#6A5E50;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">'+lab+'</div><div style="font-size:26px;font-weight:900;color:'+col+';line-height:1.1;">'+(r?r.pts+'–0':'—')+'</div><div style="font-size:12px;color:#A89880;margin-top:4px;">'+(r?where(r)+' · de '+r.from[0]+'–'+r.from[1]+' à '+r.to[0]+'–'+r.to[1]:'')+'</div></div>';};
+      var h=(sec?sec('🔥 Séries','points marqués d’affilée sans que l’autre équipe marque'):'');
+      h+='<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px;">'+cardS('Ma plus grosse série',best[0],'#3DC97A')+cardS('Plus grosse série adverse',best[1],'#E05252')+'</div>';
+      if(matches.length===1){
+        var big=all.filter(function(r){return r.pts>=6;});
+        if(big.length){
+          var g='grid-template-columns:.7fr 1.4fr .8fr 1.6fr;';
+          h+='<div style="background:#1A1A1A;border:1px solid rgba(212,170,106,0.12);border-radius:12px;overflow:hidden;margin-bottom:18px;"><div style="display:grid;'+g+'background:#111;">'
+            +['Période','Équipe','Série','Score'].map(function(x,i){return '<div style="padding:9px 12px;font-size:10px;color:#6A5E50;font-weight:700;text-transform:uppercase;text-align:'+(i?'center':'left')+';">'+x+'</div>';}).join('')+'</div>';
+          big.forEach(function(r,i){
+            var mine=r.s===0,nm=mine?E(selTeam.name):E(nameOpp(r.m,r.flip));
+            h+='<div style="display:grid;'+g+'background:'+(i%2?'rgba(255,255,255,0.02)':'transparent')+';border-top:1px solid rgba(255,255,255,0.04);align-items:center;">'
+              +'<div style="padding:10px 12px;font-weight:800;color:#F0E8D8;">'+qtL(r.qt)+(r.qtEnd!==r.qt?'–'+qtL(r.qtEnd):'')+'</div>'
+              +'<div style="padding:10px 12px;text-align:center;font-weight:700;color:'+(mine?'#F0E8D8':'#A89880')+';">'+nm+'</div>'
+              +'<div style="padding:10px 12px;text-align:center;font-weight:900;color:'+(mine?'#3DC97A':'#E05252')+';">'+r.pts+'–0</div>'
+              +'<div style="padding:10px 12px;text-align:center;font-size:13px;color:#A89880;">'+r.from[0]+'–'+r.from[1]+' → '+r.to[0]+'–'+r.to[1]+'</div></div>';
+          });
+          h+='</div>';
+        }else h+='<div style="font-size:13px;color:#6A5E50;margin-bottom:18px;">Aucune série de 6 points ou plus dans ce match.</div>';
+      }
+      return h;
+    }catch(e){console.error(e);return '';}
+  };
 })();
 
 /*XV_END*/
