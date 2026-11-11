@@ -460,7 +460,7 @@ document.addEventListener('DOMContentLoaded', function(){
 var _SB_URL="https://umuvirwbtpflizxupwbr.supabase.co";
 // Version de ce fichier — à incrémenter à chaque déploiement, en cohérence avec la valeur
 // mise à jour dans la table Supabase `app_version` (voir _checkAppVersion ci-dessous).
-var APP_VERSION = "2026-11-11-451";
+var APP_VERSION = "2026-11-11-453";
 var _SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtdXZpcndidHBmbGl6eHVwd2JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3MTI1MDEsImV4cCI6MjA5MDI4ODUwMX0.fFQaF-zP9dzcWITJDf6GBmvu0pdcuvlaUz0A0qW0kfo";
 var _LICENCE_KEY='btp_licence';
 var _MACHINE_KEY='btp_machine';
@@ -40627,6 +40627,7 @@ function afterChange(c){
 }
 function doDelete(c,i){logEventDelete(c.m.id,i);PG.sel=null;PG.draft=null;afterChange(c);}
 PG.editHtml=function(c){
+  advResync(c);
   var log=getLog(c.m.id);
   if(!PG.edInit){PG.edInit=true;PG.edQt=CS.qt||0;}
   var bl=sortBlocks(blocksOf(c));
@@ -40658,12 +40659,24 @@ PG.editHtml=function(c){
 
 // ----- brouillon d'édition -----
 // tir adverse « équipe » (sans joueuse identifiée) : tir + ligne jumelle du journal + éventuelle passe + éventuel rebond
+// tir adverse quand l'adversaire n'est pas une équipe enregistrée (simple nom) : une ligne du journal + position à part
+function whoStr(e){return e.advTeam&&e.pid!=null?'adv'+e.pid:(e.advTeam?'advcol':(e.target==='adverse'?'adverse':(e.pid!=null&&e.pid!=='collectif'?'p'+e.pid:'collectif')));}
+function whoSet(e,v){if(v==='adverse'){e.pid=null;e.target='adverse';e.advTeam=false;}else if(v==='collectif'){e.pid=null;e.target='collectif';e.advTeam=false;}else if(v==='advcol'){e.pid=null;e.target='adverse';e.advTeam=true;}else if(v.indexOf('adv')===0){e.pid=parseInt(v.replace('adv',''));e.target='player';e.advTeam=true;}else{e.pid=parseInt(v.replace('p',''));e.target='player';e.advTeam=false;}}
+function isAdvLeg(ev){return !!ev&&ev.type==='stat'&&ev.target==='adverse'&&!ev.advTeam&&ev.pid==null&&/^pts[23][mr]$/.test(ev.key);}
+function legPd(log,r){for(var i=r+1;i<log.length;i++){var e=log[i];if(e.type==='stat'&&FOLLOW[e.key]){if(e.key==='pd')return i;}else break;}return -1;}
+function advShift(from,delta){try{var c=PG.ctx(),a=c&&DB.adverseShots&&DB.adverseShots[c.m.id];if(a)a.forEach(function(x){if(x.logSeq!=null&&x.logSeq>=from)x.logSeq+=delta;});}catch(e){}}
+function advResync(c){try{var a=DB.adverseShots&&DB.adverseShots[c.m.id];if(!a||!a.length)return;var L=[];getLog(c.m.id).forEach(function(e,i){if(isAdvLeg(e))L.push(i);});if(L.length===a.length)a.forEach(function(x,k){x.logSeq=L[k];});}catch(e){}}
 function isAdvCol(ev){return !!ev&&ev.type==='shot'&&ev.pid==='collectifAdv'&&ev.shotIdx!=null;}
 function advDup(log,r){var e=log[r+1],ev=log[r];return (e&&e.type==='stat'&&e.target==='adverse'&&e.pid==null&&e.key===ev.key)?r+1:-1;}
 function advFollow(log,r,key){var i=(advDup(log,r)>=0?r+2:r+1);for(;i<log.length;i++){var e=log[i];if(e.type==='stat'&&FOLLOW[e.key]){if(key==='reb'?(e.key==='rebo'||e.key==='rebd'):e.key===key)return i;}else break;}return -1;}
 function findReb(log,r){for(var i=r+1;i<log.length;i++){var e=log[i];if(e.type==='stat'&&FOLLOW[e.key]){if(e.key==='rebo'||e.key==='rebd')return i;}else break;}return -1;}
 function makeDraft(c,r){
   var log=getLog(c.m.id),ev=log[r];if(!ev)return null;
+  if(isAdvLeg(ev)){
+    var shL=shotObj(c,ev,r)||{},rbL=findReb(log,r),rebL=null;
+    if(rbL>=0){var eL=log[rbL];rebL=(eL.advTeam||eL.target==='adverse')?{k:'adv'}:{k:'p',pid:eL.pid};}
+    return{kind:'shot',adv:true,advCol:true,leg:true,who:'adverse',pts:(ev.key.indexOf('pts3')===0?3:2),made:!!KMADE[ev.key],x:shL.x,y:shL.y,assist:legPd(log,r)>=0?true:null,reb:rebL,rebOrig:rebL?JSON.stringify(rebL):'',ctx:{scp:!!ev.isSCP,papb:!!ev.isPAPB,fb8:!!ev.isFB8},qt:parseInt(ev.qt)||1};
+  }
   if(isAdvCol(ev)){
     var shA=shotObj(c,ev,r)||{},rbA=advFollow(log,r,'reb'),rebA=null;
     if(rbA>=0){var eA=log[rbA];rebA=(eA.advTeam||eA.target==='adverse')?{k:'adv'}:{k:'p',pid:eA.pid};}
@@ -40678,7 +40691,16 @@ function makeDraft(c,r){
   if(ev.type==='sub')return{kind:'sub',adv:!!ev.advTeam,out:ev.outId,inn:ev.inId,qt:parseInt(ev.qt)||1};
   var adv=!!(ev.advTeam||ev.target==='adverse');
   var who=ev.advTeam&&ev.pid!=null?'adv'+ev.pid:(ev.advTeam?'advcol':(ev.target==='adverse'?'adverse':(ev.pid!=null&&ev.pid!=='collectif'?'p'+ev.pid:'collectif')));
-  return{kind:'gen',adv:adv,who:who,whoOrig:who,key:ev.key,made:!!KMADE[ev.key],isShot:!!(KMADE[ev.key]||KMISS[ev.key]),qt:parseInt(ev.qt)||1,qtOrig:parseInt(ev.qt)||1};
+  var dg={kind:'gen',adv:adv,who:who,whoOrig:who,key:ev.key,made:!!KMADE[ev.key],isShot:!!(KMADE[ev.key]||KMISS[ev.key]),qt:parseInt(ev.qt)||1,qtOrig:parseInt(ev.qt)||1};
+  // action liée (interception ⇄ balle perdue, faute commise ⇄ faute provoquée)
+  var li=(ev.linkedTo!=null&&ev.linkedTo>r&&log[ev.linkedTo]&&log[ev.linkedTo].linkedTo===r)?ev.linkedTo:-1;
+  dg.link=li>=0?{i:li,key:log[li].key}:null;
+  dg.lk=li>=0?whoStr(log[li]):null;dg.lkOrig=dg.lk;
+  dg.lkAdv=li>=0?!!(log[li].advTeam||log[li].target==='adverse'):!adv;
+  // rebond après un lancer franc raté
+  dg.isLF=(ev.key==='lfm'||ev.key==='lfr');
+  if(dg.isLF){var rbG=findReb(log,r),rebG=null;if(rbG>=0){var eG=log[rbG];rebG=(eG.advTeam||eG.target==='adverse')?{k:'adv'}:{k:'p',pid:eG.pid};}dg.reb=rebG;dg.rebOrig=rebG?JSON.stringify(rebG):'';}
+  return dg;
 }
 function chipP(p,on,fn,adv,suffix){return '<button class="pgchip'+(on?' on':'')+(adv?' adv':'')+'" onclick="'+fn+'">'+avA(p,30,!!adv)+E(p.first||'')+(suffix||'')+'</button>';}
 function chipT(t,on,fn,adv,cls){return '<button class="pgchip t'+(on?' on':'')+(adv?' adv':'')+(cls?' '+cls:'')+'" onclick="'+fn+'">'+t+'</button>';}
@@ -40736,7 +40758,24 @@ function panelHtml(c){
   else who+=chipT('Adversaire',true,'void 0',true);
   who+='</div>';
   var res=d.isShot?'<div class="pgrow" style="gap:8px;margin:12px 0 4px"><button class="pgbig ok'+(d.made?' on':'')+'" onclick="pgDr(\'made\',true)">✓ Marqué</button><button class="pgbig ko'+(!d.made?' on':'')+'" onclick="pgDr(\'made\',false)">✕ Raté</button></div>':'';
-  return head+'<div style="font-size:18px;font-weight:500;margin:4px 0 12px">'+(KLAB[ev.key]||ev.key)+'</div>'+who+res+qtRow(d)
+  var oppN=E((c.opp&&c.opp.name)||c.m.opp||'Adversaire');
+  var lkH='';
+  if(d.link||ev.key==='bp'){
+    var lkKey=d.link?d.link.key:'inter';
+    var lkT={inter:'Interception',bp:'Balle perdue',fc:'Faute commise par',fi:'Faute provoquée par'}[lkKey]||(KLAB[lkKey]||lkKey);
+    lkH='<div class="pglab" style="margin:12px 0 6px;color:#a89c88">'+lkT+'</div><div class="pgrow" style="gap:8px">';
+    if(ev.key==='bp')lkH+=chipT('Pas d’interception',d.lk==null,'pgDr(\'lk\',null)');
+    if(!d.lkAdv)lkH+=c.mp.map(function(p){return chipP(p,d.lk==='p'+p.id,'pgDr(\'lk\',\'p'+p.id+'\')',false);}).join('')+(lkKey==='inter'?'':chipT('Collectif',d.lk==='collectif','pgDr(\'lk\',\'collectif\')'));
+    else if(c.opp)lkH+=c.op.map(function(p){return chipP(p,d.lk==='adv'+p.id,'pgDr(\'lk\',\'adv'+p.id+'\')',true);}).join('')+chipT(oppN,d.lk==='advcol','pgDr(\'lk\',\'advcol\')',true);
+    else lkH+=chipT(oppN,d.lk==='adverse','pgDr(\'lk\',\'adverse\')',true);
+    lkH+='</div>';
+  }
+  var rbH='';
+  if(d.isLF&&!d.made){
+    rbH='<div class="pglab" style="margin:12px 0 6px;color:#a89c88">Rebond</div><div class="pgrow" style="gap:8px">'+c.mp.map(function(p){return chipP(p,d.reb&&d.reb.k==='p'&&d.reb.pid===p.id,'pgDr(\'reb\',{k:\'p\',pid:'+p.id+'})',false);}).join('')
+      +chipT(oppN,d.reb&&d.reb.k==='adv','pgDr(\'reb\',{k:\'adv\'})',true)+chipT('Sans rebond',!d.reb,'pgDr(\'reb\',null)')+'</div>';
+  }
+  return head+'<div style="font-size:18px;font-weight:500;margin:4px 0 12px">'+(KLAB[ev.key]||ev.key)+'</div>'+who+res+lkH+rbH+qtRow(d)
     +'<div class="pgrow" style="margin-top:12px;position:sticky;bottom:-14px;background:#262321;padding:10px 0 4px;border-top:1px solid rgba(255,255,255,.08)"><button class="pgbig" style="background:linear-gradient(180deg,#E8C88A,#D4AA6A);color:#1a1408;border:none" onclick="pgEdSave()">Enregistrer</button><button class="pgbig" style="color:#f08585;border-color:rgba(224,82,82,.4)" onclick="pgEdDel('+PG.sel+')">🗑 Supprimer</button></div>';
 }
 PG.afterRender=function(){
@@ -40747,13 +40786,13 @@ PG.afterRender=function(){
 };
 // liaisons du journal : insertion / retrait sans casser les index "linkedTo"
 function relink(log,from,delta){log.forEach(function(e){if(e.linkedTo!=null&&e.linkedTo>=from)e.linkedTo+=delta;});}
-function logRemove(log,idx){log.splice(idx,1);relink(log,idx+1,-1);log.forEach(function(e,i){e.seq=i;});}
-function logInsert(log,idx,ev){relink(log,idx,1);log.splice(idx,0,ev);log.forEach(function(e,i){e.seq=i;});}
+function logRemove(log,idx){log.splice(idx,1);relink(log,idx+1,-1);advShift(idx+1,-1);log.forEach(function(e,i){e.seq=i;});}
+function logInsert(log,idx,ev){relink(log,idx,1);advShift(idx,1);log.splice(idx,0,ev);log.forEach(function(e,i){e.seq=i;});}
 window.pgEdSave=function(){
   var c=PG.ctx(),d=PG.draft;if(!c||!d||PG.sel==null)return;
   var m=c.m,log=getLog(m.id),r=PG.sel,ev=log[r];if(!ev)return;
   try{
-    if(d.kind==='shot')saveShot(c,log,r,ev,d);
+    if(d.kind==='shot'){if(d.leg)saveAdvLeg(c,log,r,ev,d);else saveShot(c,log,r,ev,d);}
     else if(d.kind==='sub'){
       if(d.out!==ev.outId)logEventEdit(m.id,r,'outId',d.out);
       if(d.inn!==ev.inId)logEventEdit(m.id,r,'inId',d.inn);
@@ -40762,12 +40801,71 @@ window.pgEdSave=function(){
       if(d.who!==d.whoOrig)logEventEdit(m.id,r,'who',d.who);
       if(d.isShot){var base=ev.key.replace(/[mr]$/,'');var nk=base+(d.made?'m':'r');if(nk!==ev.key)logEventEdit(m.id,r,'key',nk);}
       if(d.qt!==d.qtOrig)logEventEdit(m.id,r,'qt',d.qt);
+      var teamG=gT(m.teamId);
+      // action liée : changer la joueuse, l'ajouter ou la retirer
+      if(d.lk!==d.lkOrig){
+        if(d.lkOrig!=null&&d.lk!=null)logEventEdit(m.id,d.link.i,'who',d.lk);
+        else if(d.lkOrig!=null){var liR=d.link.i;applyLogEvent(m.id,log[liR],teamG,m,-1);delete log[r].linkedTo;logRemove(log,liR);}
+        else{var eL={type:'stat',key:'inter',qt:d.qt,ts:ev.ts,clk:ev.clk,linkedTo:r};whoSet(eL,d.lk);logInsert(log,r+1,eL);log[r].linkedTo=r+1;applyLogEvent(m.id,eL,teamG,m,+1);}
+      }
+      if(d.link&&d.lk!=null&&log[log[r].linkedTo])log[log[r].linkedTo].qt=d.qt;
+      // rebond après un lancer franc raté
+      if(d.isLF){
+        var wantG=d.made?null:d.reb,wantGS=wantG?JSON.stringify(wantG):'';
+        if(wantGS!==(d.rebOrig||'')||d.made){
+          var rbI=findReb(log,r);
+          if(rbI>=0){applyLogEvent(m.id,log[rbI],teamG,m,-1);logRemove(log,rbI);}
+          if(wantG){
+            var oK=d.adv?'rebd':'rebo',aK=d.adv?'rebo':'rebd',eR;
+            if(wantG.k==='p'){var spG=gPS(m.id,wantG.pid);spG[oK]=(spG[oK]||0)+1;recalc(m.id,wantG.pid);eR={type:'stat',pid:wantG.pid,key:oK,qt:d.qt,target:'player',ts:ev.ts,clk:ev.clk};}
+            else eR={type:'stat',pid:null,key:aK,qt:d.qt,target:'adverse',ts:ev.ts,clk:ev.clk};
+            logInsert(log,r+1,eR);
+          }
+        }else{var rbQ=findReb(log,r);if(rbQ>=0)log[rbQ].qt=d.qt;}
+      }
+      saveDB();
     }
   }catch(e){console.error(e);toast('Erreur : '+e.message,'red');}
   toast('✓ Bloc enregistré','acc');
   PG.draft=makeDraft(c,PG.sel);
   afterChange(c);
 };
+function saveAdvLeg(c,log,r,ev,d){
+  var m=c.m,team=gT(m.teamId);
+  var oldMade=!!KMADE[ev.key],oldSv=oldMade?(ev.key.indexOf('pts3')===0?3:2):0;
+  var nk=(d.pts===3?'pts3':'pts2')+(d.made?'m':'r'),sv=d.made?(d.pts===3?3:2):0;
+  var sh=shotObj(c,ev,r);
+  // contexte : on retire l'ancien des totaux adverses
+  var A=(DB.advStats=DB.advStats||{}),st=(A[m.id]=A[m.id]||{scp:0,papb:0,fb8:0});
+  if(oldMade){if(ev.isSCP)st.scp=Math.max(0,(st.scp||0)-(ev.scpVal||0));if(ev.isPAPB)st.papb=Math.max(0,(st.papb||0)-(ev.scpVal||0));if(ev.isFB8)st.fb8=Math.max(0,(st.fb8||0)-(ev.scpVal||0));}
+  // tir : 2/3 pts, marqué/raté, quart-temps (score et +/- gérés par le journal)
+  if(nk!==ev.key)logEventEdit(m.id,r,'key',nk);
+  if(d.qt!==(parseInt(ev.qt)||1))logEventEdit(m.id,r,'qt',d.qt);
+  ev.isSCP=d.ctx.scp||undefined;ev.isPAPB=d.ctx.papb||undefined;ev.isFB8=d.ctx.fb8||undefined;
+  ev.scpVal=(ev.isSCP||ev.isPAPB||ev.isFB8)?sv:undefined;
+  if(d.made){if(ev.isSCP)st.scp=(st.scp||0)+sv;if(ev.isPAPB)st.papb=(st.papb||0)+sv;if(ev.isFB8)st.fb8=(st.fb8||0)+sv;}
+  // position
+  if(sh){sh.x=d.x;sh.y=d.y;sh.made=d.made;sh.key=nk;sh.qt=d.qt;}
+  else if(d.x!=null){DB.adverseShots=DB.adverseShots||{};(DB.adverseShots[m.id]=DB.adverseShots[m.id]||[]).push({x:d.x,y:d.y,made:d.made,qt:d.qt,key:nk,logSeq:r});}
+  // passe décisive
+  var pdI=legPd(log,r),wantPd=!!(d.made&&d.assist===true);
+  if(pdI>=0&&!wantPd)logRemove(log,pdI);
+  else if(pdI<0&&wantPd)logInsert(log,r+1,{type:'stat',pid:null,key:'pd',qt:d.qt,target:'adverse',ts:ev.ts,clk:ev.clk});
+  else if(pdI>=0)log[pdI].qt=d.qt;
+  // rebond (tir raté seulement)
+  var want=d.made?null:d.reb,wantS=want?JSON.stringify(want):'';
+  if(wantS!==(d.rebOrig||'')||d.made){
+    var rb=findReb(log,r);
+    if(rb>=0){var old=log[rb];applyLogEvent(m.id,old,team,m,-1);logRemove(log,rb);}
+    if(want){
+      var e2;
+      if(want.k==='p'){var sp=gPS(m.id,want.pid);sp.rebd=(sp.rebd||0)+1;recalc(m.id,want.pid);e2={type:'stat',pid:want.pid,key:'rebd',qt:d.qt,target:'player',ts:ev.ts,clk:ev.clk};}
+      else e2={type:'stat',pid:null,key:'rebo',qt:d.qt,target:'adverse',ts:ev.ts,clk:ev.clk};
+      logInsert(log,r+1,e2);
+    }
+  }
+  saveDB();
+}
 function saveShot(c,log,r,ev,d){
   var m=c.m,team=gT(m.teamId);
   var oldPid=ev.pid,oldS=gPS(m.id,oldPid),sh=oldS.shots[ev.shotIdx];
@@ -40818,7 +40916,6 @@ function saveShot(c,log,r,ev,d){
       var oursKey=d.adv?'rebd':'rebo',advKey=d.adv?'rebo':'rebd',e2;
       if(want.k==='p'){var sp=gPS(m.id,want.pid);sp[oursKey]=(sp[oursKey]||0)+1;recalc(m.id,want.pid);e2={type:'stat',pid:want.pid,key:oursKey,qt:d.qt,target:'player',ts:ev.ts,clk:ev.clk};}
       else{e2={type:'stat',pid:null,key:advKey,qt:d.qt,target:'adverse',ts:ev.ts,clk:ev.clk};}
-      if(e2.target==='adverse'&&c.opp){e2.advTeam=true;applyLogEvent(m.id,e2,team,m,+1);}
       logInsert(log,(aCol&&advDup(log,r)>=0)?r+2:r+1,e2);
     }
   }
