@@ -460,7 +460,7 @@ document.addEventListener('DOMContentLoaded', function(){
 var _SB_URL="https://umuvirwbtpflizxupwbr.supabase.co";
 // Version de ce fichier — à incrémenter à chaque déploiement, en cohérence avec la valeur
 // mise à jour dans la table Supabase `app_version` (voir _checkAppVersion ci-dessous).
-var APP_VERSION = "2026-11-11-458";
+var APP_VERSION = "2026-11-11-459";
 var _SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtdXZpcndidHBmbGl6eHVwd2JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3MTI1MDEsImV4cCI6MjA5MDI4ODUwMX0.fFQaF-zP9dzcWITJDf6GBmvu0pdcuvlaUz0A0qW0kfo";
 var _LICENCE_KEY='btp_licence';
 var _MACHINE_KEY='btp_machine';
@@ -39430,10 +39430,10 @@ function legendHtml(sv){
   if(on[0].col&&on[1].col&&on[1].min!=null){parts.push(f(on[0],'moins de '+on[1].min+' min'));}
   if(on[1].col&&on[1].min!=null){parts.push(f(on[1],on[1].min+(on[2].min!=null&&on[2].col?' à '+on[2].min:'')+' min'));}
   if(on[2].col&&on[2].min!=null){parts.push(f(on[2],on[2].min+' min et +'));}
-  return parts.length?'<span style="font-size:12.5px;color:#a89c88">'+parts.join(' &nbsp;')+'</span>':'';
+  return parts.length?'<span class="shL" style="font-size:12.5px;color:#a89c88;white-space:nowrap">'+parts.join(' &nbsp;')+'</span>':'';
 }
 function stripHead(title,right,col){
-  return '<div id="ps2sh" style="display:flex;align-items:center;gap:14px;margin-bottom:10px;flex:none;'+(ST.step!=='idle'&&P._hh?'height:'+P._hh+'px;overflow:hidden':'min-height:36px')+'"><span style="font-size:14px;letter-spacing:.14em;font-weight:500;color:'+(col||'#D4AA6A')+';text-transform:uppercase">'+title+'</span><span style="flex:1"></span>'+(right||'')+'</div>';
+  return '<div id="ps2sh" style="display:flex;align-items:center;gap:14px;margin-bottom:10px;flex:none;'+(ST.step!=='idle'&&P._hh?'height:'+P._hh+'px;overflow:hidden':'min-height:36px')+'"><span class="shT" style="font-size:14px;letter-spacing:.14em;font-weight:500;white-space:nowrap;color:'+(col||'#D4AA6A')+';text-transform:uppercase">'+title+'</span><span style="flex:1;min-width:0"></span>'+(right||'')+'</div>';
 }
 function remplacerBtn(){return '<button class="ps2h" onclick="openSubModal()">⇄ Remplacer</button>';}
 function seuilsBtn(){return '<button class="ps2h gold" style="height:32px;font-size:13px" onclick="ps2Seuils()">⚙ Seuils</button>';}
@@ -39628,7 +39628,19 @@ P.fitTop=function(){
   var fs=19,n=0;nm.forEach(function(e){e.style.fontSize=fs+'px';});
   while(ub.clientWidth<300&&fs>12&&n<20){fs-=0.5;nm.forEach(function(e){e.style.fontSize=fs+'px';});n++;}
 };
-P.fit=function(){try{P.fitTop();}catch(e){}[].forEach.call(document.querySelectorAll('#ps2 .pcFit'),function(el){var fs=parseFloat(el.style.fontSize)||12,n=0;while(el.scrollWidth>el.clientWidth+1&&fs>8&&n<24){fs-=0.5;el.style.fontSize=fs+'px';if(n>6)el.style.letterSpacing='0';n++;}});};
+P.fitHead=function(){
+  var h=document.getElementById('ps2sh');if(!h)return;
+  var t=h.querySelector('.shT'),l=h.querySelector('.shL');if(!t)return;
+  [].forEach.call(h.children,function(c){if(c!==t&&c.style&&!c.style.flex)c.style.flexShrink='0';});
+  var ft=14,fl=12.5,ls=0.14,n=0;
+  while(h.scrollWidth>h.clientWidth+1&&n<40){
+    if(ft>9){ft-=0.5;t.style.fontSize=ft+'px';}
+    if(ls>0.02){ls=Math.max(0.02,ls-0.02);t.style.letterSpacing=ls+'em';}
+    if(l&&fl>9){fl-=0.5;l.style.fontSize=fl+'px';}
+    if(ft<=9&&(!l||fl<=9))break;n++;
+  }
+};
+P.fit=function(){try{P.fitTop();}catch(e){}try{P.fitHead();}catch(e){}[].forEach.call(document.querySelectorAll('#ps2 .pcFit'),function(el){var fs=parseFloat(el.style.fontSize)||12,n=0;while(el.scrollWidth>el.clientWidth+1&&fs>8&&n<24){fs-=0.5;el.style.fontSize=fs+'px';if(n>6)el.style.letterSpacing='0';n++;}});};
 var REFW=1700;
 P.k=function(){return Math.min(1,window.innerWidth/REFW);};
 P.scale=function(){
@@ -40263,7 +40275,6 @@ function renderStrip(c){
 setInterval(function(){if(PG.open){var l=S('pgClk');if(l){var s=(CS.qtClockSec==null?(CS.qtClockDuration||600):CS.qtClockSec);l.textContent=mm(s);}}},500);
 
 PG.render=function(skipBody){
-  try{if(window.__ps2&&__ps2.scale)setTimeout(function(){try{__ps2.scale();}catch(e){}},0);}catch(e){}
   if(!PG.open)return;
   var c=ctx();if(!c)return;
   var body=S('pgBody'),sc=body?body.scrollTop:0;
@@ -40272,12 +40283,14 @@ PG.render=function(skipBody){
     if(PG.page==='saisie'){/* le contenu est monté par renderSaisieManuelleModal */}
     else{
       var h='';
+      try{if(window.__ps2&&__ps2.scale)__ps2.scale();}catch(e){}
       try{h=({bilan:bilanHtml,rotations:rotHtml,stats:statsHtml,shot:PG.shotHtml,edit:PG.editHtml})[PG.page](c);}catch(e){console.error(e);h='<div class="pgmut" style="padding:30px">Erreur d’affichage : '+E(e.message)+'</div>';}
       body.className='';body.innerHTML=h;body.scrollTop=sc;
       if(PG.afterRender)PG.afterRender();
     }
   }
 };
+var _pgRz;window.addEventListener('resize',function(){clearTimeout(_pgRz);_pgRz=setTimeout(function(){try{if(PG.open&&PG.page==='bilan')PG.render();}catch(e){}},120);});
 PG.go=function(p){
   PG.page=p;PG.sel=null;PG.draft=null;
   var b=S('pgBody');if(b){b.innerHTML='';b.className='';}
@@ -40400,8 +40413,10 @@ function bilanHtml(c){
     return '<div style="flex:1;display:grid;grid-template-columns:130px 1fr 1fr;gap:14px;align-items:center;padding:8px 0;border-top:1px solid rgba(255,255,255,.07)"><span style="font-size:18px;color:'+T+'">'+z+'</span>'+cellZ(0,GOLD,T)+cellZ(1,'#6f675a',M)+'</div>';};
   var zones='<div style="flex:none;display:grid;grid-template-columns:130px 1fr 1fr;gap:14px;font-size:12.5px;letter-spacing:.1em;color:'+GOLD+';text-transform:uppercase;padding-bottom:4px"><span></span><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+meN+'</span><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+opN+'</span></div>'+zr('Raquette')+zr('Mi-distance')+zr('3 points');
   var top='<div class="pgrow" style="justify-content:flex-end;margin-bottom:12px">'+qtPills(c,q,'pgQt')+'</div>';
-  return top+'<div style="display:flex;flex-direction:column;gap:14px;min-height:calc(100vh - 232px)"><div style="flex:1;display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px">'+card('Score par quart-temps',sc)+card('Les quatre facteurs',k4,'vert = le meilleur des deux')+card('D’où viennent les points',pts,hasMiss?'points · réussis/tentés':'')+'</div>'
-    +'<div style="flex:1.2;display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px">'+card('Tes meilleures joueuses','<div style="flex:1;display:flex;flex-direction:column;min-height:0">'+bestH+'</div>','classées à l’évaluation')+card('Fautes à surveiller',fouls,'3 fautes ou plus')+card('Réussite par zone',zones)+'</div></div>';
+  var _pb=S('pgBody'),_avH=(_pb?_pb.clientHeight:900)-32-52,_avW=(_pb?_pb.clientWidth:1800)-36,_DH=940;
+  var _s=Math.max(0.45,Math.min(1,_avH/_DH)),_gh=(_s<1?_DH:_avH);
+  return top+'<div style="height:'+Math.round(_gh*_s)+'px;overflow:hidden"><div style="display:flex;flex-direction:column;gap:14px;height:'+_gh+'px;width:'+Math.round(_avW/_s)+'px;transform:scale('+_s+');transform-origin:0 0"><div style="flex:1;display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px">'+card('Score par quart-temps',sc)+card('Les quatre facteurs',k4,'vert = le meilleur des deux')+card('D’où viennent les points',pts,hasMiss?'points · réussis/tentés':'')+'</div>'
+    +'<div style="flex:1.2;display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px">'+card('Tes meilleures joueuses','<div style="flex:1;display:flex;flex-direction:column;min-height:0">'+bestH+'</div>','classées à l’évaluation')+card('Fautes à surveiller',fouls,'3 fautes ou plus')+card('Réussite par zone',zones)+'</div></div></div>';
 }
 function fmtN(x){return(Math.round(x*10)/10).toString().replace('.',',');}
 var BROWS=[['PTS','pts','n',1],['TM','tm','n',1],['TT','tt','n',1],['%T','pct','p',1],['2PM','pts2m','n',1],['2PT','pts2r','n',1],['%2P','pct2','p',1],['3PM','pts3m','n',1],['3PT','pts3r','n',1],['%3P','pct3','p',1],['LFM','lfm','n',1],['LFT','lfr','n',1],
