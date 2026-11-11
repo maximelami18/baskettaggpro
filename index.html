@@ -213,7 +213,7 @@ body.has-pending-coding #btnActionReplay{display:flex;}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-</head>
+<style>#videoSelectorBar:empty{display:none!important}</style></head>
 <body>
 <div id="licenceScreen">
   <div id="licenceBox">
@@ -460,7 +460,7 @@ document.addEventListener('DOMContentLoaded', function(){
 var _SB_URL="https://umuvirwbtpflizxupwbr.supabase.co";
 // Version de ce fichier — à incrémenter à chaque déploiement, en cohérence avec la valeur
 // mise à jour dans la table Supabase `app_version` (voir _checkAppVersion ci-dessous).
-var APP_VERSION = "2026-11-11-459";
+var APP_VERSION = "2026-11-12-461";
 var _SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtdXZpcndidHBmbGl6eHVwd2JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3MTI1MDEsImV4cCI6MjA5MDI4ODUwMX0.fFQaF-zP9dzcWITJDf6GBmvu0pdcuvlaUz0A0qW0kfo";
 var _LICENCE_KEY='btp_licence';
 var _MACHINE_KEY='btp_machine';
@@ -1079,7 +1079,7 @@ function renderVideoSelectorBar(loadedVideos,matchId){
   if(!bar)return;
   var m=gM(matchId);
   var videos=loadedVideos||(m&&m.videos&&m.videos.length?m.videos.map(function(v,vi){return v.url?{label:v.label,name:v.name,url:v.url}:null;}):null);
-  if(!videos||videos.filter(Boolean).length<=1){bar.style.display='none';return;}
+  if(!videos||videos.filter(Boolean).length<=1){bar.style.display='none';bar.innerHTML='';return;}
   bar.style.display='block';
   bar.innerHTML=videos.map(function(v,vi){
     if(!v)return'';
@@ -6273,7 +6273,7 @@ function exitCoding(){
     var mr=document.getElementById('mediaRow');
     if(mr){mr.style.display='';mr.style.height='240px';mr.style.justifyContent='';}
     var videoWrap=document.getElementById('videoWrap');if(videoWrap)videoWrap.style.display='';
-    var videoSelectorBar=document.getElementById('videoSelectorBar');if(videoSelectorBar)videoSelectorBar.style.display='';
+    var videoSelectorBar=document.getElementById('videoSelectorBar');if(videoSelectorBar){videoSelectorBar.style.display='';videoSelectorBar.innerHTML='';}
     var videoControls=document.getElementById('videoControls');if(videoControls)videoControls.style.display='';
     // Chrono : reste visible si Live était actif en collectif
     if(!(_liveStatsMode&&(CS.mode==='codage'||CS.mode==='stats'))){_showLiveChrono(false);}
@@ -39016,6 +39016,8 @@ window.doSubs=function(){
 // ───────── Mise en page : styles ─────────
 var css=document.createElement('style');
 css.textContent=`
+#ps2Hdr{display:none!important}
+body.ps2on #codingHeader>#ps2Hdr{display:flex!important}
 body.ps2on #codingHeader>*{display:none!important}
 body.ps2on #codingHeader>.ps2k{display:flex!important}
 body.ps2on #codingHeader{gap:12px;background:#1A1A1A;border-bottom:1px solid rgba(255,255,255,.08)}
