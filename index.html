@@ -460,7 +460,7 @@ document.addEventListener('DOMContentLoaded', function(){
 var _SB_URL="https://umuvirwbtpflizxupwbr.supabase.co";
 // Version de ce fichier — à incrémenter à chaque déploiement, en cohérence avec la valeur
 // mise à jour dans la table Supabase `app_version` (voir _checkAppVersion ci-dessous).
-var APP_VERSION = "2026-11-13-494";
+var APP_VERSION = "2026-11-13-495";
 var _SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtdXZpcndidHBmbGl6eHVwd2JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3MTI1MDEsImV4cCI6MjA5MDI4ODUwMX0.fFQaF-zP9dzcWITJDf6GBmvu0pdcuvlaUz0A0qW0kfo";
 var _LICENCE_KEY='btp_licence';
 var _MACHINE_KEY='btp_machine';
@@ -3188,7 +3188,7 @@ function _bgShortcutCandidates(board){
       subsHere.forEach(function(s){if(!subBuckets[s.id])subBuckets[s.id]={sub:s,actions:[]};subBuckets[s.id].actions.push(a);});
     });
     var activeSubs=famSubs.filter(function(s){var b=subBuckets[s.id];return b&&b.actions.length;});
-    var skipSingle=!!(DB.settings&&DB.settings.skipSingleSub)&&activeSubs.length===1;
+    var skipSingle=false;
     if(skipSingle){
       subBuckets[activeSubs[0].id].actions.forEach(function(a){looseActs.push({node:a,subId:activeSubs[0].id});});
     } else if(activeSubs.length){
@@ -3216,7 +3216,7 @@ function renderFamSubCards(board,famEntry,disabled,fixedBox){
     subsHere.forEach(function(s){if(!subBuckets[s.id])subBuckets[s.id]={sub:s,actions:[]};subBuckets[s.id].actions.push(a);});
   });
   var activeSubs=subs.filter(function(s){var b=subBuckets[s.id];return b&&b.actions.length;});
-  var skipSingle=!!(DB.settings&&DB.settings.skipSingleSub)&&activeSubs.length===1&&!quickItems.length;
+  var skipSingle=false;
   var rowW=famNode?(famNode.rowW||3):3;
   var fontOverride=famNode?famNode.fontSize:null;
   // Nombre d'items réellement affichés dans la grille principale de cette famille, selon la branche
@@ -42930,6 +42930,159 @@ var _oc=window.openCoding;
 window.openCoding=function(mode,matchId){var r=_oc.apply(this,arguments);if(mode==='instats'){setTimeout(function(){if(CS.mode==='instats')SL.open();},60);}return r;};
 var _ex=window.exitCoding;
 window.exitCoding=function(){if(SL.on)SL.close();return _ex.apply(this,arguments);};
+})();
+
+/* ═══════════ v495 — Refonte visuelle de la page Réglages
+   Menu à gauche (Compte · Codage · Joueurs & stats · Shoot Lab · Stockage), une section à la fois.
+   Toutes les fonctions d'origine sont réutilisées (saveSettings, licences, rôles, stats cachées, types de tir, stockage). */
+(function(){
+function E(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function J(s){return E(s).replace(/'/g,"\\'");}
+var G='#D4AA6A',GL='#E8C88A';
+window._sxSec=window._sxSec||'codage';window._sxOpen=window._sxOpen||{0:1};
+var css=document.createElement('style');
+css.textContent=`
+.sx{display:flex;gap:18px;min-height:100%;font-family:Outfit,sans-serif;color:#F0E8D8;box-sizing:border-box}
+.sxN{flex:0 0 clamp(170px,19vw,230px);display:flex;flex-direction:column;gap:6px;position:sticky;top:0;align-self:flex-start}
+.sxN h1{margin:0 0 2px;font-size:clamp(22px,2.4vw,28px);font-weight:900;letter-spacing:-.01em}.sxN .sub{font-size:12.5px;color:#8a7e6c;margin-bottom:12px}
+.sxI{display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:12px;border:1.5px solid transparent;color:#cfc3ad;font-weight:800;font-size:14px;cursor:pointer;white-space:nowrap;overflow:hidden}
+.sxI:hover{background:rgba(255,255,255,.03)}
+.sxI i{font-style:normal;width:30px;height:30px;border-radius:9px;display:grid;place-items:center;background:#252320;font-size:15px;flex-shrink:0}
+.sxI.on{background:linear-gradient(180deg,rgba(212,170,106,.2),rgba(212,170,106,.06));border-color:#D4AA6A;color:#E8C88A}.sxI.on i{background:linear-gradient(180deg,#E8C88A,#C79C57)}
+.sxC{flex:1;min-width:0;display:flex;flex-direction:column;gap:14px;padding-bottom:30px}
+.sxB{border-radius:16px;border:2px solid rgba(212,170,106,.45);background:linear-gradient(180deg,rgba(212,170,106,.11),rgba(212,170,106,.02) 50%),#1c1a18;padding:12px 14px 14px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.sxP{display:flex;align-items:center;gap:9px;min-height:32px;padding:0 6px 0 5px;border-radius:999px;background:linear-gradient(90deg,#D4AA6A,#B8904F);color:#150E00;white-space:nowrap;overflow:hidden}
+.sxP i{font-style:normal;width:24px;height:24px;border-radius:50%;background:#150E00;display:grid;place-items:center;font-size:12px;flex-shrink:0}.sxP b{font-size:14px;letter-spacing:.03em}.sxP span{margin-left:auto;font-size:11.5px;font-weight:700;opacity:.75;padding-right:8px;overflow:hidden;text-overflow:ellipsis}
+.sxR{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:12px;background:#211f1c;border:1px solid rgba(255,255,255,.06);min-width:0}
+.sxR .t{flex:1;min-width:0}.sxR .t b{display:block;font-size:14px}.sxR .t span{display:block;font-size:12px;color:#8a7e6c;margin-top:2px;line-height:1.35}
+.sxIc{width:34px;height:34px;border-radius:10px;background:#2c2824;display:grid;place-items:center;font-size:16px;flex-shrink:0}
+.sxT{flex-shrink:0;width:46px;height:26px;border-radius:13px;position:relative;background:#3a3530;border:none;cursor:pointer;padding:0}.sxT::after{content:'';position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#8a7e6c;transition:left .15s}
+.sxT.on{background:#D4AA6A}.sxT.on::after{left:23px;background:#150E00}
+.sxSeg{display:flex;gap:3px;padding:4px;border-radius:12px;background:#151311;border:1px solid rgba(255,255,255,.07)}
+.sxSeg button{flex:1;min-width:0;height:32px;border:none;border-radius:9px;background:transparent;font:800 clamp(10.5px,1vw,13px) Outfit;color:#a89c88;cursor:pointer;padding:0}
+.sxSeg button:hover{color:#F0E8D8}.sxSeg button.on{background:linear-gradient(180deg,#E8C88A,#C79C57);color:#150E00;box-shadow:0 2px 8px rgba(212,170,106,.4)}
+.sxL{font-size:12px;font-weight:800;color:#a89c88;margin:0 0 5px 2px;letter-spacing:.02em}
+.sxChip{display:inline-flex;align-items:center;gap:4px;height:30px;padding:0 4px 0 11px;border-radius:999px;background:#2a2622;border:1px solid rgba(212,170,106,.25);font-size:12.5px;font-weight:700;white-space:nowrap;cursor:grab;user-select:none;touch-action:none}
+.sxChip button{border:none;background:none;color:inherit;opacity:.55;cursor:pointer;font-size:12px;padding:0 4px;font-family:inherit}.sxChip button:hover{opacity:1}
+.sxIn{flex:1;min-width:0;height:38px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:#151311;color:#F0E8D8;padding:0 12px;font:600 13.5px Outfit;outline:none;box-sizing:border-box}
+.sxIn:focus{border-color:#D4AA6A}
+.sxBtn{height:38px;padding:0 16px;border:none;border-radius:10px;background:linear-gradient(180deg,#E8C88A,#C79C57);color:#150E00;font:900 13px Outfit;white-space:nowrap;cursor:pointer;flex-shrink:0}
+.sxB2{height:32px;padding:0 12px;border-radius:9px;border:1px solid rgba(212,170,106,.45);color:#E8C88A;font:800 12.5px Outfit;white-space:nowrap;background:#1d1a17;cursor:pointer;flex-shrink:0;display:inline-flex;align-items:center;gap:6px}
+.sxB2.red{color:#f08585;border-color:rgba(224,82,82,.45)}
+.sxB2 i{width:14px;height:14px;border-radius:4px;display:inline-block;border:1px solid rgba(255,255,255,.35)}
+.sxGrip{color:#8a7e6c;font-size:15px;cursor:grab;touch-action:none;user-select:none;padding:0 2px}
+.sxDrag{opacity:.4}.sxDrop{box-shadow:0 0 0 2px #E8C88A}
+.sxRow2{display:flex;flex-direction:column;gap:14px;min-width:0}.sxRow2>.sxB{flex:1}
+@media (max-width:1050px){.sxRow2{flex-direction:column}}
+`;
+document.head.appendChild(css);
+
+function tg(t,d,on,ic,fn){return '<div class="sxR"><span class="sxIc">'+ic+'</span><div class="t"><b>'+t+'</b><span>'+d+'</span></div><button class="sxT'+(on?' on':'')+'" onclick="'+fn+'" title="'+(on?'Activé':'Désactivé')+'"></button></div>';}
+function blk(ic,t,sub,body,st){return '<div class="sxB"'+(st?' style="'+st+'"':'')+'><div class="sxP"><i>'+ic+'</i><b>'+t+'</b>'+(sub?'<span>'+sub+'</span>':'')+'</div>'+body+'</div>';}
+
+// ───────── sections
+function secCompte(){var act=_getLicenceKey(),L=_getLicenceHistory()||[];
+  var h=L.map(function(l){var on=l.key===act;return '<div class="sxR" style="'+(on?'border:1.5px solid '+G+';background:rgba(212,170,106,.1)':'')+'"><span class="sxIc" style="'+(on?'background:linear-gradient(180deg,#E8C88A,#C79C57)':'')+'">🔑</span><div class="t"><b>'+E(l.label||l.key)+'</b>'+(l.label&&l.label!==l.key?'<span style="font-family:JetBrains Mono,monospace">'+E(l.key)+'</span>':'')+'</div>'
+    +(on?'<span style="padding:4px 11px;border-radius:999px;background:rgba(75,224,140,.15);color:#4BE08C;font-weight:900;font-size:12px;white-space:nowrap">● En cours</span>':'<button class="sxBtn" style="height:32px" onclick="switchLicence(\''+J(l.key)+'\')">Basculer</button>')
+    +'<button class="sxB2" onclick="licenceRenameModal(\''+J(l.key)+'\')">✎ Renommer</button>'+(on?'':'<button class="sxB2 red" title="Oublier sur cet ordinateur (ne supprime aucune donnée)" onclick="settingsRemoveLicence(\''+J(l.key)+'\')">✕</button>')+'</div>';}).join('');
+  h+='<div style="display:flex;gap:8px"><input class="sxIn" id="settingsNewLicenceInp" placeholder="BTP-XXXX-XXXX-XXXX" maxlength="19" oninput="formatLicenceKey(this)" style="font-family:JetBrains Mono,monospace;letter-spacing:.06em" onkeydown="if(event.key===\'Enter\')settingsAddLicence()"><button class="sxBtn" onclick="settingsAddLicence()">+ Ajouter une licence</button></div>'
+   +'<div style="font-size:11.5px;color:#8a7e6c">Bascule entre plusieurs licences (un autre club…) sur cet ordinateur. Les données de chaque licence restent séparées et intactes sur le serveur.</div>';
+  return blk('🔑','MES LICENCES','chaque licence garde ses données séparées',h);}
+
+function secCodage(){var s=DB.settings||{},pre=s.preRoll!=null?s.preRoll:10,post=s.postRoll||0;var tot=pre+3+post;
+  var bar='<div style="display:flex;gap:8px;align-items:stretch;height:44px">'
+   +'<div style="flex:'+pre+';min-width:0;border-radius:10px;background:linear-gradient(90deg,rgba(212,170,106,.12),rgba(212,170,106,.4));border:1.5px solid '+G+';display:flex;align-items:center;justify-content:center;font-weight:900;color:'+GL+';white-space:nowrap;overflow:hidden">◀ Pré-roll · '+pre+' s</div>'
+   +'<div style="flex:3;min-width:64px;border-radius:10px;background:'+G+';color:#150E00;display:grid;place-items:center;font-weight:900">ACTION</div>'
+   +'<div style="flex:'+Math.max(1.2,post)+';min-width:48px;border-radius:10px;'+(post?'background:linear-gradient(90deg,rgba(212,170,106,.4),rgba(212,170,106,.12));border:1.5px solid '+G+';color:'+GL:'border:1.5px dashed rgba(212,170,106,.5);color:#a89c88')+';display:grid;place-items:center;font-weight:800;font-size:12.5px;white-space:nowrap">'+(post?'Post-roll · ':'')+post+' s ▶</div></div>';
+  var seg=function(vals,cur,key){return '<div class="sxSeg">'+vals.map(function(v){return '<button class="'+(v===cur?'on':'')+'" onclick="saveSettings(\''+key+'\','+v+')">'+v+'s</button>';}).join('')+'</div>';};
+  var h1=bar+'<div><div class="sxL">PRÉ-ROLL · avant l\'action</div>'+seg([5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20],pre,'preRoll')+'</div>'
+   +'<div><div class="sxL">POST-ROLL · après l\'action</div>'+seg([0,1,2,3,4,5,6,7,8,9,10],post,'postRoll')+'</div>'
+   +'<div style="font-size:11.5px;color:#8a7e6c">Ajouté automatiquement à chaque séquence codée.</div>';
+  var tagOn=s.tagPlayersEnabled!==false,chain=!!s.chainAttDef,note=!!s.autoPromptNote;
+  var h2=tg('Demander les joueurs impliqués','Après chaque séquence : passeur, tireur, perte de balle, défenseurs, interception… Désactive pour coder plus vite (la rentabilité reste calculée, seules les vues Joueurs et Duos restent vides).',tagOn,'👥',"saveSettings('tagPlayersEnabled',"+(!tagOn)+")")
+   +tg('Proposer une note à la fin de chaque action','Une fenêtre pour écrire une note libre avant que la vidéo reprenne. Le bouton 📝 Note reste toujours disponible.',note,'📝',"saveSettings('autoPromptNote',"+(!note)+")")
+   +tg('Enchaîner sur la défense adverse','Quand les deux équipes ont une board : après une attaque validée, la board de l\'autre équipe propose sa défense pour coder la même action. La vidéo repart une fois les deux validées.',chain,'🔗',"saveSettings('chainAttDef',"+(!chain)+")");
+  return blk('🎬','DURÉE DES SÉQUENCES','appliqué à chaque action codée',h1)+blk('⚡','PENDANT LE CODAGE','ce qui s\'ouvre après chaque action',h2);}
+
+function colBtn(lbl,hex,cb){return '<button class="sxB2" data-xvpk="1" onclick="'+cb+'"><i style="background:'+E(hex)+'"></i>'+lbl+' ▾</button>';}
+window.sxPick=function(btn,kind,id,k){var hex,set;
+  if(kind==='hs'){var s=(DB.hsStats||[]).find(function(x){return x.id===id;});if(!s)return;hex=s.color||'#3DC97A';set=function(v){s.color=v;};}
+  else{var r=prGet(id);if(!r)return;hex=k==='tc'?prTc(r):r.color;set=function(v){r[k]=v;};}
+  var t=null;xvPick(btn,hex,function(v){set(v);var sw=btn.querySelector('i');if(sw)sw.style.background=v;clearTimeout(t);t=setTimeout(function(){try{saveDB();}catch(e){}var c=btn.closest('.sxR');var ch=c&&c.querySelector('[data-chip]');if(ch&&kind!=='hs'){var rr=prGet(id);ch.innerHTML=prChip(rr);}},250);});};
+function secJoueurs(){var L=prList();
+  var h=(L.length?L.map(function(r){var n=prUse(r.id);return '<div class="sxR" style="padding:7px 10px"><span data-chip style="flex-shrink:0">'+prChip(r)+'</span><input class="sxIn" style="height:32px;min-width:120px" value="'+E(r.name)+'" onchange="prRen(\''+J(r.id)+'\',this.value)">'
+    +'<span style="font-size:11.5px;color:#8a7e6c;white-space:nowrap">'+n+' joueur'+(n>1?'s':'')+'</span>'+colBtn('Fond',r.color,"sxPick(this,'pr','"+J(r.id)+"','color')")+colBtn('Texte',prTc(r),"sxPick(this,'pr','"+J(r.id)+"','tc')")
+    +'<button class="sxB2 red" title="Supprimer ce rôle" onclick="rolDel(\''+J(r.id)+'\')">🗑</button></div>';}).join(''):'<div style="font-size:12.5px;color:#8a7e6c">Aucun rôle pour l\'instant.</div>')
+   +'<div style="display:flex;gap:8px"><input class="sxIn" id="prNew" placeholder="Nouveau rôle (ex. 3 and D)…" maxlength="40" onkeydown="if(event.key===\'Enter\')rolAdd()"><button class="sxBtn" onclick="rolAdd()">+ Ajouter</button></div>'
+   +'<div style="font-size:11.5px;color:#8a7e6c">2 rôles maximum par joueur (les tiens comme les joueurs scoutés) : ils s\'affichent sur les cartes, dans Scouting individuel+ et dans les PDF. Supprimer un rôle le retire des cartes, les joueurs restent.</div>';
+  var l=hsDefs(true);
+  var h2=(l.length?l.map(function(s){var n=(DB.hsEvents||[]).filter(function(e){return e.sid===s.id;}).length;return '<div class="sxR" data-hs="'+E(s.id)+'" style="padding:7px 10px;'+(s.on===false?'opacity:.55':'')+'"><span class="sxGrip" title="Glisser pour changer l\'ordre">⠿</span>'+colBtn('Couleur',/^#[0-9a-f]{6}$/i.test(s.color||'')?s.color:'#3DC97A',"sxPick(this,'hs','"+J(s.id)+"')")
+    +'<div class="t" style="display:flex;align-items:center;gap:10px"><input class="sxIn" style="height:32px" value="'+E(s.label)+'" onchange="hsRename(\''+J(s.id)+'\',this.value)"><span style="white-space:nowrap;margin:0">'+(n?n+' saisie'+(n>1?'s':''):'jamais utilisée')+'</span></div>'
+    +'<span style="font-size:11px;color:#8a7e6c">Active</span><button class="sxT'+(s.on!==false?' on':'')+'" onclick="hsToggle(\''+J(s.id)+'\')"></button><button class="sxB2 red" title="Supprimer'+(n?' (efface aussi ses saisies)':'')+'" onclick="hsDel(\''+J(s.id)+'\')">🗑</button></div>';}).join(''):'<div style="font-size:12.5px;color:#8a7e6c">Aucune stat cachée pour l\'instant.</div>')
+   +'<div style="display:flex;gap:8px"><input class="sxIn" id="hsNew" placeholder="Nouvelle stat cachée (ex. Aide défensive)…" onkeydown="if(event.key===\'Enter\')hsAdd()"><button class="sxBtn" onclick="hsAdd()">+ Ajouter</button></div>'
+   +'<div style="font-size:11.5px;color:#8a7e6c">Des actions que la feuille de stats ne compte pas. Tu les saisis en match avec le bouton « Stats cachées », le bilan est dans Stats+. Supprimer une stat l\'efface avec toutes ses saisies ; pour la garder sans la saisir, désactive-la.</div>';
+  return '<div class="sxRow2">'+blk('🎽','RÔLES DES JOUEURS','2 max par joueur',h)+blk('🕵','STATS CACHÉES','bilan dans Stats+',h2)+'</div>';}
+
+function secShoot(){var T=_getShotTypes();
+  var h='<div style="display:flex;gap:8px;flex-wrap:wrap"><input class="sxIn" id="newShotTypeInp" placeholder="Nouveau type de tir…" style="min-width:180px" oninput="window._newShotTypeVal=this.value" onkeydown="if(event.key===\'Enter\')addShotType()"><button class="sxBtn" onclick="addShotType()">+ Ajouter</button>'
+   +(window._stClipboard?'<button class="sxB2" style="height:38px" onclick="pasteShotType()">📋 Coller « '+E(window._stClipboard)+' »</button>':'')
+   +'<button class="sxB2" style="height:38px" onclick="exportShotTypes()">⬇ Exporter</button><button class="sxB2" style="height:38px" onclick="importShotTypesTrigger()">⬆ Importer</button></div>'
+   +(window._stSubClipboard?'<div><button class="sxB2" onclick="pasteShotSubPrompt()">📋 Coller le sous-type « '+E(window._stSubClipboard)+' »</button></div>':'')
+   +'<div id="sxTypes" style="display:flex;flex-direction:column;gap:6px">';
+  T.forEach(function(t,i){var lbl=typeof t==='object'?t.label:t,subs=(typeof t==='object'&&t.subs)||[],open=!!window._sxOpen[i],ed=window._stEditingIdx===i;
+    h+='<div class="sxTy" data-i="'+i+'" style="border-radius:12px;background:'+(open?'rgba(212,170,106,.08)':'#211f1c')+';border:1.5px solid '+(open?G:'rgba(255,255,255,.06)')+'">'
+     +'<div style="display:flex;align-items:center;gap:8px;min-height:42px;padding:0 10px;cursor:pointer" onclick="if(!event.target.closest(\'button,input,.sxGrip\'))sxTog('+i+')"><span class="sxGrip" data-g="t" title="Glisser pour changer l\'ordre">⠿</span>'
+     +(ed?'<input id="stEditInp_'+i+'" class="sxIn" style="height:30px" value="'+E(lbl)+'" onkeydown="if(event.key===\'Enter\')saveShotTypeEditInline('+i+');if(event.key===\'Escape\')cancelShotTypeEditInline()"><button class="sxB2" style="color:#4BE08C;border-color:rgba(75,224,140,.5)" onclick="saveShotTypeEditInline('+i+')">✓</button><button class="sxB2" onclick="cancelShotTypeEditInline()">✕</button>'
+       :'<b style="font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+E(lbl)+'</b><span style="padding:2px 9px;border-radius:999px;background:#2c2824;color:#a89c88;font-size:11.5px;font-weight:800;white-space:nowrap;flex-shrink:0">'+(subs.length?subs.length+' sous-type'+(subs.length>1?'s':''):'aucun sous-type')+'</span><span style="flex:1"></span>'
+        +'<button class="sxB2" style="height:28px" title="Renommer" onclick="startShotTypeEditInline('+i+')">✎</button><button class="sxB2" style="height:28px" title="Copier" onclick="copyShotType('+i+')">⧉</button><button class="sxB2 red" style="height:28px" title="Supprimer" onclick="deleteShotType('+i+')">✕</button><span style="color:'+GL+';font-size:14px;width:18px;text-align:center">'+(open?'▾':'▸')+'</span>')+'</div>';
+    if(open){h+='<div class="sxSubs" data-i="'+i+'" style="display:flex;flex-wrap:wrap;gap:6px;padding:0 12px 12px 34px">';
+      subs.forEach(function(s,si){var se=window._stSubEditingIdx&&window._stSubEditingIdx[0]===i&&window._stSubEditingIdx[1]===si;
+        h+=se?'<span class="sxChip" style="cursor:default"><input id="stSubEditInp_'+i+'_'+si+'" class="sxIn" style="height:24px;width:160px;font-size:12px" value="'+E(s)+'" onkeydown="if(event.key===\'Enter\')saveShotSubEditInline('+i+','+si+');if(event.key===\'Escape\')cancelShotSubEditInline()"><button onclick="saveShotSubEditInline('+i+','+si+')" style="color:#4BE08C;opacity:1">✓</button><button onclick="cancelShotSubEditInline()">✕</button></span>'
+          :'<span class="sxChip" data-si="'+si+'" title="Glisser pour changer l\'ordre">'+E(s)+'<button title="Renommer" onclick="startShotSubEditInline('+i+','+si+')">✎</button><button title="Copier" onclick="copyShotSub(\''+J(s)+'\')">⧉</button><button title="Supprimer" onclick="deleteShotTypeSub('+i+','+si+')">✕</button></span>';});
+      h+='<button class="sxChip" style="border-style:dashed;color:'+GL+';padding-right:11px;cursor:pointer;background:#1d1a17" onclick="addShotTypeSub('+i+')">+ Sous-type</button></div>';}
+    h+='</div>';});
+  h+='</div><div style="font-size:11.5px;color:#8a7e6c">Glisse ⠿ pour l\'ordre des types, et glisse une pastille pour l\'ordre des sous-types. C\'est l\'ordre utilisé dans Shoot Lab.</div>';
+  return blk('🎯','TYPES DE TIR · SHOOT LAB','proposés quand tu complètes un tir',h);}
+window.sxTog=function(i){window._sxOpen[i]=!window._sxOpen[i];renderSettingsPage();};
+
+function secStock(){return blk('💾','STOCKAGE VIDÉO','les vidéos sont gardées dans ce navigateur',
+  '<div id="storageInfo" style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;font-size:13px;color:#a89c88">Calcul en cours…</div><div><button class="sxB2" style="height:38px" onclick="listStoredVideos()">📋 Vidéos stockées</button></div>');}
+
+var SECS=[['compte','🔑','Compte',secCompte],['codage','🎬','Codage',secCodage],['joueurs','👥','Joueurs & stats',secJoueurs],['shoot','🎯','Shoot Lab',secShoot],['stock','💾','Stockage',secStock]];
+window.sxGo=function(k){window._sxSec=k;renderSettingsPage();var pa=document.getElementById('pageArea');if(pa)pa.scrollTop=0;};
+
+// ───────── glisser pour l'ordre (types, sous-types, stats cachées)
+function dnd(root,itemSel,handleSel,onDrop){[].forEach.call(root.querySelectorAll(itemSel),function(el){var hd=handleSel?el.querySelector(handleSel):el;if(!hd)return;
+  var st=function(e){if(e.button>0||(e.target.closest('button,input')&&e.target!==hd))return;var t0=e.touches?e.touches[0]:e,x0=t0.clientX,y0=t0.clientY,moved=false,tg=null;
+    var mv=function(ev){var t=ev.touches?ev.touches[0]:ev;if(!moved&&Math.abs(t.clientX-x0)+Math.abs(t.clientY-y0)<6)return;if(ev.cancelable)ev.preventDefault();moved=true;el.classList.add('sxDrag');
+      var o=document.elementFromPoint(t.clientX,t.clientY);o=o&&o.closest?o.closest(itemSel):null;if(o&&o.parentNode!==el.parentNode)o=null;if(tg&&tg!==o)tg.classList.remove('sxDrop');if(o&&o!==el){tg=o;o.classList.add('sxDrop');}else tg=null;};
+    var up=function(){removeEventListener('mousemove',mv);removeEventListener('mouseup',up);removeEventListener('touchmove',mv);removeEventListener('touchend',up);el.classList.remove('sxDrag');if(tg){tg.classList.remove('sxDrop');onDrop(el,tg);}};
+    addEventListener('mousemove',mv);addEventListener('mouseup',up);addEventListener('touchmove',mv,{passive:false});addEventListener('touchend',up);};
+  hd.addEventListener('mousedown',st);hd.addEventListener('touchstart',st,{passive:true});});}
+function moveArr(a,from,to){var x=a.splice(from,1)[0];a.splice(to,0,x);}
+function bind(pa){
+  var tl=pa.querySelector('#sxTypes');if(tl){dnd(tl,'.sxTy','.sxGrip',function(a,b){var T=_getShotTypes(),i=+a.dataset.i,j=+b.dataset.i,op={};moveArr(T,i,j);
+      var keys=Object.keys(window._sxOpen).filter(function(k){return window._sxOpen[k];}).map(Number),order=T.map(function(_,k){return k;});var idx=[];for(var k=0;k<T.length;k++)idx.push(k);moveArr(idx,i,j);idx.forEach(function(old,nw){if(keys.indexOf(old)>=0)op[nw]=1;});window._sxOpen=op;
+      DB.settings.shotTypes=T;try{saveDB();}catch(e){}renderSettingsPage();});
+    [].forEach.call(tl.querySelectorAll('.sxSubs'),function(box){dnd(box,'.sxChip[data-si]',null,function(a,b){var T=_getShotTypes(),i=+box.dataset.i,t=T[i];if(!t||typeof t!=='object')return;moveArr(t.subs,+a.dataset.si,+b.dataset.si);DB.settings.shotTypes=T;try{saveDB();}catch(e){}renderSettingsPage();});});}
+  var hs=pa.querySelectorAll('[data-hs]');if(hs.length)dnd(hs[0].parentNode,'[data-hs]','.sxGrip',function(a,b){var l=hsDefs(true),i=l.findIndex(function(s){return s.id===a.dataset.hs;}),j=l.findIndex(function(s){return s.id===b.dataset.hs;});moveArr(l,i,j);l.forEach(function(s,k){s.o=k;});try{saveDB();}catch(e){}renderSettingsPage();});}
+
+window.renderSettingsPage=function(){if(!DB.settings)DB.settings={postRoll:0,preRoll:10};try{_getShotTypes();}catch(e){}
+  if(DB.hsEvents&&DB.hsEvents.length&&DB.matches&&DB.matches.length){var ids={};DB.matches.forEach(function(m){ids[String(m.id)]=1;});var k=DB.hsEvents.filter(function(e){return e.mid==null||ids[String(e.mid)];});if(k.length!==DB.hsEvents.length){DB.hsEvents=k;try{saveDB();}catch(e){}}}
+  var cur=SECS.find(function(s){return s[0]===window._sxSec;})||SECS[1];
+  var nT=(_getShotTypes()||[]).length;
+  var nav='<div class="sxN"><h1>Réglages</h1><div class="sub">Configuration de Basket Tagg Pro</div>'+SECS.map(function(s){return '<div class="sxI'+(s===cur?' on':'')+'" onclick="sxGo(\''+s[0]+'\')"><i>'+s[1]+'</i>'+s[2]+'</div>';}).join('')+'</div>';
+  var pa=document.getElementById('pageArea');if(!pa)return;
+  pa.innerHTML='<div class="sx">'+nav+'<div class="sxC">'+cur[3]()+'</div></div>';
+  bind(pa);
+  if(cur[0]==='stock'&&navigator.storage&&navigator.storage.estimate){navigator.storage.estimate().then(function(est){var el=document.getElementById('storageInfo');if(!el)return;var u=est.usage/1e9,t=est.quota/1e9,pct=Math.round(est.usage/est.quota*100),c=pct>80?'#FF7A7A':pct>50?G:'#4BE08C';
+    el.innerHTML='<b style="font-size:24px;color:'+c+'">'+u.toFixed(2).replace('.',',')+' Go</b><span>/ '+t.toFixed(2).replace('.',',')+' Go disponibles · '+pct+' %</span><div style="flex:1;min-width:160px;height:10px;border-radius:5px;background:#2c2824;overflow:hidden"><div style="width:'+pct+'%;height:100%;background:'+c+'"></div></div>';});}
+  var inp=document.getElementById('stEditInp_'+window._stEditingIdx);if(inp){inp.focus();inp.select();}
+  if(window._stSubEditingIdx){var si=document.getElementById('stSubEditInp_'+window._stSubEditingIdx[0]+'_'+window._stSubEditingIdx[1]);if(si){si.focus();si.select();}}};
+// ouvrir le type auquel on ajoute un sous-type
+var _ats=window.addShotTypeSub;if(_ats)window.addShotTypeSub=function(i){window._sxOpen[i]=1;return _ats.apply(this,arguments);};
+// réglage supprimé : « Sauter l'étape sous-famille s'il n'y en a qu'une »
+try{if(window.DB&&DB.settings)delete DB.settings.skipSingleSub;}catch(e){}
 })();
 
 /*XV_END*/
