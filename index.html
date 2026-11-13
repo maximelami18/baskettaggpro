@@ -460,7 +460,7 @@ document.addEventListener('DOMContentLoaded', function(){
 var _SB_URL="https://umuvirwbtpflizxupwbr.supabase.co";
 // Version de ce fichier — à incrémenter à chaque déploiement, en cohérence avec la valeur
 // mise à jour dans la table Supabase `app_version` (voir _checkAppVersion ci-dessous).
-var APP_VERSION = "2026-11-13-489";
+var APP_VERSION = "2026-11-13-490";
 var _SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtdXZpcndidHBmbGl6eHVwd2JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3MTI1MDEsImV4cCI6MjA5MDI4ODUwMX0.fFQaF-zP9dzcWITJDf6GBmvu0pdcuvlaUz0A0qW0kfo";
 var _LICENCE_KEY='btp_licence';
 var _MACHINE_KEY='btp_machine';
@@ -16096,11 +16096,11 @@ function hsSettingsCard(){
       +'<label style="font-size:12px;color:var(--txt2);display:flex;gap:5px;align-items:center;white-space:nowrap;"><input type="checkbox"'+(s.on!==false?' checked':'')+' onchange="hsToggle(\''+s.id+'\')">Active</label>'
       +'<button class="btn bg bsm" '+(i?'':'disabled style="opacity:.3"')+' onclick="hsMove(\''+s.id+'\',-1)">▲</button>'
       +'<button class="btn bg bsm" '+(i<l.length-1?'':'disabled style="opacity:.3"')+' onclick="hsMove(\''+s.id+'\',1)">▼</button>'
-      +'<button class="btn bg bsm" '+(u?'disabled style="opacity:.3" title="Déjà utilisée : désactive-la plutôt"':'')+' onclick="hsDel(\''+s.id+'\')">🗑</button>'
+      +'<button class="btn bg bsm" title="Supprimer'+(u?' (efface aussi ses saisies)':'')+'" onclick="hsDel(\''+s.id+'\')">🗑</button>'
       +'</div>';
   });
   h+='<div style="display:flex;gap:8px;margin-top:6px;"><input id="hsNew" class="inp" placeholder="Nouvelle stat cachée (ex. Aide défensive)…" style="flex:1;" onkeydown="if(event.key===\'Enter\')hsAdd()"><button class="btn bp" onclick="hsAdd()">+ Ajouter</button></div>'
-    +'<div style="font-size:12px;color:var(--txt3);margin-top:10px;">Une stat déjà utilisée ne peut pas être supprimée, seulement désactivée (elle disparaît de la saisie, ses données restent).</div>'
+    +'<div style="font-size:12px;color:var(--txt3);margin-top:10px;">Supprimer une stat l\'efface de tout le logiciel, avec toutes ses saisies. Pour la garder sans la saisir, décoche « Active ».</div>'
     +'</div>';
   return h;
 }
@@ -42749,10 +42749,10 @@ function autoPick(){var p=pend();if(p.length)SL.pick('p',p[0].id);else{SL.cur=nu
 
 // ───────── actions du panneau
 SL.court=function(ev){var sv=ev.currentTarget,pt=sv.createSVGPoint();pt.x=ev.clientX;pt.y=ev.clientY;var q=pt.matrixTransform(sv.getScreenCTM().inverse());
-  if(!SL.f)return;SL.f.x=Math.round(Math.max(0,Math.min(1500,q.x)));SL.f.y=Math.round(Math.max(0,Math.min(1400,q.y)));SL.f.is3=_isShotThreePointer(SL.f.x,SL.f.y);renderPanel();};
+  if(!SL.f)return;SL.f.x=Math.round(Math.max(0,Math.min(1500,q.x)));SL.f.y=Math.round(Math.max(0,Math.min(1400,q.y)));SL.f.is3=_isShotThreePointer(SL.f.x,SL.f.y);renderPanel();auto();};
 SL.lvl=function(k){if(!SL.f)return;SL.f.lvl=SL.f.lvl===k?null:k;renderPanel();};
-SL.type=function(i){if(!SL.f)return;var T=types();SL.f.t=i;SL.f.s=null;SL.f.view=T[i]&&T[i].subs.length?'subs':'types';renderPanel();};
-SL.sub=function(j){if(!SL.f)return;SL.f.s=SL.f.s===j?null:j;renderPanel();};
+SL.type=function(i){if(!SL.f)return;var T=types();SL.f.t=i;SL.f.s=null;SL.f.view=T[i]&&T[i].subs.length?'subs':'types';renderPanel();auto();};
+SL.sub=function(j){if(!SL.f)return;SL.f.s=SL.f.s===j?null:j;renderPanel();auto();};
 SL.back=function(){if(SL.f){SL.f.view='types';renderPanel();}};
 SL.made=function(){if(SL.f){SL.f.made=!SL.f.made;renderPanel();}};
 SL.plMenu=function(){var el=S('slPlM');if(el){el.remove();return;}var t=curTeam(),b=S('slPlB');if(!t||!b)return;var r=b.getBoundingClientRect();
@@ -42760,6 +42760,8 @@ SL.plMenu=function(){var el=S('slPlM');if(el){el.remove();return;}var t=curTeam(
   d.innerHTML=(t.players||[]).slice().sort(function(a,b2){return (+a.num||0)-(+b2.num||0);}).map(function(p){return '<button onclick="__sl.setPl(\''+p.id+'\')" style="display:flex;align-items:center;gap:7px;padding:5px 8px;border-radius:9px;border:1px solid '+(String(p.id)===String(SL.f.pid)?G:'rgba(255,255,255,.1)')+';background:#252320;color:#F0E8D8;font:800 12.5px Outfit;text-align:left">'+av(p)+E(p.first||p.last||'')+'</button>';}).join('');
   document.body.appendChild(d);setTimeout(function(){document.addEventListener('click',function h(e){if(!d.contains(e.target)&&e.target!==b){d.remove();document.removeEventListener('click',h);}});},0);};
 SL.setPl=function(pid){var t=curTeam(),p=t&&(t.players||[]).find(function(x){return String(x.id)===String(pid);});if(SL.f&&p)SL.f.pid=p.id;var m=S('slPlM');if(m)m.remove();renderPanel();};
+// enregistrement automatique (comme Prise de stats) : dès que position + type (+ sous-type) sont faits, le tir part et le suivant s'ouvre
+function auto(){var c=SL.cur;if(!c||c.kind!=='p'||!ready())return;clearTimeout(SL.at);var id=c.id;SL.at=setTimeout(function(){if(SL.cur&&SL.cur.id===id&&ready())SL.save();},220);}
 function ready(){var f=SL.f;if(!f||f.x==null)return false;var T=types();if(f.t==null||!T[f.t])return false;if(T[f.t].subs.length&&f.s==null)return false;return true;}
 SL.save=function(){var f=SL.f,c=SL.cur;if(!f||!c)return;if(!ready()){toast('Complète la position et le type de tir','red');return;}
   var T=types(),t=T[f.t],shotType=t.label+(f.s!=null&&t.subs[f.s]?' — '+t.subs[f.s]:''),is3=!!f.is3,made=!!f.made;
@@ -42823,8 +42825,8 @@ function panelHtml(){var f=SL.f,c=SL.cur;
    +'<button id="slPlB" onclick="__sl.plMenu()" style="display:inline-flex;align-items:center;gap:7px;height:32px;padding:0 10px 0 4px;border-radius:999px;border:1.5px solid '+G+';background:rgba(212,170,106,.14);margin-left:6px;color:#F0E8D8">'+av(p)+'<b style="font-size:13px">'+E(p?(p.first||p.last):'—')+'</b><span style="font-size:11px;color:#a89c88">changer ▾</span></button>'
    +'<button onclick="__sl.made()" style="display:inline-flex;align-items:center;height:32px;padding:0 13px;border-radius:999px;border:1.5px solid '+(f.made?'#4BE08C':'#FF7A7A')+';background:'+(f.made?'rgba(75,224,140,.14)':'rgba(255,122,122,.14)')+';color:'+(f.made?'#4BE08C':'#FF7A7A')+';font-weight:900;font-size:12.5px">'+(f.made?'✓ Marqué':'✗ Loupé')+'</button>'
    +'<span style="font-size:11.5px;color:#8a7e6c;overflow:hidden;text-overflow:ellipsis;min-width:0">repris du Codage'+(path(o)?' · '+E(path(o)):'')+'</span><span style="flex:1"></span>'
-   +(edit?'<button class="cg2btn" style="height:34px;color:#f08585;border-color:rgba(224,82,82,.45)" onclick="__sl.del()">🗑 Supprimer</button>':'<button class="cg2btn" style="height:34px" onclick="__sl.skip()">Passer ›</button>')
-   +'<button class="cg2btn" onclick="__sl.save()" style="height:34px;padding:0 20px;'+(ready()?'background:linear-gradient(180deg,#E8C88A,#C79C57);color:#150E00;border-color:#E8C88A;box-shadow:0 4px 14px rgba(212,170,106,.35)':'opacity:.55')+';font-weight:900;font-size:13.5px">'+(edit?'✓ Enregistrer':'✓ Valider · tir suivant →')+'</button></div>';
+   +(edit?'<button class="cg2btn" style="height:34px;color:#f08585;border-color:rgba(224,82,82,.45)" onclick="__sl.del()">🗑 Supprimer</button><button class="cg2btn" onclick="__sl.save()" style="height:34px;padding:0 20px;'+(ready()?'background:linear-gradient(180deg,#E8C88A,#C79C57);color:#150E00;border-color:#E8C88A;box-shadow:0 4px 14px rgba(212,170,106,.35)':'opacity:.55')+';font-weight:900;font-size:13.5px">✓ Enregistrer</button>'
+     :'<span style="font-size:11.5px;color:#8a7e6c;flex-shrink:0">s\'enregistre dès que le type est choisi</span><button class="cg2btn" style="height:34px" onclick="__sl.skip()">Passer ›</button>')+'</div>';
   var lv=[['tres','Très ouvert','#4BE08C'],['ouvert','Ouvert','#F0B040'],['conteste','Contesté','#FF7A7A']];
   var left='<div id="slLeftCol" style="flex:0 0 auto;min-width:0;display:flex;flex-direction:column;gap:8px">'
    +blk(1,'Position',ok1,ok1?'<span style="padding:2px 9px;border-radius:999px;background:#150E00;color:#4BE08C;font:900 11.5px Outfit">'+(f.is3?'3 PTS':'2 PTS')+' · auto</span>':'<span style="font-size:11.5px;font-weight:700;opacity:.8;margin-right:6px">tape l\'endroit du tir</span>','<div id="slCourt" style="flex:1;min-height:0;display:flex;justify-content:center;align-items:center">'+courtSvg(f)+'</div>','flex:1')
@@ -42860,6 +42862,14 @@ SL.open=function(){if(SL.on)return;SL.on=true;SL.team='notre';SL.qt=0;
 SL.close=function(){if(!SL.on)return;SL.on=false;stopLoop();try{pauseVideo();}catch(e){}var vw=S('videoWrap');if(vw&&SL.ph0&&SL.ph0.parentNode){SL.ph0.parentNode.insertBefore(vw,SL.ph0);SL.ph0.remove();}var r=S('slRoot');if(r)r.remove();var m=S('slPlM');if(m)m.remove();};
 SL.exit=function(){SL.close();try{exitCoding();}catch(e){}};
 addEventListener('resize',function(){if(!SL.on)return;var p=S('slP');if(p)p.style.height=panelH()+'px';renderPanel();});
+
+// ───────── Stats cachées : suppression possible même si déjà saisie (efface aussi ses saisies partout)
+window.hsDel=function(id){try{hsEns();}catch(e){}var st=(DB.hsStats||[]).find(function(x){return x.id===id;});if(!st)return;var n=(DB.hsEvents||[]).filter(function(e){return e.sid===id;}).length;
+  if(n&&!confirm('Supprimer la stat cachée « '+st.label+' » ?\n\nElle sera supprimée de tout le logiciel : '+(n>1?'les '+n+' saisies faites avec cette stat, dans tous les matchs, seront effacées.':'la saisie faite avec cette stat sera effacée.')+' C\'est définitif.'))return;
+  DB.hsStats=DB.hsStats.filter(function(x){return x.id!==id;});DB.hsEvents=(DB.hsEvents||[]).filter(function(e){return e.sid!==id;});try{saveDB();}catch(e){}try{renderSettingsPage();}catch(e){}};
+// saisies d'un match supprimé : on les retire pour que le compteur reste juste
+var _rsp=window.renderSettingsPage;
+window.renderSettingsPage=function(){try{if(DB.hsEvents&&DB.hsEvents.length&&DB.matches&&DB.matches.length){var ids={};DB.matches.forEach(function(m){ids[String(m.id)]=1;});var k=DB.hsEvents.filter(function(e){return e.mid==null||ids[String(e.mid)];});if(k.length!==DB.hsEvents.length){DB.hsEvents=k;try{saveDB();}catch(e){}}}}catch(e){}return _rsp.apply(this,arguments);};
 
 var _oc=window.openCoding;
 window.openCoding=function(mode,matchId){var r=_oc.apply(this,arguments);if(mode==='instats'){setTimeout(function(){if(CS.mode==='instats')SL.open();},60);}return r;};
