@@ -460,7 +460,7 @@ document.addEventListener('DOMContentLoaded', function(){
 var _SB_URL="https://umuvirwbtpflizxupwbr.supabase.co";
 // Version de ce fichier — à incrémenter à chaque déploiement, en cohérence avec la valeur
 // mise à jour dans la table Supabase `app_version` (voir _checkAppVersion ci-dessous).
-var APP_VERSION = "2026-11-13-476";
+var APP_VERSION = "2026-11-13-477";
 var _SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtdXZpcndidHBmbGl6eHVwd2JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3MTI1MDEsImV4cCI6MjA5MDI4ODUwMX0.fFQaF-zP9dzcWITJDf6GBmvu0pdcuvlaUz0A0qW0kfo";
 var _LICENCE_KEY='btp_licence';
 var _MACHINE_KEY='btp_machine';
@@ -42352,7 +42352,8 @@ var css=document.createElement('style');css.textContent=`
 .nvCh button{height:30px;padding:0 10px;border-radius:9px;font:800 12.5px Outfit,sans-serif;cursor:pointer}
 .nvMenu{position:absolute;right:8px;top:48px;z-index:20;min-width:260px;max-width:90%;border-radius:12px;background:#1c1a18;border:1px solid rgba(212,170,106,.5);box-shadow:0 14px 40px #000;padding:6px;display:flex;flex-direction:column;gap:3px}
 .nvMenu div{display:flex;align-items:center;gap:6px;padding:7px 9px;border-radius:8px;cursor:pointer;color:#F0E8D8;font-size:13px}
-.nvMenu div:hover{background:#2a2622}`;document.head.appendChild(css);
+.nvMenu div:hover{background:#2a2622}
+body.nvDrag iframe{pointer-events:none!important}`;document.head.appendChild(css);
 function chronoHtml(){var run=!!_liveChronoRunning,t=el();
   return '<span style="display:flex;align-items:center;gap:6px;font-size:10.5px;font-weight:900;letter-spacing:.12em;color:'+(run?'#FF8A8A':'#8a7e6c')+'"><i style="width:9px;height:9px;border-radius:50%;background:'+(run?'#FF4D4D;box-shadow:0 0 8px #FF4D4D':'#6f665a')+'"></i>'+(run?'LIVE':'ARRÊT')+'</span>'
    +'<b id="cg2LiveT" style="font-family:JetBrains Mono,monospace;font-size:28px;color:#fff;line-height:1">'+fmt(t)+'</b>'
@@ -42366,7 +42367,7 @@ function build(box){var x=m(),u=(x&&x.navUrl)||'';
   box.innerHTML='<div class="nvBar"><button class="cg2btn" title="Page précédente" onclick="__cg2.live.nav.back()"'+(N.hist.length?'':' disabled style="opacity:.4"')+'>←</button><button class="cg2btn" title="Recharger" onclick="__cg2.live.nav.reload()">↻</button>'
    +'<input id="nvUrl" placeholder="Colle l\'adresse du direct (YouTube, Dailymotion, Twitch…)" value="'+E(u)+'" onkeydown="if(event.key===\'Enter\')__cg2.live.nav.go(this.value)">'
    +'<button class="cg2btn" style="background:#D4AA6A;color:#150E00;border-color:#D4AA6A;font-weight:800" onclick="__cg2.live.nav.go(document.getElementById(\'nvUrl\').value)">Ouvrir</button>'
-   +'<button class="cg2btn" onclick="__cg2.live.nav.menu()">★ Mes liens</button><button class="cg2btn" title="Ouvrir dans une fenêtre à part" onclick="__cg2.live.nav.ext()">🪟</button></div>'
+   +'<button class="cg2btn" onclick="__cg2.live.nav.menu()">★ Mes liens</button><button class="cg2btn" title="Ouvrir dans une fenêtre à part" onclick="__cg2.live.nav.ext()">🪟</button><button class="cg2btn" title="Quitter le navigateur" style="color:#f08585;border-color:rgba(224,82,82,.45);font-weight:800" onclick="__cg2.live.nav.quit()">✕ Quitter</button></div>'
    +'<div class="nvBody" id="nvBody">'+bodyHtml(u)+'<div class="nvCh" id="nvCh">'+chronoHtml()+'</div></div>';}
 var _paint=L.paint;
 L.paint=function(){var box=S('cg2Live');if(!box)return;var on=C.active()&&!!window._liveStatsMode;
@@ -42387,6 +42388,10 @@ N.menu=function(){if(S('nvMenu')){N.closeMenu();return;}var body=S('cg2Live');if
   d.innerHTML=(ls.length?ls.map(function(l,i){return '<div onclick="__cg2.live.nav.go(__cg2.live.nav.L()['+i+'].u)"><span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">★ '+E(l.n)+'</span><span onclick="event.stopPropagation();__cg2.live.nav.del('+i+')" style="color:#f08585;padding:0 4px">✕</span></div>';}).join(''):'<div style="cursor:default;color:#8a7e6c">Aucun lien enregistré</div>')
    +'<div onclick="__cg2.live.nav.save()" style="color:#E8C88A;border-top:1px solid #ffffff14;margin-top:3px">＋ Enregistrer le lien actuel</div>';body.style.position='relative';body.appendChild(d);};
 N.L=links;
+N.quit=function(){var x=m();if(!x)return;if(!confirm('Quitter le navigateur pour ce match ? Le lien est retiré et l\'écran Live revient au chrono seul.'))return;delete x.navUrl;x.extBrowser=false;N.hist=[];N.big=false;N.closeMenu();try{saveDB();}catch(e){}var b=S('cg2Live');if(b){b.dataset.nv='';b.classList.remove('nv');}L.paint();try{C.render();}catch(e){}toast('Navigateur fermé pour ce match','acc');};
+document.addEventListener('mousedown',function(e){var t=e.target;if(t&&t.closest&&t.closest('.rh,.cg2grip,.cgH,.cgMv,.cg2h,[class*="resize"],[id*="esize"],[class*="grip"]'))document.body.classList.add('nvDrag');},true);
+document.addEventListener('touchstart',function(e){var t=e.target;if(t&&t.closest&&t.closest('.rh,.cg2grip,.cgH,.cgMv,.cg2h,[class*="resize"],[id*="esize"],[class*="grip"]'))document.body.classList.add('nvDrag');},{capture:true,passive:true});
+['mouseup','touchend','touchcancel','blur'].forEach(function(ev){window.addEventListener(ev,function(){document.body.classList.remove('nvDrag');},true);});
 N.save=function(){var x=m(),u=x&&x.navUrl;if(!u){toast('Ouvre d\'abord une adresse','red');return;}var n=prompt('Nom du lien (ex. « Direct de la ligue »)');if(!n||!n.trim())return;links().push({n:n.trim(),u:u});try{saveDB();}catch(e){}N.closeMenu();toast('✓ Lien enregistré','acc');};
 N.del=function(i){links().splice(i,1);try{saveDB();}catch(e){}N.closeMenu();N.menu();};
 // ancien bouton « Rouvrir la vidéo » : ouvre la page actuelle à part
