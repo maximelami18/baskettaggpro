@@ -460,7 +460,7 @@ document.addEventListener('DOMContentLoaded', function(){
 var _SB_URL="https://umuvirwbtpflizxupwbr.supabase.co";
 // Version de ce fichier — à incrémenter à chaque déploiement, en cohérence avec la valeur
 // mise à jour dans la table Supabase `app_version` (voir _checkAppVersion ci-dessous).
-var APP_VERSION = "2026-11-13-495";
+var APP_VERSION = "2026-11-13-496";
 var _SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtdXZpcndidHBmbGl6eHVwd2JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3MTI1MDEsImV4cCI6MjA5MDI4ODUwMX0.fFQaF-zP9dzcWITJDf6GBmvu0pdcuvlaUz0A0qW0kfo";
 var _LICENCE_KEY='btp_licence';
 var _MACHINE_KEY='btp_machine';
@@ -43045,8 +43045,19 @@ function secShoot(){var T=_getShotTypes();
   return blk('🎯','TYPES DE TIR · SHOOT LAB','proposés quand tu complètes un tir',h);}
 window.sxTog=function(i){window._sxOpen[i]=!window._sxOpen[i];renderSettingsPage();};
 
-function secStock(){return blk('💾','STOCKAGE VIDÉO','les vidéos sont gardées dans ce navigateur',
-  '<div id="storageInfo" style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;font-size:13px;color:#a89c88">Calcul en cours…</div><div><button class="sxB2" style="height:38px" onclick="listStoredVideos()">📋 Vidéos stockées</button></div>');}
+function secStock(){return blk('💾','ESPACE UTILISÉ','les vidéos sont gardées dans ce navigateur',
+  '<div id="storageInfo" style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;font-size:13px;color:#a89c88">Calcul en cours…</div>')
+  +blk('🎬','VIDÉOS STOCKÉES','sur cet appareil','<div id="sxVids" style="display:flex;flex-direction:column;gap:8px"><div style="font-size:12.5px;color:#8a7e6c">Chargement…</div></div><div style="font-size:11.5px;color:#8a7e6c">Supprimer une vidéo libère de la place. Les séquences codées sur le match sont gardées : il suffit de recharger la vidéo pour les revoir.</div>');}
+function fillVids(){var box=document.getElementById('sxVids');if(!box)return;
+  openVideoDB(function(db){if(!db){box.innerHTML='<div style="font-size:12.5px;color:#8a7e6c">Stockage vidéo indisponible sur ce navigateur.</div>';return;}
+    var req=db.transaction('blobsV2','readonly').objectStore('blobsV2').getAll();
+    req.onsuccess=function(){var lic=_getLicenceKey()||'legacy',L=(req.result||[]).filter(function(e){return String(e.ckey).indexOf(lic+'::')===0;});box=document.getElementById('sxVids');if(!box)return;
+      if(!L.length){box.innerHTML='<div style="font-size:12.5px;color:#8a7e6c">Aucune vidéo stockée sur cet appareil.</div>';return;}
+      box.innerHTML=L.map(function(e){var raw=String(e.matchId),pt=raw.split('_'),mid=parseInt(pt[0]),vi=pt.length>1?parseInt(pt[1]):null,m=(DB.matches||[]).find(function(x){return x.id===mid;});
+        var t=m?gT(m.teamId):null,o=m&&m.oppTeamId?gT(m.oppTeamId):null,tn=(t&&t.name)||'',on=(o&&o.name)||(m&&m.opp)||'?';
+        var title=m?('J'+(m.round||'?')+' — '+(m.home===false?on+' vs '+tn:tn+' vs '+on)):'Match supprimé',vl=vi!==null&&m&&m.videos&&m.videos[vi]?m.videos[vi].label:'';
+        var dt=m&&m.date?String(m.date).split('-').reverse().join('/'):'',mo=(e.blob&&e.blob.size?e.blob.size/1e6:0),sz=mo>=1000?(mo/1000).toFixed(2).replace('.',',')+' Go':Math.round(mo)+' Mo';
+        return '<div class="sxR"><span class="sxIc">🎬</span><div class="t"><b>'+E(title)+(vl?' · '+E(vl):'')+'</b><span>'+(dt?dt+' · ':'')+E(e.name||'')+'</span></div><span style="font-weight:900;color:#E8C88A;white-space:nowrap">'+sz+'</span><button class="sxB2 red" onclick="deleteStoredVideoAndUnlink(\''+J(raw)+'\','+mid+','+(vi===null?'null':vi)+')">🗑 Supprimer</button></div>';}).join('');};});}
 
 var SECS=[['compte','🔑','Compte',secCompte],['codage','🎬','Codage',secCodage],['joueurs','👥','Joueurs & stats',secJoueurs],['shoot','🎯','Shoot Lab',secShoot],['stock','💾','Stockage',secStock]];
 window.sxGo=function(k){window._sxSec=k;renderSettingsPage();var pa=document.getElementById('pageArea');if(pa)pa.scrollTop=0;};
@@ -43077,6 +43088,7 @@ window.renderSettingsPage=function(){if(!DB.settings)DB.settings={postRoll:0,pre
   bind(pa);
   if(cur[0]==='stock'&&navigator.storage&&navigator.storage.estimate){navigator.storage.estimate().then(function(est){var el=document.getElementById('storageInfo');if(!el)return;var u=est.usage/1e9,t=est.quota/1e9,pct=Math.round(est.usage/est.quota*100),c=pct>80?'#FF7A7A':pct>50?G:'#4BE08C';
     el.innerHTML='<b style="font-size:24px;color:'+c+'">'+u.toFixed(2).replace('.',',')+' Go</b><span>/ '+t.toFixed(2).replace('.',',')+' Go disponibles · '+pct+' %</span><div style="flex:1;min-width:160px;height:10px;border-radius:5px;background:#2c2824;overflow:hidden"><div style="width:'+pct+'%;height:100%;background:'+c+'"></div></div>';});}
+  if(cur[0]==='stock'){try{fillVids();}catch(e){}}
   var inp=document.getElementById('stEditInp_'+window._stEditingIdx);if(inp){inp.focus();inp.select();}
   if(window._stSubEditingIdx){var si=document.getElementById('stSubEditInp_'+window._stSubEditingIdx[0]+'_'+window._stSubEditingIdx[1]);if(si){si.focus();si.select();}}};
 // ouvrir le type auquel on ajoute un sous-type
