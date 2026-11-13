@@ -460,7 +460,7 @@ document.addEventListener('DOMContentLoaded', function(){
 var _SB_URL="https://umuvirwbtpflizxupwbr.supabase.co";
 // Version de ce fichier — à incrémenter à chaque déploiement, en cohérence avec la valeur
 // mise à jour dans la table Supabase `app_version` (voir _checkAppVersion ci-dessous).
-var APP_VERSION = "2026-11-13-473";
+var APP_VERSION = "2026-11-13-476";
 var _SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtdXZpcndidHBmbGl6eHVwd2JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3MTI1MDEsImV4cCI6MjA5MDI4ODUwMX0.fFQaF-zP9dzcWITJDf6GBmvu0pdcuvlaUz0A0qW0kfo";
 var _LICENCE_KEY='btp_licence';
 var _MACHINE_KEY='btp_machine';
@@ -41650,6 +41650,7 @@ C.savePl=function(id){var s=(DB.sequences||[]).find(function(x){return x.id===id
   s.playerId=pl?pl.id:null;s.player=pl?(pl.first+' '+pl.last):'Équipe';if(q)s.qt=+q.value;saveDB();closeModal();try{renderSeqPanel();}catch(e){render();}};
 
 // ───────── branchements (rien d'autre n'est modifié)
+var _rap=window.renderActionPanel;window.renderActionPanel=function(){var r=_rap.apply(this,arguments);try{if(active()&&!C.st.drag)layout();}catch(e){}return r;};
 var _rsp=window.renderSeqPanel;window.renderSeqPanel=function(){var r=_rsp&&_rsp.apply(this,arguments);try{render();}catch(e){}return r;};
 var _oc=window.openCoding;window.openCoding=function(){if(window.__cg2){C.st.sel=null;C._h=0;}var r=_oc.apply(this,arguments);C._h=0;setTimeout(render,0);setTimeout(render,400);return r;};
 var _ex=window.exitCoding;window.exitCoding=function(){if(C.st.mode==='draw')drawClose();C.st.mode=null;var r=_ex.apply(this,arguments);document.body.classList.remove('cg2on');show(false);var vw=S('videoWrap');if(vw)vw.style.width='';return r;};
@@ -41714,7 +41715,7 @@ function polOf(b,node){if(!node)return null;if(node.type==='Action')return node.
   if(node.type==='Famille'){var subs=bgSubsOfFamily(b,node.id);for(var i=0;i<subs.length;i++){var p=polOf(b,subs[i]);if(p)return p;}}
   return null;}
 function colP(ppp,def){return def?(ppp<=0.8?'#3DC97A':ppp<=1.1?'#F0A030':'#FF6B6B'):(ppp>=1.1?'#3DC97A':ppp>=0.8?'#F0A030':'#FF6B6B');}
-function sline(s,def,cp){var c=colP(s.ppp,def);return '<b style="color:'+c+';font-weight:900">'+s.ppp.toFixed(2)+'</b><span style="opacity:.8"> PPP</span><i style="opacity:.45;font-style:normal"> · </i>'+s.n+' poss<i style="opacity:.45;font-style:normal"> · </i><b style="color:'+(def?'#FF9A9A':'#5BEA9C')+'">'+s.pts+' pts'+(cp?'':' '+(def?'encaissés':'marqués'))+'</b>';}
+function sline(s,def,cp){var c=colP(s.ppp,def);return '<b style="color:'+c+';font-weight:900">'+s.ppp.toFixed(2)+'</b><span style="opacity:.8"> PPP</span><i style="opacity:.45;font-style:normal"> · </i>'+s.n+' poss<i style="opacity:.45;font-style:normal"> · </i><b style="color:'+(def?'#FF9A9A':'#5BEA9C')+'">'+s.pts+' pts</b>';}
 function pill(s,def,big,cp){if(!B.st.badges)return '';var m=FS('ppp');if(!s.n)return '';
   return '<span class="cgPill cg2fit" style="max-width:96%;box-sizing:border-box;font-size:'+((big?16:13)*m)+'px;font-weight:700;color:rgba(255,255,255,.92);border:none;background:rgba(0,0,0,.34);padding:3px 9px">'+sline(s,def,cp)+'</span>';}
 function share(b,all,node,s){var p=polOf(b,node);var den=all.filter(function(x){var a=b.nodes.find(function(n){return n.id===x.actionId;});return !p||(a&&a.polarity===p);}).length||1;return Math.round(s.n*100/den);}
@@ -42029,7 +42030,7 @@ function html(){var run=!!_liveChronoRunning,t=el();
   var btns=run?b('⏹ Arrêter','__cg2.live.stop()','background:#e05252;color:#fff;border:none')
     :(t>0?b('▶ Reprendre','__cg2.live.start()','background:#3DC97A;color:#0c1f14;border:none')+b('↺ Remettre à zéro','__cg2.live.reset()','background:#211f1c;color:#cfc6b4;border:1px solid rgba(255,255,255,.14)')
           :b('▶ Démarrer le chrono','__cg2.live.start()','background:#3DC97A;color:#0c1f14;border:none'));
-  if(ext())btns+=b('🪟 Rouvrir la vidéo','__cg2.live.openExt()','background:transparent;color:#E8C88A;border:1px solid rgba(212,170,106,.45)');
+  if(ext())btns+=b('🪟 Fenêtre à part','__cg2.live.openExt()','background:transparent;color:#E8C88A;border:1px solid rgba(212,170,106,.45)');
   return '<span style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:900;letter-spacing:.14em;color:'+(run?'#FF8A8A':'#8a7e6c')+'"><i style="width:10px;height:10px;border-radius:50%;background:'+(run?'#FF4D4D;box-shadow:0 0 10px #FF4D4D':'#6f665a')+'"></i>'+(run?'LIVE':'CHRONO À L’ARRÊT')+'</span>'
    +'<span id="cg2LiveT" class="cg2fit" style="max-width:100%;font-family:JetBrains Mono,monospace;font-size:96px;font-weight:800;line-height:1;letter-spacing:-.02em;color:#fff">'+fmt(t)+'</span>'
    +'<div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center">'+btns+'</div>'
@@ -42042,7 +42043,7 @@ function ensure(){if(S('cg2Live'))return;var vw=S('videoWrap');if(!vw)return;var
 C.beforeLayout=function(){ensure();L.paint();if(window._liveStatsMode&&C.active()){var mr=S('mediaRow');if(mr&&mr.clientHeight<150){mr.style.height=Math.max(220,Math.round((S('codingBody')||document.body).clientHeight*0.4))+'px';}}};
 setInterval(function(){var t=S('cg2LiveT');if(t&&t.offsetParent)t.textContent=fmt(el());},500);
 // Ouverture d'un match « navigateur externe » : passe en Live et ouvre la fenêtre (pendant le clic, pour ne pas être bloqué)
-var _oc=window.openCoding;window.openCoding=function(mode,id){var r=_oc.apply(this,arguments);try{var mm=gM(id);if(mode==='codage'&&mm&&mm.extBrowser){if(!window._liveStatsMode)toggleLiveStatsMode();if(!opened[id]&&(!win||win.closed)){opened[id]=1;L.openExt();}setTimeout(function(){C.render();},60);}}catch(e){}return r;};
+var _oc=window.openCoding;window.openCoding=function(mode,id){var r=_oc.apply(this,arguments);try{var mm=gM(id);if(mode==='codage'&&mm&&mm.extBrowser){if(!window._liveStatsMode)toggleLiveStatsMode();setTimeout(function(){C.render();},60);}}catch(e){}return r;};
 
 // ───────── fiche match : 3e source « Navigateur externe » (sans lien)
 var _rp=window.renderPage;window.renderPage=function(){var r=_rp.apply(this,arguments);try{formSource();}catch(e){}return r;};
@@ -42319,6 +42320,78 @@ var _osp=window.openSeqPlayersModal;
 window.openSeqPlayersModal=function(){var ps=window._pendingSeq;
   if(CS.mode==='codage'&&ps&&ps.pr&&!ps.pr.resKind&&teamFor()){genModal();return;}
   return _osp.apply(this,arguments);};
+})();
+
+/* ═══════════ v476 — Live : navigateur intégré dans le cadre du chrono ═══════════ */
+(function(){
+var C=window.__cg2;if(!C||!C.live)return;var L=C.live;
+var S=function(id){return document.getElementById(id);};
+function E(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function m(){try{return curMatch();}catch(e){return null;}}
+var N=L.nav={big:false,hist:[]};
+function navOn(){var x=m();return !!(x&&(x.extBrowser||x.navUrl))&&!N.big;}
+function links(){DB.settings=DB.settings||{};return DB.settings.navLinks=DB.settings.navLinks||[];}
+var BLOCK=/(^|\.)(google\.[a-z.]+|facebook\.com|instagram\.com|x\.com|twitter\.com|linkedin\.com|tiktok\.com|apple\.com|amazon\.[a-z.]+|microsoft\.com|live\.com|outlook\.com|github\.com)$/i;
+function norm(u){u=String(u||'').trim();if(!u)return '';if(!/^https?:\/\//i.test(u))u='https://'+u;return u;}
+function embed(u){var h='',id;try{h=new URL(u).hostname;}catch(e){return {src:u,blocked:false};}
+  if(/youtube\.com|youtu\.be/.test(h)){id=(u.match(/[?&]v=([\w-]{6,})/)||u.match(/youtu\.be\/([\w-]{6,})/)||u.match(/\/(?:live|embed|shorts)\/([\w-]{6,})/)||[])[1];if(id)return {src:'https://www.youtube.com/embed/'+id+'?autoplay=1&rel=0',blocked:false};return {src:u,blocked:true};}
+  if(/dailymotion\.com|dai\.ly/.test(h)){id=(u.match(/video\/([a-z0-9]+)/i)||u.match(/dai\.ly\/([a-z0-9]+)/i)||[])[1];if(id)return {src:'https://geo.dailymotion.com/player.html?video='+id,blocked:false};}
+  if(/twitch\.tv/.test(h)){var ch=(u.match(/twitch\.tv\/([\w]+)/)||[])[1];if(ch&&ch!=='videos')return {src:'https://player.twitch.tv/?channel='+ch+'&parent='+(location.hostname||'localhost'),blocked:false};}
+  return {src:u,blocked:BLOCK.test(h)};}
+function fmt(t){t=Math.floor(t);var h=Math.floor(t/3600),mi=Math.floor((t%3600)/60),se=t%60;return h+':'+(mi<10?'0':'')+mi+':'+(se<10?'0':'')+se;}
+function el(){var t=0;try{t=liveChronoCurrentTime();}catch(e){}return t;}
+var css=document.createElement('style');css.textContent=`
+#cg2Live.nv{padding:0!important;gap:0!important;justify-content:flex-start!important;align-items:stretch!important}
+.nvBar{flex-shrink:0;display:flex;align-items:center;gap:6px;padding:7px 8px;background:#161412;border-bottom:1px solid rgba(212,170,106,.25);min-width:0}
+.nvBar input{flex:1;min-width:60px;height:34px;border-radius:10px;background:#0d0c0b;border:1px solid rgba(212,170,106,.4);color:#F0E8D8;font:13px Outfit,sans-serif;padding:0 12px;outline:none}
+.nvBar .cg2btn{height:34px;padding:0 10px;flex-shrink:0}
+.nvBody{flex:1;min-height:0;position:relative;background:#000}
+.nvBody iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:#000}
+.nvMsg{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:20px;text-align:center;background:#0d0c0b;color:#F0E8D8}
+.nvCh{position:absolute;right:10px;bottom:10px;z-index:5;display:flex;align-items:center;gap:9px;padding:7px 10px;border-radius:14px;background:rgba(13,12,11,.9);border:1.5px solid rgba(224,82,82,.6);box-shadow:0 8px 24px #000a;white-space:nowrap}
+.nvCh button{height:30px;padding:0 10px;border-radius:9px;font:800 12.5px Outfit,sans-serif;cursor:pointer}
+.nvMenu{position:absolute;right:8px;top:48px;z-index:20;min-width:260px;max-width:90%;border-radius:12px;background:#1c1a18;border:1px solid rgba(212,170,106,.5);box-shadow:0 14px 40px #000;padding:6px;display:flex;flex-direction:column;gap:3px}
+.nvMenu div{display:flex;align-items:center;gap:6px;padding:7px 9px;border-radius:8px;cursor:pointer;color:#F0E8D8;font-size:13px}
+.nvMenu div:hover{background:#2a2622}`;document.head.appendChild(css);
+function chronoHtml(){var run=!!_liveChronoRunning,t=el();
+  return '<span style="display:flex;align-items:center;gap:6px;font-size:10.5px;font-weight:900;letter-spacing:.12em;color:'+(run?'#FF8A8A':'#8a7e6c')+'"><i style="width:9px;height:9px;border-radius:50%;background:'+(run?'#FF4D4D;box-shadow:0 0 8px #FF4D4D':'#6f665a')+'"></i>'+(run?'LIVE':'ARRÊT')+'</span>'
+   +'<b id="cg2LiveT" style="font-family:JetBrains Mono,monospace;font-size:28px;color:#fff;line-height:1">'+fmt(t)+'</b>'
+   +(run?'<button style="border:none;background:#e05252;color:#fff" title="Arrêter le chrono" onclick="__cg2.live.stop()">⏹</button>':'<button style="border:none;background:#3DC97A;color:#0c1f14" onclick="__cg2.live.start()">▶ '+(t>0?'Reprendre':'Démarrer')+'</button>')
+   +'<button style="border:1px solid #ffffff30;background:transparent;color:#cfc6b4" onclick="__cg2.live.nav.grand(true)">⤢ Grand</button>';}
+function bodyHtml(u){var x=m();if(!u)return '<div class="nvMsg"><span style="font-size:38px">🌐</span><b style="font-size:19px">Colle l\'adresse du direct en haut</b><span style="font-size:13px;color:#a89c88;max-width:520px">YouTube, Dailymotion, Twitch et beaucoup de sites de diffusion s\'affichent ici. Google, Facebook, Instagram… refusent : ils s\'ouvrent dans une fenêtre à part.</span></div>';
+  var e=embed(u);if(e.blocked)return '<div class="nvMsg"><span style="font-size:38px">🚫</span><b style="font-size:19px">Ce site refuse d\'être affiché dans un autre logiciel</b><span style="font-size:13px;color:#a89c88;max-width:520px">Google, Facebook, Instagram et la plupart des grands sites bloquent l\'affichage intégré. YouTube, Dailymotion, Twitch et beaucoup de sites de diffusion fonctionnent.</span><button class="cg2btn" style="height:42px;padding:0 18px;background:#D4AA6A;color:#150E00;border-color:#D4AA6A;font-weight:800" onclick="__cg2.live.nav.ext()">🪟 Ouvrir dans une fenêtre à part</button></div>';
+  return '<iframe src="'+E(e.src)+'" allow="autoplay; fullscreen; encrypted-media; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>';}
+function build(box){var x=m(),u=(x&&x.navUrl)||'';
+  box.classList.add('nv');box.dataset.nv='1';box.dataset.u=u;
+  box.innerHTML='<div class="nvBar"><button class="cg2btn" title="Page précédente" onclick="__cg2.live.nav.back()"'+(N.hist.length?'':' disabled style="opacity:.4"')+'>←</button><button class="cg2btn" title="Recharger" onclick="__cg2.live.nav.reload()">↻</button>'
+   +'<input id="nvUrl" placeholder="Colle l\'adresse du direct (YouTube, Dailymotion, Twitch…)" value="'+E(u)+'" onkeydown="if(event.key===\'Enter\')__cg2.live.nav.go(this.value)">'
+   +'<button class="cg2btn" style="background:#D4AA6A;color:#150E00;border-color:#D4AA6A;font-weight:800" onclick="__cg2.live.nav.go(document.getElementById(\'nvUrl\').value)">Ouvrir</button>'
+   +'<button class="cg2btn" onclick="__cg2.live.nav.menu()">★ Mes liens</button><button class="cg2btn" title="Ouvrir dans une fenêtre à part" onclick="__cg2.live.nav.ext()">🪟</button></div>'
+   +'<div class="nvBody" id="nvBody">'+bodyHtml(u)+'<div class="nvCh" id="nvCh">'+chronoHtml()+'</div></div>';}
+var _paint=L.paint;
+L.paint=function(){var box=S('cg2Live');if(!box)return;var on=C.active()&&!!window._liveStatsMode;
+  if(on&&navOn()){box.style.display='flex';var vw=S('videoWrap'),mr=S('mediaRow'),vc=S('videoControls');if(mr)mr.style.display='flex';if(vw)vw.style.display='none';if(vc)vc.style.display='none';
+    var x=m(),u=(x&&x.navUrl)||'';if(box.dataset.nv!=='1'||box.dataset.u!==u)build(box);else{var ch=S('nvCh');if(ch)ch.innerHTML=chronoHtml();}return;}
+  box.dataset.nv='';box.dataset.u='';box.classList.remove('nv');
+  _paint.apply(this,arguments);
+  if(on&&!navOn()&&N.big){var x2=m();if(x2&&(x2.extBrowser||x2.navUrl)){var d=box.querySelector('div');if(d&&!S('nvBack')){d.insertAdjacentHTML('beforeend','<button id="nvBack" onclick="__cg2.live.nav.grand(false)" style="display:flex;align-items:center;gap:8px;height:46px;padding:0 20px;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;white-space:nowrap;background:transparent;color:#E8C88A;border:1px solid rgba(212,170,106,.45)">🌐 Navigateur</button>');}}}};
+N.go=function(u){u=norm(u);var x=m();if(!x)return;if(x.navUrl&&x.navUrl!==u)N.hist.push(x.navUrl);x.navUrl=u;try{saveDB();}catch(e){}N.closeMenu();L.paint();};
+N.back=function(){var x=m(),p=N.hist.pop();if(!x||!p)return;x.navUrl=p;try{saveDB();}catch(e){}L.paint();};
+N.reload=function(){var b=S('cg2Live');if(b)b.dataset.u='§';L.paint();};
+N.ext=function(){var x=m(),u=(x&&x.navUrl)||'https://www.google.com/';var w=Math.round(screen.availWidth*0.45),h=Math.round(screen.availHeight*0.7),win=null;
+  try{win=window.open(u,'btpVideoExt','popup=yes,width='+w+',height='+h+',left='+(screen.availWidth-w)+',top=40');}catch(e){}
+  if(!win)toast('Autorise les fenêtres pop-up pour Basket Tagg Pro, puis réessaie','acc');else try{win.focus();}catch(e){}};
+N.grand=function(v){N.big=!!v;var b=S('cg2Live');if(b){b.dataset.nv='';}L.paint();try{C.render();}catch(e){}};
+N.closeMenu=function(){var mm=S('nvMenu');if(mm)mm.remove();};
+N.menu=function(){if(S('nvMenu')){N.closeMenu();return;}var body=S('cg2Live');if(!body)return;var ls=links();var d=document.createElement('div');d.id='nvMenu';d.className='nvMenu';
+  d.innerHTML=(ls.length?ls.map(function(l,i){return '<div onclick="__cg2.live.nav.go(__cg2.live.nav.L()['+i+'].u)"><span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">★ '+E(l.n)+'</span><span onclick="event.stopPropagation();__cg2.live.nav.del('+i+')" style="color:#f08585;padding:0 4px">✕</span></div>';}).join(''):'<div style="cursor:default;color:#8a7e6c">Aucun lien enregistré</div>')
+   +'<div onclick="__cg2.live.nav.save()" style="color:#E8C88A;border-top:1px solid #ffffff14;margin-top:3px">＋ Enregistrer le lien actuel</div>';body.style.position='relative';body.appendChild(d);};
+N.L=links;
+N.save=function(){var x=m(),u=x&&x.navUrl;if(!u){toast('Ouvre d\'abord une adresse','red');return;}var n=prompt('Nom du lien (ex. « Direct de la ligue »)');if(!n||!n.trim())return;links().push({n:n.trim(),u:u});try{saveDB();}catch(e){}N.closeMenu();toast('✓ Lien enregistré','acc');};
+N.del=function(i){links().splice(i,1);try{saveDB();}catch(e){}N.closeMenu();N.menu();};
+// ancien bouton « Rouvrir la vidéo » : ouvre la page actuelle à part
+L.openExt=N.ext;
+// au démarrage d'un match navigateur : plus d'ouverture automatique de fenêtre, tout se passe dans le cadre
 })();
 
 /*XV_END*/
