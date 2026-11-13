@@ -460,7 +460,7 @@ document.addEventListener('DOMContentLoaded', function(){
 var _SB_URL="https://umuvirwbtpflizxupwbr.supabase.co";
 // Version de ce fichier — à incrémenter à chaque déploiement, en cohérence avec la valeur
 // mise à jour dans la table Supabase `app_version` (voir _checkAppVersion ci-dessous).
-var APP_VERSION = "2026-11-13-492";
+var APP_VERSION = "2026-11-13-493";
 var _SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtdXZpcndidHBmbGl6eHVwd2JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3MTI1MDEsImV4cCI6MjA5MDI4ODUwMX0.fFQaF-zP9dzcWITJDf6GBmvu0pdcuvlaUz0A0qW0kfo";
 var _LICENCE_KEY='btp_licence';
 var _MACHINE_KEY='btp_machine';
@@ -42676,6 +42676,22 @@ B.vivMenu=function(b){var pa=CS.pendingAct,chain=CS.pendingSubActions||[],all=_.
   if(!lv.length&&!rs.length)h+='<div style="flex:1;display:grid;place-items:center;color:#8a7e6c">Aucune suite reliée à « '+E(pa.label)+' » dans la board.</div>';
   return h+'</div>';};
 B.vpick=function(i,id){var ch=CS.pendingSubActions||[];if(ch[i]&&ch[i].id===id){CS.pendingSubActions=ch.slice(0,i);renderActionPanel();return;}CS.pendingSubActions=ch.slice(0,i);clickChainNode(id);};
+// ───────── raccourcis clavier en board vivante : toutes les actions sont visibles (ronds), donc leur touche marche
+// directement depuis la board (en classique, il faut d'abord la sous-famille). Sous-actions / résultats : gestion d'origine.
+window.addEventListener('keydown',function(e){
+  if(!B.st.viv||B.st.edit||e.ctrlKey||e.metaKey||e.altKey)return;
+  var ae=document.activeElement;if(ae&&['INPUT','TEXTAREA','SELECT'].indexOf(ae.tagName)>=0)return;
+  if(!(C.active&&C.active())||!CS.matchId||CS.mode!=='codage'||CS.pendingAct||CS.pendingSub||CS.pendingQuickFam||CS.pendingChainFam)return;
+  var b=typeof curBoard==='function'?curBoard():null;if(!b)return;
+  var fes=_.famEntries(b),hit=null;
+  fes.some(function(fe){return _.famItems(b,fe).some(function(it){
+    if(it.acts){var a=it.acts.find(function(x){return x.shortcut&&x.shortcut===e.key;});if(a){hit={k:'a',n:a,sub:it.k==='s'?it.node.id:'',fam:fe.node?fe.node.id:''};return true;}}
+    else if(it.res){var r=it.res.find(function(x){return x.shortcut&&x.shortcut===e.key;});if(r){hit={k:'q',n:r};return true;}}
+    return false;});});
+  if(!hit)return;
+  e.preventDefault();e.stopPropagation();
+  if(hit.k==='a')B.go('act',hit.n.id,hit.sub,hit.fam);else B.go('q',hit.n.id);
+},true);
 })();
 
 /* ═══════════ v489 — « Shoot Lab » (remplace l'écran InStats)
