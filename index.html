@@ -460,7 +460,7 @@ document.addEventListener('DOMContentLoaded', function(){
 var _SB_URL="https://umuvirwbtpflizxupwbr.supabase.co";
 // Version de ce fichier — à incrémenter à chaque déploiement, en cohérence avec la valeur
 // mise à jour dans la table Supabase `app_version` (voir _checkAppVersion ci-dessous).
-var APP_VERSION = "2026-11-13-505";
+var APP_VERSION = "2026-11-13-506";
 var _SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtdXZpcndidHBmbGl6eHVwd2JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3MTI1MDEsImV4cCI6MjA5MDI4ODUwMX0.fFQaF-zP9dzcWITJDf6GBmvu0pdcuvlaUz0A0qW0kfo";
 var _LICENCE_KEY='btp_licence';
 var _MACHINE_KEY='btp_machine';
@@ -34554,7 +34554,7 @@ function cmpRender(){var ps=SC.sel.map(pl).filter(Boolean).slice(0,3);if(ps.leng
 
 /* ═══════════════ v322 · import des championnats, saisons, parcours ═══════════════ */
 var BB={busy:0,stop:0,loading:{}},BB_YEAR=2026,BB_SEA='2026-27';
-function bbCall(q){return fetch(_SB_URL+'/functions/v1/bb-import?'+q,{headers:{apikey:_SB_KEY,Authorization:'Bearer '+_SB_KEY}}).then(function(r){return r.text().then(function(t){var j;try{j=JSON.parse(t);}catch(e){throw new Error('réponse illisible (HTTP '+r.status+')');}if(!r.ok||j.error)throw new Error(j.error||('HTTP '+r.status));return j;});});}
+function bbCall(q){return fetch(_SB_URL+'/functions/v1/bb-import?'+q+'&_t='+Date.now(),{cache:'no-store',headers:{apikey:_SB_KEY,Authorization:'Bearer '+_SB_KEY}}).then(function(r){return r.text().then(function(t){var j;try{j=JSON.parse(t);}catch(e){throw new Error('réponse illisible (HTTP '+r.status+')');}if(!r.ok||j.error)throw new Error(j.error||('HTTP '+r.status));return j;});});}
 function bbWait(ms){return new Promise(function(r){setTimeout(r,ms);});}
 function bbHash(s){var h=7;s=String(s);for(var i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))%1900000000;return 100000000+h;}
 function bbStart(sea){return parseInt(String(sea).slice(0,4))||BB_YEAR;}
@@ -34908,7 +34908,7 @@ window.scRefreshAll=function(force){db();var L=((DB.scMeta||{}).bbLeagues||[]),h
       var prev=DB.scMeta.bbDone[lg],ps0=DB.scMeta.bbSc[lg]||{},at=DB.scMeta.bbDoneAt[lg]||{},nat={};
       var ds=(j.done||[]).filter(function(g){return !g.live&&(ps0[g.id]==null||ps0[g.id]===g.sc);});
       newSc[lg]={};(j.done||[]).forEach(function(g){newSc[lg][g.id]=g.sc;});seen[lg]=ds.map(function(g){return g.id;});
-      ds.forEach(function(g){var t0=at[g.id]||NOW;nat[g.id]=t0;var isNew=!prev||prev.indexOf(g.id)<0,recent=NOW-t0<WIN;if(!isNew&&!recent)return;
+      ds.forEach(function(g){var known=prev&&prev.indexOf(g.id)>=0,t0=at[g.id]||(known?1:NOW);nat[g.id]=t0;var isNew=!known,recent=NOW-t0<WIN;if(!isNew&&!recent)return;
         (g.teams||[]).forEach(function(t){if(prev&&isNew)chg[t]=1;else chgP[t]=1;if(!teamLg[t])teamLg[t]=lg;});});
       okL[lg]=nat;}).catch(function(){st.fail++;}).then(function(){return bbWait(400);});});});
   /* nouveaux joueurs : une équipe a de nouveaux matchs → on relit son effectif et on importe ceux qui ont une ligne 2026-27 */
