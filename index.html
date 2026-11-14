@@ -460,7 +460,7 @@ document.addEventListener('DOMContentLoaded', function(){
 var _SB_URL="https://umuvirwbtpflizxupwbr.supabase.co";
 // Version de ce fichier — à incrémenter à chaque déploiement, en cohérence avec la valeur
 // mise à jour dans la table Supabase `app_version` (voir _checkAppVersion ci-dessous).
-var APP_VERSION = "2026-11-13-501";
+var APP_VERSION = "2026-11-13-503";
 var _SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtdXZpcndidHBmbGl6eHVwd2JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3MTI1MDEsImV4cCI6MjA5MDI4ODUwMX0.fFQaF-zP9dzcWITJDf6GBmvu0pdcuvlaUz0A0qW0kfo";
 var _LICENCE_KEY='btp_licence';
 var _MACHINE_KEY='btp_machine';
@@ -3837,8 +3837,8 @@ function showPlayerImpactModal(tid,pid,keep){var team=gT(tid),p=team&&team.playe
   var lab='font-size:11px;letter-spacing:.16em;font-weight:800;color:var(--txt3);text-transform:uppercase;';
   var h='<div class="modal-bg" onclick="closeModal()"><div class="modal-box" style="max-width:1260px;width:98%;max-height:none;overflow:hidden;padding:0;" onclick="event.stopPropagation()">';
   // ── Hero
-  h+='<div style="position:relative;overflow:hidden;height:96px;background:linear-gradient(100deg,color-mix(in srgb,'+_pc+' 55%,#0a0d14) 0%,color-mix(in srgb,'+_pc+' 30%,#0a0d14) 58%,#0a0d14 100%);">'
-   +(p.photo?'<div style="position:absolute;right:170px;top:50%;transform:translateY(-50%);width:70px;height:70px;border-radius:50%;overflow:hidden;border:2px solid rgba(255,255,255,.22);box-shadow:0 6px 18px rgba(0,0,0,.45);z-index:2;background:url('+p.photo+') center '+_py+'%/cover;"></div>':'')
+  h+='<div style="position:relative;overflow:hidden;isolation:isolate;height:96px;background:#202020;">'+(window.xvTeamBg?window.xvTeamBg(team,96):'')
+   +(p.photo?'<div style="position:absolute;right:170px;top:50%;transform:translateY(-50%);width:70px;height:70px;border-radius:50%;overflow:hidden;border:2px solid var(--acc);box-shadow:0 0 0 4px rgba(212,170,106,.15),0 6px 18px rgba(0,0,0,.45);z-index:2;background:url('+p.photo+') center '+_py+'%/cover;"></div>':'')
    +'<div style="position:absolute;left:22px;bottom:9px;"><div style="font-size:11.5px;letter-spacing:.3em;font-weight:800;color:'+GOLD+';">▮ IMPACT SUR L\'ÉQUIPE</div><div style="font-size:12px;letter-spacing:.2em;color:var(--txt2);margin-top:4px;font-weight:700;">'+esc((p.first||'').toUpperCase())+'</div><div style="font-size:30px;font-weight:900;color:#fff;letter-spacing:-.01em;line-height:1;margin-top:1px;display:flex;align-items:center;gap:10px;">'+''+/* numéro retiré v301 */esc((p.last||'').toUpperCase())+'</div></div>'
    +'<div style="position:absolute;right:12px;top:10px;display:flex;gap:8px;z-index:3;"><button onclick="showPlayerStatsModal('+tid+','+pid+')" style="background:rgba(0,0,0,.45);border:1px solid var(--bdr2);color:var(--txt2);height:34px;padding:0 14px;border-radius:9px;cursor:pointer;font-size:13px;">← Fiche</button><button onclick="closeModal()" style="background:rgba(0,0,0,.45);border:1px solid var(--bdr2);color:var(--txt2);width:34px;height:34px;border-radius:9px;cursor:pointer;">✕</button></div></div>';
   h+='<div style="padding:10px 20px 14px;">';
@@ -4029,10 +4029,10 @@ function showPlayerStatsModal(tid,pid){
   if(p.h&&window.scFmtH)_pills.push(_pill(window.scFmtH(p.h)));
   if(p.w)_pills.push(_pill(prEsc(p.w)+' kg'));
   if(p.nat&&window.scNatFlag)_pills.push(_pill('<span style="font-size:15px;line-height:1;">'+window.scNatFlag(p.nat)+'</span>'+prEsc(window.scNatCode?window.scNatCode(p.nat):'')));
-  var _hn=(team.numsFixed!==false&&p.num!==''&&p.num!=null)?'<div style="position:absolute;top:0;left:28px;background:'+_pc+';border-radius:0 0 12px 12px;padding:9px 13px 8px;font-size:19px;font-weight:900;color:'+(_tpLum(_pc)>0.62?'#150E00':'#fff')+';z-index:3;box-shadow:0 3px 10px rgba(0,0,0,.35);">#'+prEsc(p.num)+'</div>':'';
-  var h='<div class="modal-bg" onclick="closeModal()"><div class="modal-box" onclick="event.stopPropagation()" style="width:900px;max-width:96vw;">'
-    +'<div style="position:relative;height:220px;margin:-26px -26px 18px;overflow:hidden;background:linear-gradient(110deg,color-mix(in srgb,'+_pc+' 18%,#0b0e16) 0%,color-mix(in srgb,'+_pc+' 42%,#0b0e16) 58%,color-mix(in srgb,'+_pc+' 70%,#0b0e16) 100%);">'
-    +(p.photo?'<div style="position:absolute;right:78px;top:50%;transform:translateY(-50%);width:150px;height:150px;border-radius:50%;overflow:hidden;border:3px solid rgba(255,255,255,.22);box-shadow:0 10px 28px rgba(0,0,0,.45);z-index:2;background:#1a1d26;"><img src="'+_tpEsc(p.photo)+'" style="width:100%;height:100%;object-fit:cover;object-position:center '+_py+'%;display:block;"></div>':'')
+  var _hn=(team.numsFixed!==false&&p.num!==''&&p.num!=null)?'<div style="position:absolute;top:0;left:28px;background:var(--acc);border-radius:0 0 12px 12px;padding:9px 13px 8px;font-size:19px;font-weight:900;color:#150E00;z-index:3;box-shadow:0 3px 10px rgba(0,0,0,.35);">#'+prEsc(p.num)+'</div>':'';
+  var h='<div class="modal-bg" onclick="closeModal()"><div class="modal-box" onclick="event.stopPropagation()" style="width:1120px;max-width:96vw;">'
+    +'<div style="position:relative;height:220px;margin:-26px -26px 18px;overflow:hidden;isolation:isolate;background:#202020;">'+(window.xvTeamBg?window.xvTeamBg(team,220):'')
+    +(p.photo?'<div style="position:absolute;right:78px;top:50%;transform:translateY(-50%);width:150px;height:150px;border-radius:50%;overflow:hidden;border:3px solid var(--acc);box-shadow:0 0 0 5px rgba(212,170,106,.15),0 10px 28px rgba(0,0,0,.45);z-index:2;background:#1a1d26;"><img src="'+_tpEsc(p.photo)+'" style="width:100%;height:100%;object-fit:cover;object-position:center '+_py+'%;display:block;"></div>':'')
     +_hn
     +'<div style="position:absolute;left:28px;bottom:16px;right:'+(p.photo?250:28)+'px;z-index:2;"><div style="font-size:12px;letter-spacing:.18em;color:var(--acc);font-weight:800;text-transform:uppercase;text-shadow:0 2px 8px #000;">'+prEsc(p.first||'')+'</div><div style="font-size:44px;font-weight:900;color:var(--txt);letter-spacing:-0.02em;line-height:1.02;text-transform:uppercase;text-shadow:0 2px 12px rgba(0,0,0,.6);">'+prEsc(p.last||'')+'</div>'
     +'<div style="margin-top:10px;display:flex;gap:7px;flex-wrap:wrap;align-items:center;">'+_pills.join('')+((p.roles&&p.roles.length)?prChips(p.roles):'')+'</div></div>'
@@ -4041,7 +4041,7 @@ function showPlayerStatsModal(tid,pid){
     +'<div style="display:inline-flex;border:1px solid var(--bdr2);border-radius:9px;overflow:hidden;">'+seg('Moyenne',!tot,'_plTot=false;showPlayerStatsModal('+tid+','+pid+')')+seg('Total',tot,'_plTot=true;showPlayerStatsModal('+tid+','+pid+')')+'</div></div>';
   if(!mj){h+='<div style="text-align:center;padding:36px;color:var(--txt3);">Aucun match avec statistiques pour ce filtre.</div>';}
   else{
-    h+='<div style="display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:14px;">'+tile('PTS',v(r.pts),1)+tile('REB',v(r.rebo+r.rebd))+tile('PD',v(r.pd))+tile('%T',pc(tm,tt))+tile('ÉVAL',v(r.eval))+tile('+/-',sg(r.pm))+'</div>'
+    h+='<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:10px;margin-bottom:14px;">'+[['PTS',v(r.pts)],['REB',v(r.rebo+r.rebd)],['PD',v(r.pd)],['EVAL',v(r.eval)],['%2PTS',(r.pts2r>0?(r.pts2m/r.pts2r*100).toFixed(1)+'%':'—')],['%3PTS',(r.pts3r>0?(r.pts3m/r.pts3r*100).toFixed(1)+'%':'—')],['%LF',(r.lfr>0?(r.lfm/r.lfr*100).toFixed(1)+'%':'—')]].map(function(t){return tile(t[0],t[1],1);}).join('')+'</div>'
     +'<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;">'
     +grp('Tirs',[['TM',v(tm)],['TT',v(tt)],['%T',pc(tm,tt)]])+grp('2 points',[['2PM',v(r.pts2m)],['2PT',v(r.pts2r)],['%2P',pc(r.pts2m,r.pts2r)]])
     +grp('3 points',[['3PM',v(r.pts3m)],['3PT',v(r.pts3r)],['%3P',pc(r.pts3m,r.pts3r)]])+grp('Lancers francs',[['LFM',v(r.lfm)],['LFT',v(r.lfr)],['%LF',pc(r.lfm,r.lfr)]])
@@ -43260,6 +43260,11 @@ if(_oc)window.openCarnet=function(){var r=_oc.apply(this,arguments);
 var _cc=window.closeCarnet;
 window.closeCarnet=function(){var r=_cc?_cc.apply(this,arguments):null;var pa=document.getElementById('pageArea');if(pa)pa.style.display='';return r;};
 })();
+/* v502 : fond des fiches joueur / impact = même fond que la carte de l'équipe dans « Mes équipes » (logo flouté, sinon halo de la couleur d'équipe) */
+window.xvTeamBg=function(team,h){if(!team)return '';var tc=(typeof _teamCol==='function')?_teamCol(team):'var(--acc)';
+  if(team.logo)return '<img src="'+team.logo+'" alt="" style="position:absolute;z-index:0;left:-6%;top:-120%;width:112%;height:340%;object-fit:cover;opacity:.38;filter:blur(38px) saturate(1.3);pointer-events:none;"/>'
+   +'<div style="position:absolute;inset:0;z-index:0;background:linear-gradient(180deg,rgba(24,24,24,.35),rgba(24,24,24,.8));pointer-events:none;"></div>';
+  return '<div style="position:absolute;inset:0;z-index:0;background:radial-gradient(ellipse at 15% 0%,color-mix(in srgb,'+tc+' 30%,transparent),transparent 65%);pointer-events:none;"></div>';};
 
 /*XV_END*/
 </script>
