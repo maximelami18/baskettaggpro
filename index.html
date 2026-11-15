@@ -460,7 +460,7 @@ document.addEventListener('DOMContentLoaded', function(){
 var _SB_URL="https://umuvirwbtpflizxupwbr.supabase.co";
 // Version de ce fichier — à incrémenter à chaque déploiement, en cohérence avec la valeur
 // mise à jour dans la table Supabase `app_version` (voir _checkAppVersion ci-dessous).
-var APP_VERSION = "2026-11-15-508";
+var APP_VERSION = "2026-11-15-510";
 var _SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtdXZpcndidHBmbGl6eHVwd2JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3MTI1MDEsImV4cCI6MjA5MDI4ODUwMX0.fFQaF-zP9dzcWITJDf6GBmvu0pdcuvlaUz0A0qW0kfo";
 var _LICENCE_KEY='btp_licence';
 var _MACHINE_KEY='btp_machine';
@@ -10603,7 +10603,7 @@ function _commitSeq(extra){
   // sans chercher à repositionner le curseur (le flux avance de lui-même).
   // En mode fichier local : on positionne la vidéo sur la fin du clip avant de reprendre.
   if(!isLiveMatch()){
-    if(vid.duration)vid.currentTime=finS;
+    if(vid.duration&&!(window.xvMM&&window.xvMM()))vid.currentTime=finS;
   }
   _maybePromptNoteAfterCoding(newSeq.id);
   saveDB();renderSeqPanel();renderActionPanel();
@@ -43303,9 +43303,10 @@ var G='#D4AA6A';
 function dbs(){if(!window.DB)return {};if(!DB.settings)DB.settings={postRoll:0,preRoll:10};return DB.settings;}
 function mt(){try{return curMatch();}catch(e){return null;}}
 /* le choix n'existe que pour une vidéo de l'ordinateur (pas de lien live / navigateur) */
-function hasLocal(){var m=mt();return !!(m&&!m.liveMode&&!m.extBrowser);}
+function hasLocal(){var m=mt();return !!(m&&!m.liveMode&&!m.extBrowser&&!window._liveStatsMode);}
 function isMatchMode(){return !!dbs().matchMode;}
 function active(){try{return isMatchMode()&&hasLocal()&&document.body.classList.contains('cg2on')&&window.CS&&CS.mode!=='stats';}catch(e){return false;}}
+window.xvMM=function(){return active();};
 var depth=0,lastGate=0;
 /* 1) Mode Match : un clic de codage ne met plus la vidéo en pause (et ne la relance pas non plus) */
 ['clickAction','clickSubFamily','clickCounterButton','clickQuickResult','selectIndivPlayer'].forEach(function(n){var o=window[n];if(typeof o!=='function')return;
