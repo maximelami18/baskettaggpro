@@ -460,7 +460,7 @@ document.addEventListener('DOMContentLoaded', function(){
 var _SB_URL="https://umuvirwbtpflizxupwbr.supabase.co";
 // Version de ce fichier — à incrémenter à chaque déploiement, en cohérence avec la valeur
 // mise à jour dans la table Supabase `app_version` (voir _checkAppVersion ci-dessous).
-var APP_VERSION = "2026-11-15-510";
+var APP_VERSION = "2026-11-16-512";
 var _SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtdXZpcndidHBmbGl6eHVwd2JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3MTI1MDEsImV4cCI6MjA5MDI4ODUwMX0.fFQaF-zP9dzcWITJDf6GBmvu0pdcuvlaUz0A0qW0kfo";
 var _LICENCE_KEY='btp_licence';
 var _MACHINE_KEY='btp_machine';
@@ -34607,12 +34607,12 @@ function bbLeague(lg,st){bbSay('⏳ Championnat '+lg+' : lecture des équipes…
 function bbHasCur(j){return(j.seasons||[]).some(function(x){return x.season===BB_SEA&&(parseFloat(x.gp)||0)>0;})||(j.games||[]).length>0;}
 function bbDate(s){var m=String(s||'').match(/(\d{1,2})\/(\d{1,2})(?:\/(\d{2,4}))?/);if(!m)return 0;var y=m[3]?(m[3].length===2?2000+ +m[3]:+m[3]):(+m[2]>=8?BB_YEAR:BB_YEAR+1);return y*10000+(+m[2])*100+(+m[1]);}
 function bbRows(j,comp,sea){var G=(j.games||[]).slice().sort(function(a,b){return bbDate(a.date)-bbDate(b.date);});
-  return G.map(function(g,i){return[bbHash(j.slug+'|'+comp+'|'+sea+'|'+(g.id||g.date||i)),i+1,g.home?1:0,g.opp||'?',g.sec||0,g.pts,g.m2,g.a2,g.m3,g.a3,g.mft,g.aft,g.o,g.d,g.ast,g.stl,g.to,g.blk,g.bs,g.pf,g.fd,g.ev,g.pm,g.win?(g.s1||1):(g.s2||0),g.win?(g.s2||0):(g.s1||1),'RS',comp,0,sea,g.p2p==null?null:g.p2p,g.p3p==null?null:g.p3p,g.ftp==null?null:g.ftp,g.pmRaw==null?null:g.pmRaw,g.pfRaw==null?null:g.pfRaw];});}
+  return G.map(function(g,i){return[bbHash(j.slug+'|'+comp+'|'+sea+'|'+(g.id||g.date||i)),i+1,g.home?1:0,g.opp||'?',g.sec||0,g.pts,g.m2,g.a2,g.m3,g.a3,g.mft,g.aft,g.o,g.d,g.ast,g.stl,g.to,g.blk,g.bs,g.pf,g.fd,g.ev,g.pm,g.win?(Math.max(g.s1||0,g.s2||0)||1):Math.min(g.s1||0,g.s2||0),g.win?Math.min(g.s1||0,g.s2||0):(Math.max(g.s1||0,g.s2||0)||1),'RS',comp,0,sea,g.p2p==null?null:g.p2p,g.p3p==null?null:g.p3p,g.ftp==null?null:g.ftp,g.pmRaw==null?null:g.pmRaw,g.pfRaw==null?null:g.pfRaw];});}
 function bbApply0(j,lg,team,st){db();BB._lgd=1;DB.scGames=DB.scGames||{};DB.scMeta=DB.scMeta||{};if(!String(j.first||'').trim()&&!String(j.last||'').trim())throw new Error('fiche illisible (nom introuvable)');if(team&&team.name){j.club=team.name;j.clubLogo=team.logo||j.clubLogo;if(team.slug&&!j.clubSlug)j.clubSlug=team.slug;}
   var p=DB.scPlayers.filter(function(x){return x.bbSlug===j.slug;})[0],isNew=!p;
   if(!p){p={id:uid(),status:'new',rating:0,notes:'',added:Date.now(),src:'bebasket',tags:[],videos:[],stats:[]};DB.scPlayers.push(p);p._k=1;}
   if(p._k){delete p._k;var KK=(DB.scMeta.bbKeep||{}),kk=bbKeepKey(j),ko=kk&&(KK[kk]||KK[kk.split('|')[0]+'|']);if(ko&&!KK[kk])kk=kk.split('|')[0]+'|';if(ko){Object.keys(ko).forEach(function(f){if(p[f]==null||p[f]===''||p[f]==='new'||p[f]===0||(Array.isArray(p[f])&&!p[f].length))p[f]=ko[f];});delete KK[kk];}}
-  p.bbSlug=j.slug;if(j.clubSlug)p.clubSlug=j.clubSlug;p.elCode=p.elCode||('bb:'+j.slug);p.upd=Date.now();p.bbAt=Date.now();
+  p.bbSlug=j.slug;p.bbWl=1;if(j.clubSlug)p.clubSlug=j.clubSlug;p.elCode=p.elCode||('bb:'+j.slug);p.upd=Date.now();p.bbAt=Date.now();
   ['first','last','born','h','w','nat','photo'].forEach(function(k){if(j[k]&&(isNew||!p[k]||p.src==='bebasket'))p[k]=j[k];});
   if(j.pos){var ep=elPos(j.pos);if(ep[0]&&(!p.pos||p.src==='bebasket')){p.pos=ep[0];if(ep[1])p.pos2=ep[1];}}
   var comp=bbLgName(lg),cLogo=((DB.scMeta.lgInfo||{})[lg]||{}).logo||(j.comps&&j.comps[0]&&j.comps[0].logo)||'';var nk=function(x){return norm(x||'').replace(/[^a-z0-9]/g,'');};if(cLogo){DB.scMeta.lgLogos=DB.scMeta.lgLogos||{};Object.keys(DB.scMeta.lgLogos).forEach(function(k){if(k!==comp&&nk(k)===nk(comp))delete DB.scMeta.lgLogos[k];});DB.scMeta.lgLogos[comp]=cLogo;}
@@ -34929,7 +34929,8 @@ window.scRefreshAll=function(force){db();var L=((DB.scMeta||{}).bbLeagues||[]),h
     return c2;});
   ch=ch.then(function(){if(BB.stop)return 0;
     var ps=DB.scPlayers.filter(function(p){return p.bbSlug;});
-    var EP='380';var todo=force?ps.filter(function(p){return !isLibre(p);}):ps.filter(function(p){return!newS[p.bbSlug];}).filter(function(p){if(isLibre(p))return false;if(p.bbEp!==EP||p.bbRetry)return true;if(!p.clubSlug)return !p.bbSeen||(Date.now()-p.bbSeen>3*864e5);return !!(chg[p.clubSlug]||need[p.clubSlug]);});
+    var EP='380';var todo=force?ps.filter(function(p){return !isLibre(p);}):ps.filter(function(p){return!newS[p.bbSlug];}).filter(function(p){if(isLibre(p))return false;if(p.bbEp!==EP||p.bbRetry||p.bbWl!==1)return true;if(!p.clubSlug)return !p.bbSeen||(Date.now()-p.bbSeen>3*864e5);return !!(chg[p.clubSlug]||need[p.clubSlug]);});
+    todo.sort(function(x,y){return((chg[x.clubSlug]||need[x.clubSlug])?0:1)-((chg[y.clubSlug]||need[y.clubSlug])?0:1);});
     st.tot=todo.length;rfPanel({done:0,total:todo.length,st:st});if(!todo.length){return 0;}
     var idx=0,done=0,pauseUntil=0,streak=0,slow=false;
     /* une réponse « matchs » refusée (ni 200 ni 404) = le site limite les lectures */
