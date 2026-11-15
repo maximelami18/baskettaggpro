@@ -460,7 +460,7 @@ document.addEventListener('DOMContentLoaded', function(){
 var _SB_URL="https://umuvirwbtpflizxupwbr.supabase.co";
 // Version de ce fichier — à incrémenter à chaque déploiement, en cohérence avec la valeur
 // mise à jour dans la table Supabase `app_version` (voir _checkAppVersion ci-dessous).
-var APP_VERSION = "2026-11-13-506";
+var APP_VERSION = "2026-11-15-508";
 var _SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtdXZpcndidHBmbGl6eHVwd2JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3MTI1MDEsImV4cCI6MjA5MDI4ODUwMX0.fFQaF-zP9dzcWITJDf6GBmvu0pdcuvlaUz0A0qW0kfo";
 var _LICENCE_KEY='btp_licence';
 var _MACHINE_KEY='btp_machine';
@@ -34891,26 +34891,35 @@ function bbCompsOf(p,r){var out=[],k2=function(x){return norm(x||'').replace(/[^
   (r.comps||[]).forEach(function(c){if(L.indexOf(c.slug)<0)return;var nm=bbLgName(c.slug),lg=(info[c.slug]||{}).logo||c.logo;if(lg){DB.scMeta.lgLogos=DB.scMeta.lgLogos||{};if(!DB.scMeta.lgLogos[nm])DB.scMeta.lgLogos[nm]=lg;}add(nm);});
   if(!out.length&&r.comp)out=[r.comp];return out;}
 
-/* ── v349 → v500 : actualisation intelligente, fiabilisée ──
-   • un échec sur un joueur ne bloque plus la mémorisation des matchs (avant : au moindre échec, rien n'était retenu
-     et le championnat repartait en mode « tout relire » → toujours les mêmes joueurs, et les équipes qui venaient de jouer n'étaient jamais relues) ;
-   • le joueur en échec est relu à la prochaine actualisation ;
-   • championnat jamais lu : toutes ses équipes sont relues ;
-   • les équipes qui ont joué depuis moins de 36 h sont relues à chaque actualisation (stats publiées en retard) ;
-   • club actuel pris sur la saison en cours (suit les transferts). */
+/* ── v349 → v507 : actualisation intelligente, fiabilisée ──
+   • qui relire ? on compare le calendrier aux matchs réellement enregistrés : une équipe est relue tant qu'un de ses matchs terminés manque chez ses joueurs
+     (plus de dépendance à une mémoire « déjà vu » qui pouvait se dérégler) + les équipes qui ont un match nouvellement terminé ;
+   • une lecture de matchs refusée par le site (trop de demandes) n'est plus comptée comme réussie : pause, puis nouvel essai ; le joueur reste « à relire » ;
+   • un échec ne bloque plus la mémorisation ; le club actuel suit la saison en cours. */
 window.scRefreshAll=function(force){db();var L=((DB.scMeta||{}).bbLeagues||[]),has=DB.scPlayers.some(function(p){return p.bbSlug;});
   if(BB.busy)return;if(!navigator.onLine){toast('Pas de connexion','red');return;}if(!has||!L.length){toast('Importe d\'abord des championnats : rien à actualiser pour l\'instant','red');return;}
   var b=document.getElementById('scRfB'),say=function(t){if(b){b.disabled=true;b.textContent=t;}};say('⏳ Recherche des nouveaux matchs…');BB.busy=1;BB.stop=0;rfPanel({phase:'Recherche des nouveaux matchs…'});window.onbeforeunload=function(){return'Actualisation en cours';};
-  var st={add:0,upd:0,fail:0,n:0,tot:0,errs:[]},chg={},chgP={},okL={},seen={},teamLg={},newS={},newSc={},NOW=Date.now(),WIN=36*36e5;
-  DB.scMeta.bbDone=DB.scMeta.bbDone||{};DB.scMeta.bbSc=DB.scMeta.bbSc||{};DB.scMeta.bbDoneAt=DB.scMeta.bbDoneAt||{};
+  var st={add:0,upd:0,fail:0,blk:0,n:0,tot:0,errs:[]},chg={},need={},okL={},seen={},teamLg={},newS={},newSc={},NOW=Date.now(),halted=false;
+  DB.scMeta.bbDone=DB.scMeta.bbDone||{};DB.scMeta.bbSc=DB.scMeta.bbSc||{};DB.scMeta.bbTry=DB.scMeta.bbTry||{};delete DB.scMeta.bbDoneAt;Object.keys(DB.scMeta.bbTry).forEach(function(k){if(NOW-DB.scMeta.bbTry[k].t>30*864e5)delete DB.scMeta.bbTry[k];});
+  /* joueurs par équipe + empreintes des matchs déjà enregistrés */
+  var byTeam={};DB.scPlayers.forEach(function(p){if(!p.bbSlug||!p.clubSlug||isLibre(p))return;(byTeam[p.clubSlug]=byTeam[p.clubSlug]||[]).push(p);});
+  var hasGame=function(t,lg,gid){var comp=bbLgName(lg),P=byTeam[t]||[];for(var i=0;i<P.length;i++){var h=bbHash(P[i].bbSlug+'|'+comp+'|'+BB_SEA+'|'+gid),R=(DB.scGames||{})[P[i].id]||[];for(var k=0;k<R.length;k++)if(R[k][0]===h)return true;}return false;};
   var ch=Promise.resolve();
   L.forEach(function(lg){ch=ch.then(function(){if(BB.stop)return;return bbCall('action=played&league='+encodeURIComponent(lg)).then(function(j){
-      var prev=DB.scMeta.bbDone[lg],ps0=DB.scMeta.bbSc[lg]||{},at=DB.scMeta.bbDoneAt[lg]||{},nat={};
+      var prev=DB.scMeta.bbDone[lg],ps0=DB.scMeta.bbSc[lg]||{};
       var ds=(j.done||[]).filter(function(g){return !g.live&&(ps0[g.id]==null||ps0[g.id]===g.sc);});
-      newSc[lg]={};(j.done||[]).forEach(function(g){newSc[lg][g.id]=g.sc;});seen[lg]=ds.map(function(g){return g.id;});
-      ds.forEach(function(g){var known=prev&&prev.indexOf(g.id)>=0,t0=at[g.id]||(known?1:NOW);nat[g.id]=t0;var isNew=!known,recent=NOW-t0<WIN;if(!isNew&&!recent)return;
-        (g.teams||[]).forEach(function(t){if(prev&&isNew)chg[t]=1;else chgP[t]=1;if(!teamLg[t])teamLg[t]=lg;});});
-      okL[lg]=nat;}).catch(function(){st.fail++;}).then(function(){return bbWait(400);});});});
+      newSc[lg]={};(j.done||[]).forEach(function(g){newSc[lg][g.id]=g.sc;});seen[lg]=ds.map(function(g){return g.id;});okL[lg]=1;
+      /* par équipe : matchs terminés présents / manquants chez ses joueurs */
+      var per={};ds.forEach(function(g){(g.teams||[]).forEach(function(t){if(!byTeam[t])return;var o=per[t]=per[t]||{ok:0,miss:[]};if(hasGame(t,lg,g.id))o.ok++;else o.miss.push(g.id);});
+        if(prev&&prev.indexOf(g.id)<0)(g.teams||[]).forEach(function(t){chg[t]=1;if(!teamLg[t])teamLg[t]=lg;});});
+      Object.keys(per).forEach(function(t){var o=per[t];if(!o.miss.length)return;if(!teamLg[t])teamLg[t]=lg;
+        if(!o.ok){/* empreintes non comparables pour cette équipe : on se fie au nombre de matchs */
+          var comp=bbLgName(lg),mx=0;(byTeam[t]||[]).forEach(function(p){var n=((DB.scGames||{})[p.id]||[]).filter(function(r){return r[26]===comp&&(r[28]==null||r[28]===BB_SEA);}).length;if(n>mx)mx=n;});
+          if(mx>=o.miss.length)return;}
+        /* un même match manquant n'est retenté qu'au plus toutes les 2 h, 10 fois maximum */
+        var go=o.miss.filter(function(id){var y=DB.scMeta.bbTry[id+'|'+t];return !y||(y.n<10&&NOW-y.t>2*36e5);});
+        if(go.length){need[t]=1;go.forEach(function(id){var k=id+'|'+t,y=DB.scMeta.bbTry[k]=DB.scMeta.bbTry[k]||{n:0,t:0};y.n++;y.t=NOW;});}});
+      }).catch(function(){st.fail++;}).then(function(){return bbWait(400);});});});
   /* nouveaux joueurs : une équipe a de nouveaux matchs → on relit son effectif et on importe ceux qui ont une ligne 2026-27 */
   ch=ch.then(function(){if(force||BB.stop)return;var ts=Object.keys(chg),c2=Promise.resolve();
     ts.forEach(function(t){c2=c2.then(function(){if(BB.stop)return;rfPanel({phase:'Recherche de nouveaux joueurs…'});var lg=teamLg[t]||L[0];
@@ -34920,19 +34929,27 @@ window.scRefreshAll=function(force){db();var L=((DB.scMeta||{}).bbLeagues||[]),h
     return c2;});
   ch=ch.then(function(){if(BB.stop)return 0;
     var ps=DB.scPlayers.filter(function(p){return p.bbSlug;});
-    var EP='380';var todo=force?ps.filter(function(p){return !isLibre(p);}):ps.filter(function(p){return!newS[p.bbSlug];}).filter(function(p){if(isLibre(p))return false;if(p.bbEp!==EP||p.bbRetry)return true;if(!p.clubSlug)return !p.bbSeen||(Date.now()-p.bbSeen>3*864e5);return !!(chg[p.clubSlug]||chgP[p.clubSlug]);});
+    var EP='380';var todo=force?ps.filter(function(p){return !isLibre(p);}):ps.filter(function(p){return!newS[p.bbSlug];}).filter(function(p){if(isLibre(p))return false;if(p.bbEp!==EP||p.bbRetry)return true;if(!p.clubSlug)return !p.bbSeen||(Date.now()-p.bbSeen>3*864e5);return !!(chg[p.clubSlug]||need[p.clubSlug]);});
     st.tot=todo.length;rfPanel({done:0,total:todo.length,st:st});if(!todo.length){return 0;}
-    var idx=0,done=0;
-    var worker=function(){return new Promise(function(res){(function next(){if(BB.stop||idx>=todo.length)return res();var p=todo[idx++];
-      var LGS=window.xvLgsOf(p,L),lastJ=null;
-      LGS.reduce(function(pr,lg){return pr.then(function(){return bbCall('action=player&slug='+encodeURIComponent(p.bbSlug)+'&league='+encodeURIComponent(lg)+'&year='+BB_YEAR).then(function(j){lastJ=j;bbApply(j,lg,null,st);});}).then(function(){return bbWait(150);});},Promise.resolve()).then(function(){var q=DB.scPlayers.filter(function(x){return x.bbSlug===p.bbSlug;})[0];if(q){q.bbEp=EP;q.bbSeen=Date.now();delete q.bbRetry;
+    var idx=0,done=0,pauseUntil=0,streak=0,slow=false;
+    /* une réponse « matchs » refusée (ni 200 ni 404) = le site limite les lectures */
+    var blocked=function(j){var d=j&&j.debug||{},g=d.games||{};return (g.status!=null&&g.status!==200&&g.status!==404)||(d.profile!=null&&d.profile!==200&&d.profile!==404);};
+    var readOne=function(p,lg){var tryN=0;var go=function(){return bbCall('action=player&slug='+encodeURIComponent(p.bbSlug)+'&league='+encodeURIComponent(lg)+'&year='+BB_YEAR).then(function(j){
+        if(blocked(j)){tryN++;streak++;slow=true;if(tryN>=3||streak>=12){var e=new Error('site occupé');e.blk=1;throw e;}
+          var w=tryN*20000;pauseUntil=Date.now()+w;rfPanel({phase:'Le site limite les lectures : pause de '+Math.round(w/1000)+' s…'});return bbWait(w).then(go);}
+        streak=0;return j;});};return go();};
+    var worker=function(wi){return new Promise(function(res){(function next(){if(BB.stop||halted||idx>=todo.length||(slow&&wi>0))return res();
+      var wait=pauseUntil-Date.now();if(wait>0)return bbWait(wait).then(next);
+      var p=todo[idx++];var LGS=window.xvLgsOf(p,L),lastJ=null;
+      LGS.reduce(function(pr,lg){return pr.then(function(){return readOne(p,lg).then(function(j){lastJ=j;bbApply(j,lg,null,st);});}).then(function(){return bbWait(150);});},Promise.resolve()).then(function(){var q=DB.scPlayers.filter(function(x){return x.bbSlug===p.bbSlug;})[0];if(q){q.bbEp=EP;q.bbSeen=Date.now();delete q.bbRetry;
           var cur=bbCur(q),rr=(q.bbs||[]).filter(function(x){return x.teamSlug&&x.season===cur;});
           if(rr.length)q.clubSlug=rr[rr.length-1].teamSlug;else if(lastJ&&lastJ.clubSlug)q.clubSlug=lastJ.clubSlug;else if(!q.clubSlug){var r2=(q.bbs||[]).filter(function(x){return x.teamSlug;});if(r2.length)q.clubSlug=r2[r2.length-1].teamSlug;}}})
-        .catch(function(){st.fail++;p.bbRetry=1;}).then(function(){done++;say('⏳ '+done+'/'+todo.length);st.dn=done;rfPanel({done:done,total:todo.length,st:st});if(done%10===0){try{saveDB();}catch(e){}}return (window._xvExp?window.xvWaitIdle():bbWait(250));}).then(next);})();});};
-    return Promise.all([worker(),worker(),worker()]);});
-  ch.then(function(){BB.busy=0;window.onbeforeunload=null;rfPanel({fin:true,st:st,total:st.tot,done:st.dn||0,stopped:!!BB.stop});
-    if(!BB.stop){Object.keys(okL).forEach(function(lg){DB.scMeta.bbDone[lg]=seen[lg];DB.scMeta.bbSc[lg]=newSc[lg]||{};DB.scMeta.bbDoneAt[lg]=okL[lg];});}saveDB();
-    toast((st.tot||st.add)?('✓ Actualisation : '+st.upd+' joueur'+(st.upd>1?'s':'')+' mis à jour sur '+st.tot+(st.add?' · '+st.add+' nouveau'+(st.add>1?'x':'')+' joueur'+(st.add>1?'s':'')+' importé'+(st.add>1?'s':''):'')+(st.fail?' · '+st.fail+' échec(s), relus à la prochaine actualisation':'')):'✓ Rien de nouveau : tous les joueurs sont à jour','acc');}).then(function(){if(b){b.disabled=false;b.textContent='🔄 Actualiser les stats';}renderScoutPage();});};
+        .catch(function(e){p.bbRetry=1;if(e&&e.blk){st.blk++;if(streak>=12)halted=true;}else st.fail++;}).then(function(){done++;say('⏳ '+done+'/'+todo.length);st.dn=done;rfPanel({done:done,total:todo.length,st:st});if(done%10===0){try{saveDB();}catch(e){}}return (window._xvExp?window.xvWaitIdle():bbWait(slow?900:250));}).then(next);})();});};
+    return Promise.all([worker(0),worker(1),worker(2)]).then(function(){if(halted)for(;idx<todo.length;idx++)todo[idx].bbRetry=1;});});
+  ch.then(function(){BB.busy=0;window.onbeforeunload=null;rfPanel({fin:true,st:st,total:st.tot,done:st.dn||0,stopped:!!BB.stop||halted});
+    if(!BB.stop){Object.keys(okL).forEach(function(lg){DB.scMeta.bbDone[lg]=seen[lg];DB.scMeta.bbSc[lg]=newSc[lg]||{};});}saveDB();
+    var left=st.blk+st.fail;
+    toast(halted?('⏸ Le site limite les lectures pour l\'instant : '+st.upd+' joueur'+(st.upd>1?'s':'')+' mis à jour, le reste sera relu à la prochaine actualisation (attends quelques minutes)'):(st.tot||st.add)?('✓ Actualisation : '+st.upd+' joueur'+(st.upd>1?'s':'')+' mis à jour sur '+st.tot+(st.add?' · '+st.add+' nouveau'+(st.add>1?'x':'')+' joueur'+(st.add>1?'s':'')+' importé'+(st.add>1?'s':''):'')+(left?' · '+left+' non lu'+(left>1?'s':'')+', relu'+(left>1?'s':'')+' à la prochaine actualisation':'')):'✓ Rien de nouveau : tous les joueurs sont à jour',(halted||left)?'red':'acc');}).then(function(){if(b){b.disabled=false;b.textContent='🔄 Actualiser les stats';}renderScoutPage();});};
 
 /* ── v352 : panneau de progression de l'actualisation ── */
 var _rfT0=0;
@@ -43018,7 +43035,8 @@ function secCodage(){var s=DB.settings||{},pre=s.preRoll!=null?s.preRoll:10,post
   var h2=tg('Demander les joueurs impliqués','Après chaque séquence : passeur, tireur, perte de balle, défenseurs, interception… Désactive pour coder plus vite (la rentabilité reste calculée, seules les vues Joueurs et Duos restent vides).',tagOn,'👥',"saveSettings('tagPlayersEnabled',"+(!tagOn)+")")
    +tg('Proposer une note à la fin de chaque action','Une fenêtre pour écrire une note libre avant que la vidéo reprenne. Le bouton 📝 Note reste toujours disponible.',note,'📝',"saveSettings('autoPromptNote',"+(!note)+")")
    +tg('Enchaîner sur la défense adverse','Quand les deux équipes ont une board : après une attaque validée, la board de l\'autre équipe propose sa défense pour coder la même action. La vidéo repart une fois les deux validées.',chain,'🔗',"saveSettings('chainAttDef',"+(!chain)+")");
-  return blk('🎬','DURÉE DES SÉQUENCES','appliqué à chaque action codée',h1)+blk('⚡','PENDANT LE CODAGE','ce qui s\'ouvre après chaque action',h2);}
+  var mm=!!s.matchMode;var hM='<div id="sxMM" class="sxSeg"><button class="'+(mm?'':'on')+'" onclick="xvSetMM(0)">🏠 Maison</button><button class="'+(mm?'on':'')+'" onclick="xvSetMM(1)">🏀 Match</button></div><div style="font-size:12px;color:#a89c88;line-height:1.5"><b style="color:#E8C88A">Maison</b> : la vidéo se met en pause quand tu codes, puis repart à la fin du codage.<br><b style="color:#E8C88A">Match</b> : la vidéo ne s\'arrête jamais quand tu codes (pause et retour avec la barre d\'espace et les flèches). L\'action est enregistrée à l\'instant du premier clic.</div><div style="font-size:11.5px;color:#8a7e6c">Uniquement pour une vidéo de ton ordinateur (pas pour un lien live).</div>';
+  return blk('🎞️','MODE DE LECTURE','vidéo de ton ordinateur',hM)+blk('🎬','DURÉE DES SÉQUENCES','appliqué à chaque action codée',h1)+blk('⚡','PENDANT LE CODAGE','ce qui s\'ouvre après chaque action',h2);}
 
 function colBtn(lbl,hex,cb){return '<button class="sxB2" data-xvpk="1" onclick="'+cb+'"><i style="background:'+E(hex)+'"></i>'+lbl+' ▾</button>';}
 window.sxPick=function(btn,kind,id,k){var hex,set;
@@ -43278,6 +43296,60 @@ window.xvHeroBg=function(p,team,mode){
 window.xvWmFit=function(){document.querySelectorAll('.xvWm').forEach(function(w){var t=w.firstChild,mx=+w.getAttribute('data-max')||150,fs=mx;t.style.fontSize=fs+'px';var av=w.clientWidth;if(!av)return;var g=0;while(t.scrollWidth>av&&fs>30&&g++<60){fs-=4;t.style.fontSize=fs+'px';}});};
 new MutationObserver(function(){if(document.querySelector('.xvWm'))requestAnimationFrame(window.xvWmFit);}).observe(document.documentElement,{childList:true,subtree:true});
 window.addEventListener('resize',function(){window.xvWmFit();});
+
+/* v508 : Codage vidéo — mode « Maison / Match » + bouton « Dernière action » dans la barre de lecture */
+(function(){
+var G='#D4AA6A';
+function dbs(){if(!window.DB)return {};if(!DB.settings)DB.settings={postRoll:0,preRoll:10};return DB.settings;}
+function mt(){try{return curMatch();}catch(e){return null;}}
+/* le choix n'existe que pour une vidéo de l'ordinateur (pas de lien live / navigateur) */
+function hasLocal(){var m=mt();return !!(m&&!m.liveMode&&!m.extBrowser);}
+function isMatchMode(){return !!dbs().matchMode;}
+function active(){try{return isMatchMode()&&hasLocal()&&document.body.classList.contains('cg2on')&&window.CS&&CS.mode!=='stats';}catch(e){return false;}}
+var depth=0,lastGate=0;
+/* 1) Mode Match : un clic de codage ne met plus la vidéo en pause (et ne la relance pas non plus) */
+['clickAction','clickSubFamily','clickCounterButton','clickQuickResult','selectIndivPlayer'].forEach(function(n){var o=window[n];if(typeof o!=='function')return;
+  window[n]=function(){depth++;lastGate=Date.now();try{return o.apply(this,arguments);}finally{depth--;}};});
+document.addEventListener('keydown',function(e){if(!active())return;depth++;lastGate=Date.now();setTimeout(function(){depth--;},0);},true);
+var _p=window.pauseVideo,_r=window.resumeVideo;
+if(_p)window.pauseVideo=function(){if(depth>0&&active())return;return _p.apply(this,arguments);};
+if(_r)window.resumeVideo=function(){if(active()&&Date.now()-lastGate<90000)return;return _r.apply(this,arguments);};
+['replaySeq','reviewLastAction'].forEach(function(n){var o=window[n];if(typeof o!=='function')return;window[n]=function(){lastGate=0;return o.apply(this,arguments);};});
+
+/* 2) Réglage (paramètres + barre du haut) */
+window.xvSetMM=function(v){dbs().matchMode=!!v;try{saveDB();}catch(e){}
+  try{if(window.__cg2&&__cg2.hdr)__cg2.hdr();}catch(e){}
+  if(document.getElementById('sxMM')&&typeof renderSettingsPage==='function')try{renderSettingsPage();}catch(e){}
+  try{toast(v?'🏀 Mode Match : la vidéo ne s\'arrête plus pendant le codage':'🏠 Mode Maison : la vidéo se met en pause pendant le codage','acc');}catch(e){}};
+function segHtml(){var v=isMatchMode(),w=innerWidth>=1350;
+  return '<div class="cg2seg" id="xvMMseg" title="Mode de lecture vidéo : Maison (pause pendant le codage) ou Match (la vidéo ne s\'arrête jamais)">'
+   +'<span class="'+(v?'':'on')+'" onclick="xvSetMM(0)">🏠'+(w?' Maison':'')+'</span><span class="'+(v?'on':'')+'" onclick="xvSetMM(1)">🏀'+(w?' Match':'')+'</span></div>';}
+function injectHdr(){var h=document.getElementById('cg2Hdr');if(!h)return;var old=document.getElementById('xvMMseg');if(old)old.remove();
+  if(!hasLocal())return;var lv=h.querySelector('button[onclick^="toggleLiveStatsMode"]');if(!lv)return;lv.insertAdjacentHTML('beforebegin',segHtml());
+  try{__cg2.fit&&__cg2.fit(h);}catch(e){}}
+(function(){var C=window.__cg2;if(!C||!C.hdr)return;var o=C.hdr;C.hdr=function(){var r=o.apply(this,arguments);injectHdr();return r;};})();
+
+/* 3) Bouton « Dernière action » dans la barre de lecture */
+var css=document.createElement('style');
+css.textContent='body.cg2on #xvRevBtn{height:30px;margin-left:8px;padding:0 12px;border-radius:9px;background:rgba(212,170,106,.16);border:1.5px solid '+G+';color:#E8C88A;font-weight:900;font-size:12.5px;white-space:nowrap;display:inline-flex;align-items:center;gap:6px;cursor:pointer;font-family:inherit}'
+ +'body.cg2on #xvRevBtn:active{background:'+G+';color:#150E00}'
+ +'#xvRevBtn{display:none}body.cg2on #xvRevBtn.on{display:inline-flex}';
+document.head.appendChild(css);
+window.xvRevLast=function(){var back=null;
+  try{if(isMatchMode()&&hasLocal()&&window.vid){back={t:vid.currentTime||0,pl:!vid.paused};}}catch(e){}
+  var seqs=(DB.sequences||[]).filter(function(s){return s.matchId===CS.matchId;});
+  window.reviewLastAction();
+  if(back&&seqs.length){var last=seqs.reduce(function(a,b){return b.id>a.id?b:a;}),fin=mmssToSec(last.fin||'00:00'),n=0;
+    var iv=setInterval(function(){n++;if(n>900){clearInterval(iv);return;}
+      if(vid.paused&&vid.currentTime>=fin-0.3){clearInterval(iv);vid.currentTime=back.t;if(back.pl)vid.play().catch(function(){});}},200);}};
+function ensureBtn(){var row=document.getElementById('videoCtrlRow');if(!row)return;var b=document.getElementById('xvRevBtn');
+  if(!b){var plus=row.querySelector('button[onclick="seekRel(10)"]');if(!plus)return;
+    plus.insertAdjacentHTML('afterend','<button id="xvRevBtn" class="vcb" onclick="xvRevLast()" title="Revoir la dernière séquence codée (même début et même fin)">↺ Dernière action</button>');b=document.getElementById('xvRevBtn');}
+  var show=document.body.classList.contains('cg2on')&&!!window.CS&&CS.mode!=='stats'&&((DB.sequences||[]).some(function(s){return s.matchId===CS.matchId;}));
+  b.classList.toggle('on',show);
+  var h=document.getElementById('cg2Hdr');if(h&&!!document.getElementById('xvMMseg')!==hasLocal()&&h.children.length)injectHdr();}
+setInterval(ensureBtn,700);
+})();
 
 /*XV_END*/
 </script>
