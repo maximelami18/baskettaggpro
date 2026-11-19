@@ -460,7 +460,7 @@ document.addEventListener('DOMContentLoaded', function(){
 var _SB_URL="https://umuvirwbtpflizxupwbr.supabase.co";
 // Version de ce fichier — à incrémenter à chaque déploiement, en cohérence avec la valeur
 // mise à jour dans la table Supabase `app_version` (voir _checkAppVersion ci-dessous).
-var APP_VERSION = "2026-11-19-561";
+var APP_VERSION = "2026-11-19-562";
 var _SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtdXZpcndidHBmbGl6eHVwd2JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3MTI1MDEsImV4cCI6MjA5MDI4ODUwMX0.fFQaF-zP9dzcWITJDf6GBmvu0pdcuvlaUz0A0qW0kfo";
 var _LICENCE_KEY='btp_licence';
 var _MACHINE_KEY='btp_machine';
@@ -44241,7 +44241,7 @@ function posOf(el,t){var S=el&&el.samples;if(!S||!S.length)return null;if(t<=S[0
   return {t:t,x:a.x+(b.x-a.x)*k,y:a.y+(b.y-a.y)*k,w:a.w+(b.w-a.w)*k};}
 function byId(A,id){for(var i=0;i<A.els.length;i++)if(A.els[i].id===id)return A.els[i];return null;}
 function offOf(A,el,vt){if(!el.trk||!el.a)return {x:0,y:0};var p=posOf(byId(A,el.trk),vt);return p?{x:p.x-el.a.x,y:p.y-el.a.y}:{x:0,y:0};}
-function vis(el,vt,te){if(el.f){if(Math.abs(vt-el.t0)>0.03)return false;var e=(te==null?vt:te)-vt;return e>=el.o-0.001&&e<=el.o+el.d+0.001;}return vt>=el.t0-0.03&&vt<=el.t1+0.03;}
+function vis(el,vt,te){if(el.f){if(Math.abs(vt-el.t0)>0.03)return false;var e=(te==null?vt:te)-vt;if(typeof AN!=='undefined'&&AN&&AN.playing&&!AN.hold&&te===vt)return false;return e>=el.o-0.001&&e<=el.o+el.d+0.001;}return vt>=el.t0-0.03&&vt<=el.t1+0.03;}
 function relT(el,vt,te){return el.f?te-vt-el.o:te-el.t0;}
 function alphaOf(el,vt,te){var a=1;if(el.inA==='fondu')a*=cl(relT(el,vt,te)/0.5,0,1);if(el.outA==='fondu')a*=cl((el.f?el.o+el.d-(te-vt):el.t1-vt)/0.5,0,1);return a;}
 function loupeAt(A,vt,te){var best=null;A.els.forEach(function(el){if(el.type!=='loupe'||!vis(el,vt,te))return;var e=Math.min(cl(relT(el,vt,te)/0.4,0,1),cl((el.f?el.o+el.d-(te-vt):el.t1-vt)/0.4,0,1));var k=1+((el.z||2)-1)*e;if(!best||k>best.k)best={k:k,x:el.x,y:el.y};});return best;}
@@ -45496,7 +45496,7 @@ var O=window.openToolComparaison;window.openToolComparaison=function(){var st=en
 
 /* xv44 — Codage vidéo : repère blanc « ton codage » sur la barre + bouton ↩ (vidéo fichier local uniquement) */
 (function(){
-var A=null,revT=null,sk=0,lastT=0,lastMatch=null,lastN=0,bound=null;
+var A=null,plA=false,revT=null,sk=0,lastT=0,lastMatch=null,lastN=0,bound=null;
 function mt(){try{return curMatch();}catch(e){return null;}}
 function local(){var m=mt();return !!(m&&!m.liveMode&&!m.extBrowser&&!window._liveStatsMode&&window.vid&&vid.duration>0&&document.body.classList.contains('cg2on')&&window.CS&&CS.mode!=='stats');}
 function nSeq(){return window.DB&&DB.sequences?DB.sequences.filter(function(s){return s.matchId===CS.matchId;}).length:0;}
@@ -45507,18 +45507,23 @@ function bind(){var v=window.vid;if(!v||bound===v)return;bound=v;lastT=v.current
  v.addEventListener('seeking',chk);
  v.addEventListener('loadedmetadata',function(){A=null;lastT=0;});}
 /* avant de cliquer une séquence / annotation : on retient l'endroit exact où tu étais */
-function pre(){try{var v=window.vid;if(!v||!local())return;var c=v.currentTime||0;if(c>5&&(A==null||revT==null||Math.abs(c-revT)>120))A=c;}catch(e){}}
+function pre(){try{var v=window.vid;if(!v||!local())return;var c=v.currentTime||0;if(c>5&&(A==null||revT==null||Math.abs(c-revT)>120)){A=c;plA=!v.paused;}}catch(e){}}
 function hook(o,n){var f=o&&o[n];if(typeof f!=='function'||f.__xv44)return;o[n]=function(){pre();sk=Date.now();var r=f.apply(this,arguments);setTimeout(function(){try{if(window.vid&&A!=null)revT=vid.currentTime;}catch(e){}},500);return r;};o[n].__xv44=1;}
+
+/* re-cliquer la séquence déjà sélectionnée la désélectionne (le menu de droite se ferme) */
+function togg(){var C=window.__cg2;if(!C||typeof C.pick!=='function'||C.pick.__tg)return;var o=C.pick;C.pick=function(id){if(id!=null&&C.st&&C.st.sel===id){return o.call(this,null);}return o.apply(this,arguments);};C.pick.__tg=1;C.pick.__xv44=1;}
+/* changer de séquence en plein visionnage : on arrête d'abord la lecture/boucle de fin de la précédente, puis on lance la nouvelle */
+function rsq(){var o=window.replaySeq;if(typeof o!=='function'||o.__rs)return;window.replaySeq=function(id){var self=this,args=arguments,v=window.vid;try{if(v&&!v.paused&&!(window.isLiveMatch&&isLiveMatch())){v.pause();return void setTimeout(function(){o.apply(self,args);},70);}}catch(e){}return o.apply(this,args);};window.replaySeq.__rs=1;window.replaySeq.__xv44=1;}
 var css=document.createElement('style');
 css.textContent='#xvBackBtn{display:none}body.cg2on #xvBackBtn.on{display:inline-flex}'
 +'body.cg2on #xvBackBtn{height:30px;width:30px;margin-left:6px;padding:0;border-radius:9px;background:#fff;border:1.5px solid #fff;color:#1a1204;font-weight:900;font-size:16px;align-items:center;justify-content:center;cursor:pointer;font-family:inherit;line-height:1}'
 +'body.cg2on #xvBackBtn:active{background:#D4AA6A;border-color:#D4AA6A}'
 +'#xvAnc{position:absolute;top:-8px;width:4px;height:28px;margin-left:-2px;background:#fff;border-radius:2px;box-shadow:0 0 8px rgba(255,255,255,.8);pointer-events:none;z-index:5;display:none}#xvAnc::before{content:"";position:absolute;left:50%;top:-6px;margin-left:-6px;border:6px solid transparent;border-top-color:#fff;border-bottom:0}';
 document.head.appendChild(css);
-window.xvBackToCode=function(){var v=window.vid;if(A==null||!v)return;var t=A;A=null;revT=null;v.currentTime=t;lastT=t;};
+window.xvBackToCode=function(){var v=window.vid;if(A==null||!v)return;var t=A,pl=plA;A=null;revT=null;lastT=t;try{v.pause();}catch(e){}setTimeout(function(){v.currentTime=t;lastT=t;setTimeout(function(){if(Math.abs(v.currentTime-t)>1.5){v.currentTime=t;lastT=t;}if(pl)v.play().catch(function(){});},120);},90);};
 function tick(){
  var m=mt();if(!m||m.id!==lastMatch){lastMatch=m?m.id:null;A=null;lastN=m&&window.CS?nSeq():0;}
- bind();hook(window.__cg2,'pick');hook(window,'replaySeq');hook(window.__an,'open');
+ bind();hook(window.__cg2,'pick');hook(window,'replaySeq');hook(window.__an,'open');togg();rsq();
  chk();
  var n=window.CS&&CS.matchId!=null?nSeq():0;if(n>lastN){A=null;revT=null;}lastN=n;
  var row=document.getElementById('videoCtrlRow'),b=document.getElementById('xvBackBtn'),rev=document.getElementById('xvRevBtn');
