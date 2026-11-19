@@ -460,7 +460,7 @@ document.addEventListener('DOMContentLoaded', function(){
 var _SB_URL="https://umuvirwbtpflizxupwbr.supabase.co";
 // Version de ce fichier — à incrémenter à chaque déploiement, en cohérence avec la valeur
 // mise à jour dans la table Supabase `app_version` (voir _checkAppVersion ci-dessous).
-var APP_VERSION = "2026-11-19-541";
+var APP_VERSION = "2026-11-19-542";
 var _SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtdXZpcndidHBmbGl6eHVwd2JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3MTI1MDEsImV4cCI6MjA5MDI4ODUwMX0.fFQaF-zP9dzcWITJDf6GBmvu0pdcuvlaUz0A0qW0kfo";
 var _LICENCE_KEY='btp_licence';
 var _MACHINE_KEY='btp_machine';
@@ -33122,15 +33122,15 @@ window.xvFast=function(n){var hp=function(x,y){var b=ed.ex.bg;if(b=='fullh')retu
     if(n==10&&!used['H'+i]){var dx=hoop[0]-q[0],dy=hoop[1]-q[1],l=Math.hypot(dx,dy)||1,d={t:'m',x:Math.round(q[0]+dx/l*80),y:Math.round(q[1]+dy/l*80),s:'H'+i,c:cd,rot:Math.round(Math.atan2(-dx,dy)*180/Math.PI)};edId(d);ed.ex.items.push(d);}}
   ed.fly=null;ed.tool='v';edBar();edRedraw();};
 /* palette objets */
-var OBJ=[['hoop','Panier','<svg width="26" height="22" viewBox="0 0 26 22"><path d="M3 3H23M13 3V8" stroke="#eee" stroke-width="2.4" fill="none"/><circle cx="13" cy="14" r="5" fill="none" stroke="#eee" stroke-width="2.4"/></svg>'],['cone','Plot','<svg width="22" height="24" viewBox="0 0 22 24"><path d="M8 2H14L19 19H3Z" fill="#f97316"/><rect x="1" y="19" width="20" height="4" fill="#eee"/></svg>'],['cir','Pastille','<span class="pc" style="background:#f59e0b;border-color:#f59e0b;color:#111;width:26px;height:26px;font-size:13px">1</span>'],['rec2','Rectangle','<span style="display:block;width:26px;height:16px;background:#3b82f6;border-radius:2px"></span>'],['cir2','Rond','<span style="display:block;width:22px;height:22px;background:#3b82f6;border-radius:50%"></span>'],['tri2','Triangle','<svg width="24" height="22" viewBox="0 0 24 22"><path d="M12 2L22 20H2Z" fill="#3b82f6"/></svg>']];
+var OBJ=[['hoop','Panier','<svg width="26" height="22" viewBox="0 0 26 22"><path d="M3 3H23M13 3V8" stroke="#eee" stroke-width="2.4" fill="none"/><circle cx="13" cy="14" r="5" fill="none" stroke="#eee" stroke-width="2.4"/></svg>'],['cone','Triangle n°','<svg width="26" height="24" viewBox="0 0 26 24"><path d="M13 2L24 22H2Z" fill="#f97316"/><text x="13" y="19" text-anchor="middle" font-size="11" font-weight="800" fill="#111" font-family="Outfit">1</text></svg>'],['cir','Pastille','<span class="pc" style="background:#f59e0b;border-color:#f59e0b;color:#111;width:26px;height:26px;font-size:13px">1</span>'],['rec2','Rectangle','<span style="display:block;width:26px;height:16px;background:#3b82f6;border-radius:2px"></span>'],['cir2','Rond','<span style="display:block;width:22px;height:22px;background:#3b82f6;border-radius:50%"></span>'],['tri2','Triangle','<svg width="24" height="22" viewBox="0 0 24 22"><path d="M12 2L22 20H2Z" fill="#3b82f6"/></svg>']];
 function palOb(){return'<div class="xvFly pal"><div class="xvSec" style="margin-bottom:8px">Objets</div><div class="og" style="grid-template-columns:repeat(3,1fr)">'+OBJ.map(function(q){return'<button class="pb'+(ed.shape==q[0]&&ed.tool=='f'?' on':'')+'" style="height:50px" title="'+q[1]+'" onclick="xvOb(\''+q[0]+'\')">'+q[2]+'</button>';}).join('')+'</div>'
  +'<div style="border-top:1px solid var(--bdr2);margin:12px 0 9px"></div><label style="display:flex;gap:9px;align-items:center;font:600 13px Outfit,sans-serif;cursor:pointer" onclick="edNumb('+(ed.numb?'false':'true')+')"><span style="width:36px;height:20px;border-radius:12px;background:'+(ed.numb?'var(--grn)':'var(--surf3)')+';position:relative;flex:0 0 auto"><i style="position:absolute;top:2px;'+(ed.numb?'right':'left')+':2px;width:16px;height:16px;border-radius:50%;background:#fff"></i></span>Numéroter les plots / pastilles</label>'
  +(ed.numb?'<button class="fv" style="height:32px" onclick="cdcN1()">↺ Repartir à 1 (n°'+(ed.n||1)+')</button>':'')+'<div class="hint">Choisis un objet puis clique sur le terrain. Les formes se redimensionnent avec les poignées sur le dessin.</div></div>';}
-window.xvOb=function(k){ed.fly=null;if(k!='cone'&&k!='cir')ed.numb=false;ed.shape=k;cdcTool('f');};
+window.xvOb=function(k){ed.fly=null;if(k=='cone')ed.numb=true;else if(k!='cir')ed.numb=false;ed.shape=k;cdcTool('f');};
 /* menu Mouvement : noms et ordre comme le modèle */
 window.xvMvD=function(){ed.lastMv='a';ed.dot=1;ed.fly=null;cdcTool('a');};
 var xm0=window.xvMv;window.xvMv=function(t){ed.dot=0;return xm0.apply(this,arguments);};
-function palMv(){var L=[['dr','〰➤','Dribble'],['d','┅➤','Passe'],['a','➤','Déplacement'],['sc','⊥','Écran'],['sh','🎯','Tir'],['hand','╫','Main à main']];
+function palMv(){var L=[['dr','〰➤','Dribble'],['d','┅➤','Passe'],['a','━➤','Déplacement'],['sc','⊥','Écran'],['sh','🎯','Tir'],['hand','╫','Main à main']];
   return'<div class="xvFly"><div class="g">'+L.map(function(q){var on=q[0]=='hand'?(ed.tool=='f'&&ed.shape=='hand'):ed.tool==q[0];return RB(q[1],q[2],on,q[0]=='hand'?'xvHand()':'xvMv(\''+q[0]+'\')');}).join('')+'</div></div>';}
 window.xvHand=function(){ed.fly=null;ed.numb=false;ed.shape='hand';cdcTool('f');};
 /* marque les trajets « Déplacement » en pointillés */
@@ -33275,6 +33275,50 @@ var vi0=vcInner;vcInner=function(ref,ro){var v=vcOf(ref);if(VR.ref===ref)return'
   if(VB[ref])return vi0(ref,ro);var h='';if(v)h+='<span class="vxp" data-ref="'+ref+'" data-dur="'+(v.dur||0)+'"></span>'+(v.txt?'<button class="btn bg bsm" title="Voir le texte du vocal" onclick="vcTxt(\''+ref+'\')">📝</button>':'');
   if(!ro)h+='<button class="btn bg bsm" onclick="vcRec(\''+ref+'\')">🎙 '+(v?'Refaire':'Dicter / Vocal')+'</button>'+(v?'<button class="btn bd bsm" onclick="vcRm(\''+ref+'\')">✕</button>':'');return h;};
 function xvRef(){var sc=ed.ex.sch[ed.si];if(!sc)return'sy0';return sc.vref||(sc.vref='sy'+Math.random().toString(36).slice(2,10));}
+
+/* ───────── v542 ───────── */
+(function(){var st=document.createElement('style');st.textContent='.xvSz{display:grid;grid-template-columns:auto 1fr;gap:6px 10px;align-items:center;width:100%;margin-top:6px}.xvSz input{width:100%;accent-color:#D4AA6A}';document.head.appendChild(st);})();
+/* texte : mesure réelle, centrage dans le cadre */
+function tFont(o){var z=o.z||30;return 'bold '+z+'px '+(o.ff?'"'+o.ff+'",sans-serif':'sans-serif');}
+var _mc=document.createElement('canvas').getContext('2d');
+edBox=function(o){var z=o.z||30,ls=String(o.s).split('\n'),w=0;_mc.font=tFont(o);ls.forEach(function(l){w=Math.max(w,_mc.measureText(l).width);});return{w:Math.max(40,Math.round(w)),h:ls.length*z*1.13};};
+/* dessin v542 */
+var d10=_drawIt0;
+_drawIt0=function(c,it){
+  if(it.t=='m'&&PK.test(String(it.s))&&it.sz&&it.sz!=1){var cp={};for(var k in it)cp[k]=it[k];delete cp.sz;c.save();c.translate(it.x,it.y);c.scale(it.sz,it.sz);c.translate(-it.x,-it.y);d10(c,cp);c.restore();return;}
+  if(it.t=='f'&&it.k=='hoop'&&it.rot){var cp2={};for(var k2 in it)cp2[k2]=it[k2];delete cp2.rot;c.save();c.translate(it.x,it.y);c.rotate(it.rot*Math.PI/180);c.translate(-it.x,-it.y);d10(c,cp2);c.restore();return;}
+  if(it.t=='f'&&it.k=='cone'){var z=it.z||1,col=(it.c&&it.c!='#f59e0b')?it.c:'#f97316',x=it.x,y=it.y;c.save();c.translate(x,y);c.scale(z,z);c.translate(-x,-y);c.beginPath();c.moveTo(x,y-34);c.lineTo(x+32,y+24);c.lineTo(x-32,y+24);c.closePath();c.fillStyle=col;c.fill();c.lineJoin='round';c.lineWidth=3;c.strokeStyle=col;c.stroke();
+    if(it.n){c.fillStyle='#111';c.textAlign='center';c.textBaseline='middle';c.font='800 22px Outfit,sans-serif';c.fillText(String(it.n),x,y+9);}c.restore();return;}
+  if(it.t=='f'&&/^(rec2|cir2|tri2)$/.test(it.k)){var z2=it.z||1,w=(it.w||dimW(it))*z2,h=(it.h||dimH(it))*z2,x2=it.x,y2=it.y,col2=(it.c&&it.c!='#f59e0b')?it.c:'#3b82f6',op=it.op==null?1:it.op;c.save();c.beginPath();
+    if(it.k=='rec2')c.rect(x2-w/2,y2-h/2,w,h);else if(it.k=='cir2')c.ellipse(x2,y2,w/2,h/2,0,0,7);else{c.moveTo(x2,y2-h/2);c.lineTo(x2+w/2,y2+h/2);c.lineTo(x2-w/2,y2+h/2);c.closePath();}
+    c.globalAlpha=op;c.fillStyle=col2;c.fill();c.globalAlpha=1;c.lineJoin='round';c.lineWidth=4;c.strokeStyle=col2;c.stroke();c.restore();return;}
+  if(it.t=='s'&&it.k=='shot'&&it.p&&it.p.length>1){var P=it.p,n=P.length,lw=it.w||3,hl=Math.max(24,lw*7),L3=edLens(P),T3=L3[n-1];if(T3>hl*1.2){var g=edTanP(P),tip=P[n-1],cut=T3-hl*.8;c.save();c.strokeStyle=c.fillStyle=it.c||'#111';c.lineWidth=lw;c.lineCap='butt';c.lineJoin='round';c.setLineDash([]);
+      [-5,5].forEach(function(o){c.beginPath();var st=Math.max(2,Math.floor(cut/20)),i,q;for(i=0;i<=st;i++){q=edPathAt(P,L3,cut*i/st);var x=q.x-Math.sin(q.g)*o,y=q.y+Math.cos(q.g)*o;i?c.lineTo(x,y):c.moveTo(x,y);}c.stroke();});
+      arrowHead(c,tip,g,hl,lw);c.restore();return;}}
+  if(it.t=='x'&&(it.ff||it.al=='c')){var z4=it.z||30,b=edBox(it);c.save();c.fillStyle=it.c||'#111';c.font=tFont(it);c.textBaseline='top';c.textAlign=it.al=='c'?'center':'left';String(it.s).split('\n').forEach(function(l,i){c.fillText(l,it.al=='c'?it.x+b.w/2:it.x,it.y+i*z4*1.13);});c.restore();return;}
+  return d10(c,it);};
+var eh10=edHitOne;edHitOne=function(o,p){if(o.t=='x'){var b=edBox(o);return p[0]>=o.x-10&&p[0]<=o.x+b.w+10&&p[1]>=o.y-10&&p[1]<=o.y+b.h+10;}return eh10(o,p);};
+/* anneau de sélection : pas de rond pointillé sur les formes */
+var er10=edRing;edRing=function(g){var s0=ed&&ed.sel;if(s0&&s0.t=='f'&&/^(rec2|cir2|tri2|hand)$/.test(s0.k||'')){ed.sel=null;try{er10.apply(this,arguments);}finally{ed.sel=s0;}
+    var H=hnd(s0);if(!H.length)return;g.save();H.forEach(function(q){g.beginPath();g.lineWidth=3;g.strokeStyle='#D4AA6A';g.fillStyle='#fff';g.rect(q.x-9,q.y-9,18,18);g.fill();g.stroke();});g.restore();return;}
+  return er10.apply(this,arguments);};
+/* poignées : panier orientable, texte */
+var hn10=hnd;hnd=function(o){if(o&&o.t=='f'&&o.k=='hoop'&&ed&&ed.ex.items.indexOf(o)>=0){var r=(o.rot||0)*Math.PI/180;return[{k:'rot',x:o.x+Math.sin(r)*70,y:o.y-Math.cos(r)*70}];}
+  if(o&&o.t=='x'&&ed&&ed.ex.items.indexOf(o)>=0){var b=edBox(o);return[{k:'tx',x:o.x+b.w+8,y:o.y+b.h+8}];}return hn10(o);};
+/* tailles des numéros de joueurs, par catégorie (balle / attaquants / défenseurs) */
+function pcat(o){var k=o.s[0];return k=='O'?'o':(k=='X'||k=='H')?'d':'n';}
+function szOf(cat){var m=ed.ex.psz||{};return m[cat]||1;}
+window.xvPSz=function(cat,v){ed.ex.psz=ed.ex.psz||{};var f=+v/100;ed.ex.psz[cat]=f;ed.ex.sch.forEach(function(sc){(sc.items||[]).forEach(function(o){if(o.t=='m'&&PK.test(String(o.s))&&pcat(o)==cat)o.sz=f;});});edRedraw();};
+var np10=newPlayers;newPlayers=function(){np10.apply(this,arguments);var m=ed.ex.psz;if(!m)return;ed.ex.items.forEach(function(o){if(o.t=='m'&&PK.test(String(o.s))&&SEEN8&&!SEEN8.has(o)&&m[pcat(o)])o.sz=m[pcat(o)];});};
+window.xvOp=function(v){var o=ed.sel;if(!o)return;o.op=+v/100;edRedraw();};
+var sb10=edSelBar;edSelBar=function(){var h=sb10.apply(this,arguments),o=ed&&ed.sel;if(!ed||ed.tool!='v'||!o)return h;
+  if(o.t=='x')h=h.replace('>Taille</span>','>Taille de police</span>').replace(/<button[^>]*onclick="xvCtr\(\)"[^>]*>[^<]*<\/button>/,'');
+  if(o.t=='f'&&/^(rec2|cir2|tri2)$/.test(o.k||'')){h=h.replace(/<span[^>]*>Taille<\/span><input class="xvRg" type="range" min="40"[^>]*>/,'<span style="font-size:12px;color:var(--txt3)">Opacité</span><input class="xvRg" type="range" min="0" max="100" value="'+Math.round((o.op==null?1:o.op)*100)+'" oninput="xvOp(this.value)">');}
+  if(o.t=='f'&&o.k=='hoop'){h='<div class="xvRt"><span class="xvSec" style="min-width:56px">Orientation</span><button onclick="xvRot(-15)">↺</button><input type="range" min="0" max="359" value="'+(((o.rot||0)+360)%360)+'" oninput="xvRotV(this.value)"><button onclick="xvRot(15)">↻</button><span style="font-size:12px;color:var(--txt3)">ou glisse la poignée dorée</span></div>'+h;}
+  return h;};
+window.xvAlC=function(){var o=ed.sel;if(!o)return;if(o.al=='c')delete o.al;else o.al='c';edBar();edRedraw();};
+var sk10=skin;skin=function(){sk10.apply(this,arguments);if(!ed||!ed.ex)return;var sd=$('xvSide');if(!sd||sd.querySelector('.xvSz'))return;var first=sd.firstElementChild;if(!first)return;
+  var w=document.createElement('div');w.className='xvSz';w.innerHTML='<span class="xvSec">Taille n° balle</span><input class="xvRg" type="range" min="50" max="200" value="'+Math.round(szOf('o')*100)+'" oninput="xvPSz(\'o\',this.value)"><span class="xvSec">Taille n° attaquants</span><input class="xvRg" type="range" min="50" max="200" value="'+Math.round(szOf('n')*100)+'" oninput="xvPSz(\'n\',this.value)"><span class="xvSec">Taille défenseurs</span><input class="xvRg" type="range" min="50" max="200" value="'+Math.round(szOf('d')*100)+'" oninput="xvPSz(\'d\',this.value)">';first.appendChild(w);};
 
 })();
 })();
