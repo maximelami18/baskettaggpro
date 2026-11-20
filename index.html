@@ -460,7 +460,7 @@ document.addEventListener('DOMContentLoaded', function(){
 var _SB_URL="https://umuvirwbtpflizxupwbr.supabase.co";
 // Version de ce fichier — à incrémenter à chaque déploiement, en cohérence avec la valeur
 // mise à jour dans la table Supabase `app_version` (voir _checkAppVersion ci-dessous).
-var APP_VERSION = "2026-11-20-580";
+var APP_VERSION = "2026-11-20-581";
 var _SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtdXZpcndidHBmbGl6eHVwd2JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3MTI1MDEsImV4cCI6MjA5MDI4ODUwMX0.fFQaF-zP9dzcWITJDf6GBmvu0pdcuvlaUz0A0qW0kfo";
 var _LICENCE_KEY='btp_licence';
 var _MACHINE_KEY='btp_machine';
@@ -45565,25 +45565,25 @@ function aggL(n){var m={},tot=0,tone={};leaves(n).forEach(function(l){if(!l.res)
 function chip(sub){return sub.map(function(s,i){return '<span style="padding:3px 9px;border-radius:8px;background:#2a2a2a;font-size:12px;font-weight:700;color:#E9DFCC">'+s+'</span>'}).join('<span style="color:#6A5E50;margin:0 4px">›</span>');}
 function ava(p,s){return window.__xo.avatar(p,s||44)}
 function nm(p){return p.first+' '+p.last}
-function quad(root,def){var MP=1;var O=opts(root).filter(function(x){return x.n.poss>=MP});if(!O.length)return '';var W=1180,H=400,L=50,B=36,mxX=Math.max.apply(null,O.map(function(x){return x.n.poss/root.poss*100}))*1.18+3,mxY=Math.max.apply(null,O.map(function(x){return x.n.ppp}))*1.22+.05,y0=-mxY*.32;
- var X_=function(v){return L+Math.min(v,mxX)/mxX*(W-L-14)},Y_=function(v){return H-B-(Math.min(v,mxY)-y0)/(mxY-y0)*(H-B-16)};
+function quad(root,def){var MP=1;var O=opts(root).filter(function(x){return x.n.poss>=MP});if(!O.length)return '';var W=1180,H=400,L=50,B=36,mxX=Math.max.apply(null,O.map(function(x){return x.n.poss}))*1.15+.6,sumP=O.reduce(function(a,x){return a+x.n.poss},0),avX=sumP/O.length,avY=(root.ppp!=null&&isFinite(root.ppp))?root.ppp:O.reduce(function(a,x){return a+x.n.ppp*x.n.poss},0)/(sumP||1),vals=O.map(function(x){return x.n.ppp}).concat([avY]),lo=Math.min.apply(null,vals),hi=Math.max.apply(null,vals),pd=(hi-lo||1)*.22,y0=lo-pd,y1=hi+pd;
+ var X_=function(v){return L+Math.min(v,mxX)/mxX*(W-L-14)},Y_=function(v){var f=(v-y0)/(y1-y0);return def?16+f*(H-B-16):H-B-f*(H-B-16)};
  var g='<svg width="'+W+'" height="'+H+'" data-l="'+L+'" data-b="'+(H-B)+'" style="display:block"><rect x="'+L+'" y="16" width="'+(W-L-14)+'" height="'+(H-B-16)+'" fill="#1a1a1a" rx="10"/>';
- var vx=X_(10),vy=Y_(def?.7:LO);
+ var vx=X_(avX),vy=Y_(avY);
  g+='<line x1="'+vx+'" y1="16" x2="'+vx+'" y2="'+(H-B)+'" stroke="#555" stroke-dasharray="4 4"/><line x1="'+L+'" y1="'+vy+'" x2="'+(W-14)+'" y2="'+vy+'" stroke="#555" stroke-dasharray="4 4"/>';
  var q=function(x,y,t,c,a){return '<text x="'+x+'" y="'+y+'" fill="'+c+'" font-size="11" font-weight="800" letter-spacing="1" text-anchor="'+a+'" opacity=".9">'+t+'</text>'};
- g+=def?q(L+10,32,'RARE MAIS CHER',R,'start')+q(W-24,32,'DANGER',R,'end')+q(L+10,H-B-10,'RARE · SOLIDE',G,'start')+q(W-24,H-B-10,'NOTRE FORCE',G,'end')
-  :q(L+10,32,'À GÉNÉRALISER',G,'start')+q(W-24,32,'NOS ARMES',G,'end')+q(L+10,H-B-10,'PEU JOUÉ · PEU RENTABLE',N,'start')+q(W-24,H-B-10,'À CORRIGER',R,'end');
+ g+=def?q(L+10,32,'PEU SOLLICITÉ · PEU ENCAISSÉ',GOLD,'start')+q(W-24,32,'TRÈS SOLLICITÉ · PEU ENCAISSÉ',G,'end')+q(L+10,H-B-10,'PEU SOLLICITÉ · BEAUCOUP ENCAISSÉ',N,'start')+q(W-24,H-B-10,'TRÈS SOLLICITÉ · BEAUCOUP ENCAISSÉ',R,'end')
+  :q(L+10,32,'PEU UTILISÉ · TRÈS RENTABLE',GOLD,'start')+q(W-24,32,'BEAUCOUP UTILISÉ · TRÈS RENTABLE',G,'end')+q(L+10,H-B-10,'PEU UTILISÉ · PEU RENTABLE',N,'start')+q(W-24,H-B-10,'BEAUCOUP UTILISÉ · PEU RENTABLE',R,'end');
  var placed=[],cir=[],dup={},lbs='';O.forEach(function(x){dup[x.n.n]=(dup[x.n.n]||0)+1});
- O.slice().sort(function(a,b){return b.n.poss-a.n.poss}).forEach(function(x){var n=x.n,sh=n.poss/root.poss*100,r=6+Math.sqrt(n.poss)*3,cx=X_(sh),cy=Y_(n.ppp);if(def)cy=Y_(Math.min(n.ppp,mxY-.1));
+ O.slice().sort(function(a,b){return b.n.poss-a.n.poss}).forEach(function(x){var n=x.n,sh=n.poss,r=6+Math.sqrt(n.poss)*3,cx=X_(sh),cy=Y_(n.ppp);
   var left=false;for(var t=0;t<12;t++){var hit=cir.filter(function(c){return Math.hypot(c[0]-cx,c[1]-cy)<(c[2]+r)*.8})[0];if(!hit)break;hit[4]=1;cx=hit[0]+hit[2]+r+3;}
   if(cx>W-20)cx=W-20;var me=[cx,cy,r,x,0];cir.push(me);
   var col=n.c||x.f.c,sn0=x.path.length>2?x.path[1]:'',lb0=n.n+'';me.push(lb0);
-  g+='<g class="bbG" data-cx="'+cx+'" data-cy="'+cy+'" data-r="'+r+'" data-n="'+X.esc(lb0)+'" data-x="'+Math.round(sh)+' %" data-y="'+(n.ppp!=null?n.ppp.toFixed(2):'-')+'"><circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="'+col+'" fill-opacity=".92" stroke="#fff" stroke-opacity=".6"/></g>';});
+  g+='<g class="bbG" data-cx="'+cx+'" data-cy="'+cy+'" data-r="'+r+'" data-n="'+X.esc(lb0)+'" data-x="'+n.poss+' poss." data-y="'+(n.ppp!=null?n.ppp.toFixed(2):'-')+'"><circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="'+col+'" fill-opacity=".92" stroke="#fff" stroke-opacity=".6"/></g>';});
  placed=[];cir.sort(function(a,b){return a[0]-b[0]}).forEach(function(c){var x=c[3],n=x.n,cx=c[0],cy=c[1],r=c[2],sn=x.path.length>2?x.path[1]:'',lab=n.n+'';
   var ty=cy+r+13,w=lab.length*5.8;var tx=Math.max(L+w/2+4,Math.min(cx,W-14-w/2-4));for(var k=0;k<8;k++){var ov=placed.some(function(q){return Math.abs(q[0]-tx)<(q[2]+w)/2+4&&Math.abs(q[1]-ty)<12});if(!ov)break;ty+=12;}placed.push([tx,ty,w]);
   lbs+='<text text-anchor="middle" x="'+tx+'" y="'+ty+'" fill="#F0E8D8" font-size="10.5" font-weight="700" stroke="#1a1a1a" stroke-width="3" paint-order="stroke" stroke-linejoin="round">'+lab+'</text>';});
  g+=lbs;
- g+='<text x="'+(W/2)+'" y="'+(H-10)+'" fill="#8a7d6a" font-size="11" font-weight="800" text-anchor="middle" letter-spacing="1">UTILISATION : % DE NOS POSSESSIONS →</text><text transform="rotate(-90 14 '+(H/2)+')" x="14" y="'+(H/2)+'" fill="#8a7d6a" font-size="11" font-weight="800" text-anchor="middle" letter-spacing="1">PPP →</text></svg>';
+ g+='<text x="'+(W/2)+'" y="'+(H-10)+'" fill="#8a7d6a" font-size="11" font-weight="800" text-anchor="middle" letter-spacing="1">COMBIEN DE POSSESSIONS ON LE JOUE →</text><text transform="rotate(-90 14 '+(H/2)+')" x="14" y="'+(H/2)+'" fill="#8a7d6a" font-size="11" font-weight="800" text-anchor="middle" letter-spacing="1">'+(def?'CE QU’ON ENCAISSE (PTS / POSS.) · MOINS = PLUS HAUT →':'CE QUE ÇA RAPPORTE (PTS / POSS.) →')+'</text></svg>';
  var lg={},leg='';O.forEach(function(x){var nm_=x.path.length>1?x.path[1]:x.path[0],c=x.n.c||x.f.c,k=nm_+c;if(!lg[k]){lg[k]=1;leg+='<span style="display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:#A89880;margin-right:14px">'+dot(c)+nm_+'</span>'}});
  return '<div class="c3Cd" style="padding:18px 20px"><div style="display:flex;align-items:baseline;gap:10px;margin-bottom:6px"><span style="font-weight:900;font-size:16px">Volume × efficacité</span><span style="font-size:12px;color:#8a7d6a">chaque bulle = une action · taille = possessions · couleur = sous-famille</span></div>'+g+'<div style="margin-top:8px">'+leg+'</div></div>';}
 /* ---- détail complet : famille › sous-famille › action › combinaisons de sous-actions › résultats ---- */
