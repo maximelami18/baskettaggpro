@@ -460,7 +460,7 @@ document.addEventListener('DOMContentLoaded', function(){
 var _SB_URL="https://umuvirwbtpflizxupwbr.supabase.co";
 // Version de ce fichier — à incrémenter à chaque déploiement, en cohérence avec la valeur
 // mise à jour dans la table Supabase `app_version` (voir _checkAppVersion ci-dessous).
-var APP_VERSION = "2026-11-20-578";
+var APP_VERSION = "2026-11-20-580";
 var _SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtdXZpcndidHBmbGl6eHVwd2JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3MTI1MDEsImV4cCI6MjA5MDI4ODUwMX0.fFQaF-zP9dzcWITJDf6GBmvu0pdcuvlaUz0A0qW0kfo";
 var _LICENCE_KEY='btp_licence';
 var _MACHINE_KEY='btp_machine';
@@ -45565,7 +45565,7 @@ function aggL(n){var m={},tot=0,tone={};leaves(n).forEach(function(l){if(!l.res)
 function chip(sub){return sub.map(function(s,i){return '<span style="padding:3px 9px;border-radius:8px;background:#2a2a2a;font-size:12px;font-weight:700;color:#E9DFCC">'+s+'</span>'}).join('<span style="color:#6A5E50;margin:0 4px">›</span>');}
 function ava(p,s){return window.__xo.avatar(p,s||44)}
 function nm(p){return p.first+' '+p.last}
-function quad(root,def){var MP=opts(root).some(function(x){return x.n.poss>=2})?2:1;var O=opts(root).filter(function(x){return x.n.poss>=MP});if(!O.length)return '';var W=1180,H=400,L=50,B=36,mxX=Math.max.apply(null,O.map(function(x){return x.n.poss/root.poss*100}))*1.18+3,mxY=Math.max.apply(null,O.map(function(x){return x.n.ppp}))*1.22+.05,y0=-mxY*.32;
+function quad(root,def){var MP=1;var O=opts(root).filter(function(x){return x.n.poss>=MP});if(!O.length)return '';var W=1180,H=400,L=50,B=36,mxX=Math.max.apply(null,O.map(function(x){return x.n.poss/root.poss*100}))*1.18+3,mxY=Math.max.apply(null,O.map(function(x){return x.n.ppp}))*1.22+.05,y0=-mxY*.32;
  var X_=function(v){return L+Math.min(v,mxX)/mxX*(W-L-14)},Y_=function(v){return H-B-(Math.min(v,mxY)-y0)/(mxY-y0)*(H-B-16)};
  var g='<svg width="'+W+'" height="'+H+'" data-l="'+L+'" data-b="'+(H-B)+'" style="display:block"><rect x="'+L+'" y="16" width="'+(W-L-14)+'" height="'+(H-B-16)+'" fill="#1a1a1a" rx="10"/>';
  var vx=X_(10),vy=Y_(def?.7:LO);
@@ -45585,7 +45585,7 @@ function quad(root,def){var MP=opts(root).some(function(x){return x.n.poss>=2})?
  g+=lbs;
  g+='<text x="'+(W/2)+'" y="'+(H-10)+'" fill="#8a7d6a" font-size="11" font-weight="800" text-anchor="middle" letter-spacing="1">UTILISATION : % DE NOS POSSESSIONS →</text><text transform="rotate(-90 14 '+(H/2)+')" x="14" y="'+(H/2)+'" fill="#8a7d6a" font-size="11" font-weight="800" text-anchor="middle" letter-spacing="1">PPP →</text></svg>';
  var lg={},leg='';O.forEach(function(x){var nm_=x.path.length>1?x.path[1]:x.path[0],c=x.n.c||x.f.c,k=nm_+c;if(!lg[k]){lg[k]=1;leg+='<span style="display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:#A89880;margin-right:14px">'+dot(c)+nm_+'</span>'}});
- return '<div class="c3Cd" style="padding:18px 20px"><div style="display:flex;align-items:baseline;gap:10px;margin-bottom:6px"><span style="font-weight:900;font-size:16px">Volume × efficacité</span><span style="font-size:12px;color:#8a7d6a">chaque bulle = une action (min. '+MP+' poss.) · taille = possessions · couleur = sous-famille</span></div>'+g+'<div style="margin-top:8px">'+leg+'</div></div>';}
+ return '<div class="c3Cd" style="padding:18px 20px"><div style="display:flex;align-items:baseline;gap:10px;margin-bottom:6px"><span style="font-weight:900;font-size:16px">Volume × efficacité</span><span style="font-size:12px;color:#8a7d6a">chaque bulle = une action · taille = possessions · couleur = sous-famille</span></div>'+g+'<div style="margin-top:8px">'+leg+'</div></div>';}
 /* ---- détail complet : famille › sous-famille › action › combinaisons de sous-actions › résultats ---- */
 function quad3(root,def){return quad(root,def).replace(/width="1180" height="400"/,'width="100%" viewBox="0 0 1180 400"');}
 function hero3(root,def){var c=def?BLUE:GOLD;
@@ -45628,17 +45628,18 @@ function resOf(list,def){var m={},pts={},ord=[];list.forEach(function(s){var r=s
  var bid=list[0]&&list[0].boardId;return ord.sort(function(a,b){return m[b]-m[a]}).map(function(r){return [r,Math.round(m[r]/list.length*100),toneOf(r,bnode(bid,'Résultat',r),pts[r]/m[r],def)]});}
 function mkN(name,list,def,kids,col){var pts=list.reduce(function(a,s){return a+(s.resultPts||0)},0);var n=T(name,list.length,pts,kids||[]);
  n.rea=list.filter(function(s){return def?s.resultPts===0:(s.resultPts!=null&&s.resultPts>0)}).length;if(col){n.c=col.c;n.tc=col.tc}return n;}
-function colOf(bid,type,label,i){var nd=bnode(bid,type,label);return {c:hex6(nd&&nd.color,PAL0[i%PAL0.length]),tc:nd&&nd.tc?hex6(nd.tc,null):null,has:!!(nd&&nd.color)};}
+function bnid(bid,id){try{var b=bid!=null&&id!=null?gB(bid):null;return b&&b.nodes.filter(function(n){return String(n.id)===String(id)})[0]||null;}catch(e){return null;}}
+function colOf(bid,type,label,i,id){var nd=bnid(bid,id)||bnode(bid,type,label);return {c:hex6(nd&&nd.color,PAL0[i%PAL0.length]),tc:nd&&nd.tc?hex6(nd.tc,null):null,has:!!(nd&&nd.color)};}
 function leafInfo(n,list,def){n.res=resOf(list,def);var g={},o=[];list.forEach(function(s){var sa=(s.subActions||[]).filter(Boolean);if(!sa.length)return;var k=sa.join('›');if(!g[k]){g[k]={sub:sa,l:[]};o.push(k)}g[k].l.push(s)});
  if(o.length){n.combos=o.map(function(k){var l=g[k].l;return {sub:g[k].sub,poss:l.length,pts:l.reduce(function(a,s){return a+(s.resultPts||0)},0),res:resOf(l,def),n:'c'}}).sort(function(a,b){return b.poss-a.poss}).slice(0,10);}}
 function buildTree(seqs,def){var P=seqs.filter(function(s){return !s.quick});var F={},fo=[];
  P.forEach(function(s){var f=s.family||'Non classé';if(!F[f]){F[f]=[];fo.push(f)}F[f].push(s)});
- var kids=fo.sort(function(a,b){return F[b].length-F[a].length}).map(function(fn,fi){var fl=F[fn],bid=fl[0].boardId,fc=colOf(bid,'Famille',fn,fi);var S={},so=[];
+ var kids=fo.sort(function(a,b){return F[b].length-F[a].length}).map(function(fn,fi){var fl=F[fn],bid=fl[0].boardId,fc=colOf(bid,'Famille',fn,fi,fl[0].famId);var S={},so=[];
   fl.forEach(function(s){var k=s.sub||'Non précisé';if(!S[k]){S[k]=[];so.push(k)}S[k].push(s)});
-  var sk=so.sort(function(a,b){return S[b].length-S[a].length}).map(function(sn,si){var sl=S[sn],sc=colOf(bid,'Sous-famille',sn,fi+si+1);if(!sc.has)sc=fc;var A={},ao=[];
+  var sk=so.sort(function(a,b){return S[b].length-S[a].length}).map(function(sn,si){var sl=S[sn],sc=colOf(bid,'Sous-famille',sn,fi+si+1,sl[0].subId);if(!sc.has)sc=fc;var A={},ao=[];
    sl.forEach(function(s){var k=s.action||'';if(!A[k]){A[k]=[];ao.push(k)}A[k].push(s)});
    if(ao.length===1&&(ao[0]===''||ao[0]==='?')){var lf=mkN(sn,sl,def,[],sc);leafInfo(lf,sl,def);return lf;}
-   var ak=ao.sort(function(a,b){return A[b].length-A[a].length}).map(function(an){var al=A[an];var ln=mkN(an&&an!=='?'?an:'Non précisé',al,def,[],sc);leafInfo(ln,al,def);return ln});
+   var ak=ao.sort(function(a,b){return A[b].length-A[a].length}).map(function(an){var al=A[an];var ac=colOf(bid,'Action',an,fi+si+2,al[0].actionId);if(!ac.has)ac=sc;var ln=mkN(an&&an!=='?'?an:'Non précisé',al,def,[],ac);leafInfo(ln,al,def);return ln});
    return mkN(sn,sl,def,ak,sc);});
   return mkN(fn,fl,def,sk,fc);});
  var root=mkN(def?'Défense':'Attaque',P,def,kids);return root;}
