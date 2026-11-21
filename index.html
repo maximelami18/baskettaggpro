@@ -460,7 +460,7 @@ document.addEventListener('DOMContentLoaded', function(){
 var _SB_URL="https://umuvirwbtpflizxupwbr.supabase.co";
 // Version de ce fichier — à incrémenter à chaque déploiement, en cohérence avec la valeur
 // mise à jour dans la table Supabase `app_version` (voir _checkAppVersion ci-dessous).
-var APP_VERSION = "2026-11-21-614";
+var APP_VERSION = "2026-11-21-615";
 var _SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtdXZpcndidHBmbGl6eHVwd2JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3MTI1MDEsImV4cCI6MjA5MDI4ODUwMX0.fFQaF-zP9dzcWITJDf6GBmvu0pdcuvlaUz0A0qW0kfo";
 var _LICENCE_KEY='btp_licence';
 var _MACHINE_KEY='btp_machine';
@@ -47030,12 +47030,12 @@ window.__x50.scPage=function(body,mode,sea){
 
 /* Scout > Équipes : d'où viennent les points */
 /* totaux réels : somme des feuilles de match de la compétition, pour chaque équipe */
-var PC={},PL={};
+var PTSL={};
 function ptsOf(lg,t,y){var G=lgGames(lg,A.schOf(lg,t.slug,y));if(!G||!G.length)return null;var L=G.filter(function(g){return g.done;}),r={gp:0,t3:0,t2:0,tl:0},miss=0;
   L.forEach(function(g){var m=A.mtOf(g.id);if(!m){miss++;return;}var side=g.h.slug===t.slug?'h':(g.a.slug===t.slug?'a':null);if(!side)return;var ok=0;
     (m.players||[]).forEach(function(p){if(p.v!==side)return;var q=p.st||{};ok=1;r.t3+=3*(+q.m3||0);r.t2+=2*(+q.m2||0);r.tl+=(+q.ftm||0);});if(ok)r.gp++;else miss++;});
   r.miss=miss;r.tt=r.t3+r.t2+r.tl;return r;}
-function ptsEnsure(lg,d,T){var y=A.curSea(),key=lg+'|'+y+'|'+T.map(function(t){return t.slug;}).join(',');var sigF=function(){return T.map(function(t){var G=lgGames(lg,A.schOf(lg,t.slug,y))||[],n=0,k=0;G.forEach(function(g){if(g.done){n++;if(A.mtOf(g.id))k++;}});return n+':'+k;}).join(',');};if(PL[key]&&(!PL[key].fin||PL[key].sig===sigF()))return PL[key];var st={n:0,tot:1,done:0};PL[key]=st;
+function ptsEnsure(lg,d,T){var y=A.curSea(),key=lg+'|'+y+'|'+T.map(function(t){return t.slug;}).join(',');var sigF=function(){return T.map(function(t){var G=lgGames(lg,A.schOf(lg,t.slug,y))||[],n=0,k=0;G.forEach(function(g){if(g.done){n++;if(A.mtOf(g.id))k++;}});return n+':'+k;}).join(',');};if(PTSL[key]&&(!PTSL[key].fin||PTSL[key].sig===sigF()))return PTSL[key];var st={n:0,tot:1,done:0};PTSL[key]=st;
   var q=[];T.forEach(function(t){q.push(function(){var G=A.schOf(lg,t.slug,y);return G?Promise.resolve(G):A.fetchSchQ(t.slug,y).then(function(g){A.putSch(lg,t.slug,y,g);});});});
   var run=function(list,k){var i=0,w=function(){if(i>=list.length)return Promise.resolve();var f=list[i++];return f().catch(function(){}).then(function(){st.done++;if(st.done%40===0)A.save();if(st.done%25===0&&A.X.v==='lg'&&A.X.tab==='graph'&&G.sub==='pts')A.draw();return w();});};var ws=[];for(var n=0;n<k;n++)ws.push(w());return Promise.all(ws);};
   st.tot=q.length;
