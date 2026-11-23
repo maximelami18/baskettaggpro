@@ -460,7 +460,7 @@ document.addEventListener('DOMContentLoaded', function(){
 var _SB_URL="https://umuvirwbtpflizxupwbr.supabase.co";
 // Version de ce fichier — à incrémenter à chaque déploiement, en cohérence avec la valeur
 // mise à jour dans la table Supabase `app_version` (voir _checkAppVersion ci-dessous).
-var APP_VERSION = "2026-11-23-649";
+var APP_VERSION = "2026-11-23-652";
 var _SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtdXZpcndidHBmbGl6eHVwd2JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3MTI1MDEsImV4cCI6MjA5MDI4ODUwMX0.fFQaF-zP9dzcWITJDf6GBmvu0pdcuvlaUz0A0qW0kfo";
 var _LICENCE_KEY='btp_licence';
 var _MACHINE_KEY='btp_machine';
@@ -46010,7 +46010,7 @@ function Q(s){return String(s==null?'':s).replace(/\\/g,'\\\\').replace(/'/g,"\\
 function nz(s){return String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'');}
 function nowY(){return B.yr()||new Date().getFullYear();}
 function seaLbl(y){return y+'-'+(+y+1);}
-var MTC={},MTH=0;var MTK=['sec','pts','ast','stl','blk','m2','a2','m3','a3','ftm','fta','oreb','dreb','to','ba','pf','fd','pm'];
+var MTC={},MTH=0;var MTK=['sec','pts','ast','stl','blk','m2','a2','m3','a3','ftm','fta','oreb','dreb','to','ba','pf','fd','pm','eval'];
 function mtPack(players){var ph=DB.scXMt._ph=DB.scXMt._ph||{};return players.map(function(r){var s=r.st||{};if(r.slug&&r.photo)ph[r.slug]=r.photo;return[r.v,r.slug||'',r.name||'',r.num==null?'':r.num,r.start?1:0].concat(MTK.map(function(k){var v=k==='sec'?(s.sec!=null?s.sec:(s.min!=null?s.min*60:null)):s[k];return v==null?null:v;}));});}
 function ddP(L){var seen={};return(L||[]).filter(function(r){var k=r.v+'|'+(r.slug||(r.name+'|'+r.num));if(seen[k])return false;seen[k]=1;return true;});}
 function mtUnpack(a){var ph=(DB.scXMt&&DB.scXMt._ph)||{};return ddP(a.map(function(x){var st={};MTK.forEach(function(k,i){st[k]=x[5+i];});st.min=st.sec!=null?Math.round(st.sec/60*10)/10:null;st.reb=(st.oreb||0)+(st.dreb||0);st.fm=(st.m2||0)+(st.m3||0);st.fa=(st.a2||0)+(st.a3||0);return{v:x[0],slug:x[1],name:x[2],num:x[3],start:!!x[4],photo:ph[x[1]]||'',st:st};}));}
@@ -46501,16 +46501,16 @@ function sumP(P,k){var s=0,n=0;P.forEach(function(p){var v=(p.st||{})[k];if(v!=n
 function pct(m,a){return(a>0&&m!=null)?m/a*100:null;}
 function mmss(s){if(s==null)return'–';return Math.floor(s/60)+':'+('0'+Math.round(s%60)).slice(-2);}
 function totOf(P){var t={};['pts','reb','ast','stl','blk','fm','fa','m2','a2','m3','a3','ftm','fta','oreb','dreb','to','ba','pf','fd','eval','pir','sec'].forEach(function(k){t[k]=sumP(P,k);});t.p2=pct(t.m2,t.a2);t.p3=pct(t.m3,t.a3);t.ft=pct(t.ftm,t.fta);t.pf2=pct(t.fm,t.fa);return t;}
-var G_M=[['',[['MIN','sec','t']]],['POINTS',[['PTS','pts','b']]],['TIRS',[['M','fm'],['T','fa'],['%','pf2','%']]],['2 POINTS',[['M','m2'],['T','a2'],['%','p2','%']]],['3 POINTS',[['M','m3'],['T','a3'],['%','p3','%']]],['LANCERS FRANCS',[['M','ftm'],['T','fta'],['%','ft','%']]],['REBONDS',[['RO','oreb'],['RD','dreb'],['REB','reb','b']]],['JEU',[['PD','ast'],['INT','stl'],['CT','blk'],['BP','to'],['CS','ba']]],['FAUTES',[['FA','pf'],['FP','fd']]],['IMPACT',[['EVAL','eval','b'],['PIR','pir'],['PIE','pie','d'],['USG%','usg','p'],['+/-','pm','s']]]];
+var G_M=[['',[['MIN','sec','t']]],['POINTS',[['PTS','pts','b']]],['TIRS',[['M','fm'],['T','fa'],['%','pf2','%']]],['2 POINTS',[['M','m2'],['T','a2'],['%','p2','%']]],['3 POINTS',[['M','m3'],['T','a3'],['%','p3','%']]],['LANCERS FRANCS',[['M','ftm'],['T','fta'],['%','ft','%']]],['REBONDS',[['RO','oreb'],['RD','dreb'],['REB','reb','b']]],['JEU',[['PD','ast'],['INT','stl'],['CT','blk'],['BP','to'],['CS','ba']]],['FAUTES',[['FA','pf'],['FP','fd']]],['IMPACT',[['EVAL','eval','b'],['+/-','pm','s']]]];
 function mcell(k,t,v){if(v==null||(typeof v==='number'&&isNaN(v)))return'–';if(t==='t')return mmss(v);if(t==='%')return fmt(v,1)+'%';if(t==='p')return fmt(v,1)+'%';if(t==='d')return fmt(v,1);if(t==='s')return(v>0?'+':'')+v;return String(Math.round(v*10)/10).replace('.',',');}
-function pstat(st){var o=Object.assign({},st);o.p2=pct(o.m2,o.a2);o.p3=pct(o.m3,o.a3);o.ft=pct(o.ftm,o.fta);o.pf2=pct(o.fm,o.fa);return o;}
+function pstat(st){var o=Object.assign({},st);try{o.eval=(typeof st.eval==='number'&&!isNaN(st.eval))?st.eval:nr(st).eval;}catch(e){}o.p2=pct(o.m2,o.a2);o.p3=pct(o.m3,o.a3);o.ft=pct(o.ftm,o.fta);o.pf2=pct(o.fm,o.fa);return o;}
 function boxTable(lg,P,nm,logo){var rows=P.filter(function(p){return(p.st.sec||0)>0;}).sort(function(a,b){return(b.start-a.start)||((b.st.sec||0)-(a.st.sec||0));}),tot=totOf(P);
   var cols=[];G_M.forEach(function(g,gi){g[1].forEach(function(c,ci){cols.push({g:gi,l:c[0],k:c[1],t:c[2]||'',sep:ci===0&&gi>0});});});
   var gh='<tr class="gh"><th></th>'+G_M.map(function(g,i){return'<th colspan="'+g[1].length+'" class="'+(i?'sep':'')+'">'+g[0]+'</th>';}).join('')+'</tr>';
   var hd=gh+'<tr><th>'+E2(nm)+'</th>'+cols.map(function(c){return'<th class="'+(c.sep?'sep':'')+'">'+c.l+'</th>';}).join('')+'</tr>';
   function cl(c,s){var v=s[c.k],x=(c.sep?'sep ':'')+(/b/.test(c.t)?'b ':'');if(c.t==='s'&&v!=null)x+=v>0?'g':v<0?'r':'';return'<td class="'+x+'">'+mcell(c.k,c.t.replace(/b/,''),v)+'</td>';}
   var body=rows.map(function(p){var dp=dbPlayer(lg,{slug:p.slug,name:p.name}),s=pstat(p.st);return'<tr><td class="b nm">'+avHtml({photo:p.photo,name:p.name},dp)+'<span class="x48Num">'+(p.num!==''?'#'+E2(p.num):'')+'</span>'+E2(p.name)+(p.start?' <span style="color:var(--acc);font-size:10px;font-weight:900">●</span>':'')+'</td>'+cols.map(function(c){return cl(c,s);}).join('')+'</tr>';}).join('');
-  var ts=Object.assign({},tot);ts.pie=null;ts.usg=null;ts.pm=null;
+  var ts=Object.assign({},tot);ts.pie=null;ts.usg=null;ts.pm=null;ts.eval=0;P.forEach(function(p){try{ts.eval+=(typeof p.st.eval==='number'&&!isNaN(p.st.eval))?p.st.eval:nr(p.st).eval;}catch(e){}});
   var tr='<tr class="tot"><td class="nm">TOTAL ÉQUIPE</td>'+cols.map(function(c){return cl(c,ts);}).join('')+'</tr>';
   return'<div class="x48S" style="margin-bottom:18px"><table class="x48T xhR xhT"><thead>'+hd+'</thead><tbody>'+body+tr+'</tbody></table></div>';}
 function matchHtml(lg,ts,y,G){var g=(G||[]).filter(function(x){return x.id===X.mm;})[0];if(!g)return'';var m=sxm().mt[g.id],mine=g.h.slug===ts?'h':'a';
