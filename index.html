@@ -460,7 +460,7 @@ document.addEventListener('DOMContentLoaded', function(){
 var _SB_URL="https://umuvirwbtpflizxupwbr.supabase.co";
 // Version de ce fichier — à incrémenter à chaque déploiement, en cohérence avec la valeur
 // mise à jour dans la table Supabase `app_version` (voir _checkAppVersion ci-dessous).
-var APP_VERSION = "2026-11-23-646";
+var APP_VERSION = "2026-11-23-647";
 var _SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtdXZpcndidHBmbGl6eHVwd2JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3MTI1MDEsImV4cCI6MjA5MDI4ODUwMX0.fFQaF-zP9dzcWITJDf6GBmvu0pdcuvlaUz0A0qW0kfo";
 var _LICENCE_KEY='btp_licence';
 var _MACHINE_KEY='btp_machine';
@@ -46170,7 +46170,8 @@ window.x48RefreshTeam=function(){var lg=X.lg,ts=X.team,y=curSea();runJob(functio
 window.x48Stop=function(){X.stop=1;try{BB.stop=1;}catch(e){}say('⏹ Arrêt en cours…');};
 
 /* ---------- navigation ---------- */
-function draw(){var pa=document.getElementById('pageArea');if(!pa||currentPage!=='scout'||X.v==='search')return;var k=pa.scrollTop;pa.innerHTML=render();pa.scrollTop=k;}
+function fresh(){try{if(!Object.keys(sxm().mt).length)return;var y=curSea(),d=X.lg&&lgData(X.lg,y);if(!d)return;d.teams.forEach(function(t){if(X.v==='team'&&t.slug!==X.team)return;if(X.v!=='team'&&X.v!=='lg')return;recalcT(X.lg,y,t);});}catch(e){console.error(e);}}
+function draw(){var pa=document.getElementById('pageArea');if(!pa||currentPage!=='scout'||X.v==='search')return;var k=pa.scrollTop;fresh();pa.innerHTML=render();pa.scrollTop=k;}
 window.x48Go=function(v,a,b){X.v=v;X.err='';if(v==='home'){X.lg=null;X.team=null;}if(v==='lg'){X.lg=a||X.lg;X.team=null;X.tab=b||'teams';autoLoad();}if(v==='team'){X.lg=a||X.lg;X.team=b||X.team;X.tabT='stats';X.cp=null;X.ms=null;X.mso=0;X.mf=null;X.mm=null;autoLoad();}if(v==='search'){}
   var pa=document.getElementById('pageArea');if(v==='search'){renderScoutPage();}else{draw();}if(pa)pa.scrollTop=0;window.scrollTo(0,0);};
 window.x48Tab=function(t){if(X.v==='lg')X.tab=t;else{X.tabT=t;X.mm=null;}try{autoLoad();draw();}catch(e){try{toast('Erreur d’affichage : '+(e&&e.message),'err');}catch(_){}console.error(e);}};
@@ -46381,8 +46382,7 @@ function gSig(g,m){var T={h:{},a:{}};['h','a'].forEach(function(v){var o={};['pt
 function uniqG(L){var seen={};return L.filter(function(g){var m=sheetOf(g.id);if(!m)return true;var k=gSig(g,m);if(seen[k])return false;seen[k]=1;return true;});}
 function sheetOf(id){var m=sxm().mt[id];return m&&m.players&&m.players.length?m:null;}
 /* recalcule équipes + joueurs + classement d'un championnat depuis les feuilles stockées */
-function recalcLg(lg,y){y=y||curSea();var d=lgData(lg,y);if(!d)return 0;var done=0;
-  d.teams.forEach(function(t){var G=(schOf(lg,t.slug,y)||[]).filter(function(g){return g.done;}),names=[];G.forEach(function(g){if(g.comp&&names.indexOf(g.comp)<0)names.push(g.comp);});
+function recalcT(lg,y,t){var G=(schOf(lg,t.slug,y)||[]).filter(function(g){return g.done;}),names=[];G.forEach(function(g){if(g.comp&&names.indexOf(g.comp)<0)names.push(g.comp);});
     var lgn=lgCompName(lg,names),key=tmKey(lg,t.slug,y),tr=sx().tm[key];
     if(!tr){tr={at:Date.now(),name:t.name,logo:t.logo||'',comps:[],players:[],avail:[]};sx().tm[key]=tr;}
     var old=tr.comps||[],comps=[],slugOf={};
@@ -46394,7 +46394,9 @@ function recalcLg(lg,y){y=y||curSea();var d=lgData(lg,y);if(!d)return 0;var done
     var L=lgn?G.filter(function(g){return g.comp===lgn;}):[];var la=aggSet(ent(L));t.st=la.team;
     /* classement : victoires / défaites / points depuis les scores des matchs terminés du championnat */
     var w=0,l=0,pf=0,pa=0,fm=[];L.slice().sort(function(a,b){return(a.date+a.time)<(b.date+b.time)?-1:1;}).forEach(function(g){var s=gSide(g,t.slug,t.name);if(!s||g.hs==null||g.as==null)return;var a=s==='h'?+g.hs:+g.as,b=s==='h'?+g.as:+g.hs;pf+=a;pa+=b;if(a>b){w++;fm.push('V');}else{l++;fm.push('D');}});
-    t.w=w;t.l=l;t.pf=pf;t.pa=pa;t.gpS=w+l;t.form=fm.slice(-5).join('');delete t.pos;done+=ent(G).length;});
+    t.w=w;t.l=l;t.pf=pf;t.pa=pa;t.gpS=w+l;t.form=fm.slice(-5).join('');delete t.pos;return ent(G).length;}
+function recalcLg(lg,y){y=y||curSea();var d=lgData(lg,y);if(!d)return 0;var done=0;
+  d.teams.forEach(function(t){done+=recalcT(lg,y,t);});
   d.hasStd=false;d.calc=5;d._rkM=null;saveDB();return done;}
 function recalcAll(){leagues().forEach(function(lg){try{if(lgData(lg))recalcLg(lg);}catch(e){console.error(e);}});}
 window.x48Recalc=recalcAll;
