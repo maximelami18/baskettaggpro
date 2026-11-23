@@ -460,7 +460,7 @@ document.addEventListener('DOMContentLoaded', function(){
 var _SB_URL="https://umuvirwbtpflizxupwbr.supabase.co";
 // Version de ce fichier — à incrémenter à chaque déploiement, en cohérence avec la valeur
 // mise à jour dans la table Supabase `app_version` (voir _checkAppVersion ci-dessous).
-var APP_VERSION = "2026-11-23-645";
+var APP_VERSION = "2026-11-23-646";
 var _SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtdXZpcndidHBmbGl6eHVwd2JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3MTI1MDEsImV4cCI6MjA5MDI4ODUwMX0.fFQaF-zP9dzcWITJDf6GBmvu0pdcuvlaUz0A0qW0kfo";
 var _LICENCE_KEY='btp_licence';
 var _MACHINE_KEY='btp_machine';
@@ -46191,7 +46191,7 @@ function syncScSt(){try{db();var ch=0,k2=function(f,l){return B.norm((f||'')+' '
     (t.players||[]).forEach(function(p){var r=TA.filter(function(q){return q.slug&&p.scSlug&&q.slug===p.scSlug;})[0]||TA.filter(function(q){return k2(q.name,'')&&k2(q.name,'')===k2(p.first,p.last);})[0];if(r&&r.st){p.scSt=Object.assign({sea:sea},r.st);ch++;}});});
   if(ch){try{saveDB();}catch(e){}}return ch;}catch(e){console.error(e);return 0;}}
 window.x48SyncSt=syncScSt;
-function autoLoad(){var y=curSea();if(X.busy)return;try{db();if(!(DB.scMeta||{}).x48p638)purgeOld();leagues().forEach(function(l){var d0=lgData(l,y);if(d0&&d0.calc!==4&&Object.keys(sxm().mt).length)recalcLg(l,y);});if((DB.scMeta||{}).x48r638!==4&&Object.keys(sxm().mt).length){DB.scMeta.x48r638=4;rebuildRows();}}catch(e){console.error(e);}if(!X.ddone&&(X.v==='home'||X.v==='lg'||X.v==='team')){X.ddone=1;setTimeout(function(){try{syncScSt();}catch(e){}try{window.x48DedupGames&&window.x48DedupGames();}catch(e){}var n=dedupPl();if(n){try{toast('✓ '+n+' doublon'+(n>1?'s':'')+' de joueurs fusionné'+(n>1?'s':''),'acc');}catch(e){}draw();}},300);}try{if((X.v==='lg'||X.v==='team')&&X.lg&&window.__x50&&window.__x50.rk&&lgData(X.lg,y))setTimeout(function(){window.__x50.rk(X.lg);},50);}catch(e){}
+function autoLoad(){var y=curSea();if(X.busy)return;try{db();if(!(DB.scMeta||{}).x48p638)purgeOld();leagues().forEach(function(l){var d0=lgData(l,y);if(d0&&d0.calc!==5&&Object.keys(sxm().mt).length)recalcLg(l,y);});if((DB.scMeta||{}).x48r638!==5&&Object.keys(sxm().mt).length){DB.scMeta.x48r638=5;rebuildRows();}}catch(e){console.error(e);}if(!X.ddone&&(X.v==='home'||X.v==='lg'||X.v==='team')){X.ddone=1;setTimeout(function(){try{syncScSt();}catch(e){}try{window.x48DedupGames&&window.x48DedupGames();}catch(e){}var n=dedupPl();if(n){try{toast('✓ '+n+' doublon'+(n>1?'s':'')+' de joueurs fusionné'+(n>1?'s':''),'acc');}catch(e){}draw();}},300);}try{if((X.v==='lg'||X.v==='team')&&X.lg&&window.__x50&&window.__x50.rk&&lgData(X.lg,y))setTimeout(function(){window.__x50.rk(X.lg);},50);}catch(e){}
   if(X.v==='team'&&X.tabT==='games'&&X.lg&&X.team&&!schOf(X.lg,X.team,y)&&!X.load['s'+X.team+y]){X.load['s'+X.team+y]=1;fetchSch(X.lg,X.team,y).catch(function(e){X.err=e.message;}).then(function(){delete X.load['s'+X.team+y];draw();});}
   if(X.v==='lg'&&X.lg&&!lgData(X.lg,y)&&!X.load['l'+X.lg+y]){X.load['l'+X.lg+y]=1;fetchLg(X.lg,y).catch(function(e){X.err=e.message;}).then(function(){delete X.load['l'+X.lg+y];draw();});}
   if(X.v==='team'&&X.lg&&X.team){var _t=tmData(X.lg,X.team,y);if(_t&&(_t.comps||[]).length>1&&!_t.pc&&!X.load['p'+X.team+y]){X.load['p'+X.team+y]=1;fetchPc(_t,X.team,y).then(function(){delete X.load['p'+X.team+y];draw();});}}
@@ -46395,7 +46395,7 @@ function recalcLg(lg,y){y=y||curSea();var d=lgData(lg,y);if(!d)return 0;var done
     /* classement : victoires / défaites / points depuis les scores des matchs terminés du championnat */
     var w=0,l=0,pf=0,pa=0,fm=[];L.slice().sort(function(a,b){return(a.date+a.time)<(b.date+b.time)?-1:1;}).forEach(function(g){var s=gSide(g,t.slug,t.name);if(!s||g.hs==null||g.as==null)return;var a=s==='h'?+g.hs:+g.as,b=s==='h'?+g.as:+g.hs;pf+=a;pa+=b;if(a>b){w++;fm.push('V');}else{l++;fm.push('D');}});
     t.w=w;t.l=l;t.pf=pf;t.pa=pa;t.gpS=w+l;t.form=fm.slice(-5).join('');delete t.pos;done+=ent(G).length;});
-  d.hasStd=false;d.calc=4;d._rkM=null;saveDB();return done;}
+  d.hasStd=false;d.calc=5;d._rkM=null;saveDB();return done;}
 function recalcAll(){leagues().forEach(function(lg){try{if(lgData(lg))recalcLg(lg);}catch(e){console.error(e);}});}
 window.x48Recalc=recalcAll;
 /* ne récupère que les feuilles de match absentes */
