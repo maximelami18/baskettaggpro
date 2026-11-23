@@ -460,7 +460,7 @@ document.addEventListener('DOMContentLoaded', function(){
 var _SB_URL="https://umuvirwbtpflizxupwbr.supabase.co";
 // Version de ce fichier — à incrémenter à chaque déploiement, en cohérence avec la valeur
 // mise à jour dans la table Supabase `app_version` (voir _checkAppVersion ci-dessous).
-var APP_VERSION = "2026-11-23-653";
+var APP_VERSION = "2026-11-23-655";
 var _SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtdXZpcndidHBmbGl6eHVwd2JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3MTI1MDEsImV4cCI6MjA5MDI4ODUwMX0.fFQaF-zP9dzcWITJDf6GBmvu0pdcuvlaUz0A0qW0kfo";
 var _LICENCE_KEY='btp_licence';
 var _MACHINE_KEY='btp_machine';
@@ -46429,7 +46429,7 @@ function syncSheets(lg,t,y,st,lab){return fetchSch(lg,t.slug,y).then(function(G)
 function purgeOld(){try{db();var y=String(nowY()),s=sx(),n=0;Object.keys(s.lg||{}).forEach(function(k){var r=s.lg[k];Object.keys(r.seasons||{}).forEach(function(yy){if(yy!==y){delete r.seasons[yy];n++;}});});
   ['tm','sc'].forEach(function(f){Object.keys(s[f]||{}).forEach(function(k){if(k.split('|').pop()!==y){delete s[f][k];n++;}});});
   var SEA=y+'-'+String(+y+1).slice(2);Object.keys(DB.scGames||{}).forEach(function(k){var R=DB.scGames[k]||[],R2=R.filter(function(r){return!r[28]||r[28]===SEA;});if(R2.length!==R.length){DB.scGames[k]=R2;n++;}});(DB.scPlayers||[]).forEach(function(p){if(p.bbs)p.bbs=p.bbs.filter(function(x){return x.season===SEA;});if(p.stats)p.stats=p.stats.filter(function(x){return String(x.season||'')===SEA;});});DB.scMeta=DB.scMeta||{};DB.scMeta.x48p638=1;DB.scMeta.x48sea=+y;X.sea=+y;if(n)saveDB();return n;}catch(e){console.error(e);return 0;}}
-window.x48Purge=purgeOld;window.x48Dbg={impOne:impOne,mtPack:mtPack,mtUnpack:mtUnpack,recalcLg:recalcLg,doLg:doLg,aggSet:aggSet,sxm:sxm,tmData:tmData,lgData:lgData,runJob:runJob};
+window.x48Purge=purgeOld;window.x48Dbg={fzPl:fzPl,impOne:impOne,mtPack:mtPack,mtUnpack:mtUnpack,recalcLg:recalcLg,doLg:doLg,aggSet:aggSet,sxm:sxm,tmData:tmData,lgData:lgData,runJob:runJob};
 /* sélection des matchs (comme dans Mes équipes) : stats moyennes calculées uniquement sur les matchs cochés */
 function msGames(lg,ts,y,tr){var G=uniqG((schOf(lg,ts,y)||[]).filter(function(g){return g.done&&sheetOf(g.id);})),sel=cpSel(lg,tr,0);
   if(sel!=='all'&&sel!=='def'){var c=(tr.comps||[]).filter(function(x){return x.slug===sel;})[0];if(c)G=G.filter(function(g){return sameC(g.comp,c.name)||sameC(g.comp,lgName(c.slug));});}return G;}
@@ -46631,7 +46631,7 @@ function impOne(lg,slug,g,msg,op){op=op||{};var y=op.y||curSea(),d=lgData(lg,y),
   scp.forEach(function(p){if(!items.some(function(i){return i.p===p;}))items.push({r:{name:full(p),num:''},p:p});});
   var ch=toData(logoU,300,1).then(function(u){T.logo=u||T.logo||null;if(ex&&nm)T.name=nm;});
   items.forEach(function(it,i){ch=ch.then(function(){if(msg)msg(nm+' : joueur '+(i+1)+'/'+items.length);var p=it.p||{},r=it.r,first=p.first,last=p.last;if(!first&&!last){var w=String(r.name||'').trim().split(/\s+/);first=w.shift()||'';last=w.join(' ');}
-    var nkP=function(f,l){try{return B.norm((f||'')+' '+(l||'')).replace(/['’`´]/g,'').replace(/[^a-z0-9]+/g,' ').trim().split(' ').filter(Boolean).sort().join(' ');}catch(e){return'';}},kk=nkP(first,last),fnd=T.players.filter(function(x){return!seenP[x.id]&&((p.id&&x.scId===p.id)||(nz(x.first+x.last)===nz(first+last))||(kk&&nkP(x.first,x.last)===kk));})[0],isNew=!fnd,o=fnd||{id:nid(),first:first||'',last:last||'',pos:'',num:'',nat:'',h:null,w:null,photo:null,photoY:22,roles:[]};
+    var nkP=function(f,l){try{return B.norm((f||'')+' '+(l||'')).replace(/['’`´]/g,'').replace(/[^a-z0-9]+/g,' ').trim().split(' ').filter(Boolean).sort().join(' ');}catch(e){return'';}},kk=nkP(first,last),fnd=T.players.filter(function(x){return!seenP[x.id]&&((p.id&&x.scId===p.id)||(nz(x.first+x.last)===nz(first+last))||(kk&&nkP(x.first,x.last)===kk));})[0],fz=fnd||fzPl(T.players,first,last,r.num,function(x){return seenP[x.id]||(x.scSlug&&r.slug&&x.scSlug!==r.slug);}),isNew=!fz,o=fz||{id:nid(),first:first||'',last:last||'',pos:'',num:'',nat:'',h:null,w:null,photo:null,photoY:22,roles:[]};
     seenP[o.id]=1;if(!isNew&&first&&last){o.first=first;o.last=last;}var num=r.num!==''&&r.num!=null?String(r.num):'';if(num)o.num=num;var ps=posOf(p);if(ps)o.pos=ps;
     if(p.nat)o.nat=p.nat;if(p.h)o.h=p.h;if(p.w)o.w=p.w;if(p.born)o.born=p.born;if(p.roles&&p.roles.length&&(isNew||!(o.roles||[]).length))o.roles=p.roles.slice(0,2);if(r.st)o.scSt=Object.assign({sea:sea},r.st);o.scId=p.id||o.scId;o.scSlug=r.slug||p.bbSlug||o.scSlug;
     var ph=p.photo||r.photo||'';
@@ -46639,14 +46639,41 @@ function impOne(lg,slug,g,msg,op){op=op||{};var y=op.y||curSea(),d=lgData(lg,y),
   return ch.then(function(){if(ex){var S='';try{S=JSON.stringify(DB.matches||[])+Object.keys(DB.pStats||{}).join(' ')+JSON.stringify(DB.sequences||[]);}catch(e){S='*';}var keep=[];T.players.forEach(function(p){if(seenP[p.id]||S==='*'||S.indexOf(String(p.id))>=0)keep.push(p);else st.del=(st.del||0)+1;});T.players=keep;}T.players=(T.players||[]).filter(function(p){if(!PHR.test((p.first||'')+' '+(p.last||'')))return true;if(!ex)return false;var S2='';try{S2=JSON.stringify(DB.matches||[])+Object.keys(DB.pStats||{}).join(' ');}catch(e){return true;}return S2.indexOf(String(p.id))>=0;});T.champLogo=lgLogo(lg)||T.champLogo;T.scoutSrc={lg:lg,slug:slug,y:y};if(!ex)DB.teams.push(T);st.team=T;st.isNew=!ex;return st;}).then(function(){return impMatches(T,lg,slug,y,msg).then(function(n){st.mt=n;return st;});});}
 /* ── fusion avec les équipes / matchs déjà saisis à la main ── */
 var MJ=null;
+/* noms de joueurs : tolère une faute d'orthographe (Levarati / Lavarati) */
+function lev(a,b){a=String(a);b=String(b);if(a===b)return 0;if(!a.length)return b.length;if(!b.length)return a.length;var p=[],i,j;for(j=0;j<=b.length;j++)p[j]=j;for(i=1;i<=a.length;i++){var c=[i];for(j=1;j<=b.length;j++)c[j]=Math.min(p[j]+1,c[j-1]+1,p[j-1]+(a.charAt(i-1)===b.charAt(j-1)?0:1));p=c;}return p[b.length];}
+function pn(x){try{return B.norm(String(x||'')).replace(/['’`´]/g,'').replace(/[^a-z0-9]+/g,' ').trim();}catch(e){return String(x||'').toLowerCase().trim();}}
+function fcomp(f,g){var a=pn(f),b=pn(g);if(!a||!b)return true;var ca=a.replace(/ /g,''),cb=b.replace(/ /g,'');if(ca===cb||lev(ca,cb)<=2)return true;
+  var ia=a.split(' ').map(function(w){return w.charAt(0);}).join(''),ib=b.split(' ').map(function(w){return w.charAt(0);}).join('');
+  if(ca===ib||cb===ia)return true;if(ca.length<=2&&cb.charAt(0)===ca.charAt(0))return true;if(cb.length<=2&&ca.charAt(0)===cb.charAt(0))return true;
+  if(ca.length>=2&&cb.indexOf(ca)===0)return true;if(cb.length>=2&&ca.indexOf(cb)===0)return true;return false;}
+function lcomp(l,m){var a=pn(l).replace(/ /g,''),b=pn(m).replace(/ /g,'');if(!a||!b)return 0;if(a===b)return 2;if(a.length>=4&&b.length>=4&&(lev(a,b)<=2||a.indexOf(b)>=0||b.indexOf(a)>=0))return 1;return 0;}
+/* au moins le prénom ou le nom de famille identique (ou presque) : même joueur, tant qu'un seul candidat convient */
+function fzPl(list,first,last,num,skip){var best=null,bd=99,tie=false;
+  (list||[]).forEach(function(x){if(skip&&skip(x))return;var lc=lcomp(x.last,last),fo=fcomp(x.first,first),fe=pn(x.first)&&pn(x.first)===pn(first),ne=num!=null&&num!==''&&String(x.num)===String(num),d=99;
+    if(lc&&fo)d=(lc===2?0:2)+(fe?0:1);
+    else if(lc===2)d=ne?4:10;
+    else if(fe&&ne)d=5;
+    else if(fe&&lcomp(x.last,last)===0&&lev(pn(x.last),pn(last))<=3&&pn(last).length>=4)d=6;
+    if(d<99){if(d<bd){bd=d;best=x;tie=false;}else if(d===bd)tie=true;}});
+  return tie?null:best;}
+
 function nzClub(x){var t=nz(String(x||'').normalize('NFD').replace(/[̀-ͯ]/g,'')).split(/[^a-z0-9]+/).filter(Boolean);var stop={basket:1,basketball:1,bc:1,club:1,as:1,asso:1,association:1,sa:1,sasp:1,bb:1,de:1,du:1,la:1,le:1,les:1,des:1,et:1,ca:1,cs:1,ss:1,us:1,jsf:1,js:1,ob:1,pro:1,elite:1};var r=t.filter(function(w){return!stop[w];});return r.length?r:t;}
 function nameSim(a,b){var A=nzClub(a),B=nzClub(b);if(!A.length||!B.length)return 0;var x=A.join(''),y=B.join('');if(x===y)return 100;if(Math.min(x.length,y.length)>=4&&(x.indexOf(y)>=0||y.indexOf(x)>=0))return 80;var inter=A.filter(function(w){return B.indexOf(w)>=0;}).length,un=A.length+B.length-inter;return inter&&inter/un>=.5?60:0;}
 function dayDiff(a,b){var x=Date.parse(a),y=Date.parse(b);if(isNaN(x)||isNaN(y))return null;return Math.abs(x-y)/864e5;}
 function oppNameOf(m,T){if(m.teamId===T.id){var ot=m.oppTeamId&&DB.teams.filter(function(t){return t.id===m.oppTeamId;})[0];return ot?ot.name:(m.opp||'');}var o=DB.teams.filter(function(t){return t.id===m.teamId;})[0];return o?o.name:'';}
 function findManual(T,g,slug){var home=g.h.slug===slug,on=(home?g.a:g.h).name;
-  var C=(DB.matches||[]).filter(function(m){if(m.scId)return false;if(m.teamId!==T.id&&m.oppTeamId!==T.id)return false;var dd=dayDiff(m.date,g.date);if(dd==null||dd>1)return false;return nameSim(oppNameOf(m,T),on)>=60;});
-  if(C.length)return C.length===1?C[0]:'amb';
-  var D0=(DB.matches||[]).filter(function(m){if(m.scId||m.date)return false;if(m.teamId!==T.id&&m.oppTeamId!==T.id)return false;if(m.home!==undefined&&m.home!==null&&!!m.home!==home)return false;if(m.round&&g.round&&String(m.round)!==String(g.round)&&0)return false;return nameSim(oppNameOf(m,T),on)>=60;});
+  var hasS=g.hs!=null&&g.as!=null,mine=hasS?(home?+g.hs:+g.as):null,theirs=hasS?(home?+g.as:+g.hs):null;
+  var P=(DB.matches||[]).filter(function(m){if(m.scId)return false;if(m.teamId!==T.id&&m.oppTeamId!==T.id&&nameSim(m.opp,T.name)<60)return false;return nameSim(oppNameOf(m,T),on)>=60;});
+  /* match daté : plus la date, le score, le domicile et la journée concordent, plus il est sûr */
+  var C=[];P.forEach(function(m){if(!m.date)return;var dd=dayDiff(m.date,g.date);if(dd==null)return;
+    var ownerT=m.teamId===T.id,a=+m.scoreA,b=+m.scoreB,pm=ownerT?a:b,pe=ownerT?b:a,sc=0;
+    var known=m.outcome&&m.outcome!=='-'&&(a||b),eq=hasS&&known&&pm===mine&&pe===theirs;
+    sc+=dd<=1?60:dd<=3?40:dd<=10?20:dd<=45?5:-100;if(eq)sc+=40;
+    if(m.home!==undefined&&m.home!==null){var hT=ownerT?!!m.home:!m.home;sc+=(hT===home)?10:-10;}
+    if(m.round&&g.round&&String(m.round)===String(g.round))sc+=15;if(nameSim(oppNameOf(m,T),on)>=100)sc+=5;
+    if(sc>=30||(dd<=1))C.push({m:m,sc:sc});});
+  if(C.length){C.sort(function(x,y){return y.sc-x.sc;});if(C.length===1||C[0].sc-C[1].sc>=10)return C[0].m;return'amb';}
+  var D0=P.filter(function(m){if(m.date)return false;if(m.home!==undefined&&m.home!==null&&!!m.home!==home)return false;return true;});
   if(D0.length>1&&g.hs!=null){var S1=D0.filter(function(m){var a=+m.scoreA,b=+m.scoreB;return(a===g.hs&&b===g.as)||(a===g.as&&b===g.hs);});if(S1.length)D0=S1;}
   if(D0.length>1&&g.round){var R1=D0.filter(function(m){return String(m.round)===String(g.round);});if(R1.length)D0=R1;}
   return D0.length===1?D0[0]:(D0.length>1?'amb':null);}
@@ -46718,16 +46745,35 @@ window.x48ImpUndo=function(){var J=jTop();if(!J)return;if(!confirm('Annuler le d
 var _rt=window.renderTeams;if(typeof _rt==='function'){window.renderTeams=function(){var h=_rt.apply(this,arguments);return typeof h==='string'?h.replace(/(<button class="btn bp" onclick="openTeamModal\(0\)" style="height:42px[^>]*>\+ Nouvelle équipe<\/button>)/,'<div style="display:flex;gap:10px;align-items:center">$1<button class="btn" onclick="x48ImpOpen()" style="height:42px;padding:0 20px;font-size:15px;">⬇ Importer depuis Scout</button>'+(jTop()?'<button class="btn" onclick="x48ImpUndo()" style="height:42px;padding:0 18px;font-size:14px;">↩ Annuler le dernier import</button>':'')+'</div>'):h;};}
 
 /* matchs joués → « Mes matchs » + stats des joueurs (format des matchs saisis) */
+/* un match déjà importé en double d'un match saisi à la main (nom ou date légèrement différents) : on garde le match saisi à la main, avec son codage, ses vidéos et ses joueurs */
+function mergeDup(T,slug,g){try{var m2=(DB.matches||[]).filter(function(x){return x.scId===g.id&&x.teamId===T.id;})[0];if(!m2)return;
+  var m1=findManual(T,g,slug);if(!m1||m1==='amb'||m1.id===m2.id)return;
+  var flip=m1.teamId!==m2.teamId;
+  /* codage : les séquences passent sur la copie importée (le côté « notre / adverse » est inversé si le match avait été créé par l'autre équipe) */
+  (DB.sequences||[]).forEach(function(q){if(q.matchId!==m1.id)return;q.matchId=m2.id;if(flip&&q.seqTeam)q.seqTeam=q.seqTeam==='adverse'?'notre':'adverse';else if(flip)q.seqTeam='adverse';});
+  var SK={id:1,teamId:1,opp:1,oppTeamId:1,oppPlayers:1,oppNums:1,players:1,nums:1,home:1,date:1,champ:1,scoreA:1,scoreB:1,status:1,outcome:1,round:1,scId:1,scTeams:1,scUp:1,scMerged:1,scAdv:1,scOv:1,adversePlayers:1};
+  Object.keys(m1).forEach(function(k){if(SK[k])return;var v=m1[k],w=m2[k];if(v==null||v===''||(Array.isArray(v)&&!v.length))return;if(w==null||w===''||w===false||w===0||(Array.isArray(w)&&!w.length))m2[k]=v;});
+  if(DB.advStats&&DB.advStats[m1.id]!=null&&DB.advStats[m2.id]==null){DB.advStats[m2.id]=DB.advStats[m1.id];}
+  if(flip){var ow=(DB.teams||[]).filter(function(t){return t.id===m1.teamId;})[0];
+    if(ow&&!m2.oppTeamId){m2.oppTeamId=ow.id;m2.opp=ow.name;m2.adversePlayers=[];if(DB.manualAdverseStats)delete DB.manualAdverseStats[m2.id];m2.scAdv=0;m2.scTeams=m2.scTeams||[m2.teamId];if(m2.scTeams.indexOf(ow.id)<0)m2.scTeams.push(ow.id);
+      m2.oppPlayers=m2.oppPlayers||[];m2.oppNums=m2.oppNums||{};(m1.players||[]).forEach(function(pid){if(m2.oppPlayers.indexOf(pid)<0)m2.oppPlayers.push(pid);if(m1.nums&&m1.nums[pid]!=null)m2.oppNums[pid]=m1.nums[pid];var k1=m1.id+'_'+pid,k2=m2.id+'_'+pid;if(DB.pStats&&DB.pStats[k1]&&!DB.pStats[k2])DB.pStats[k2]=DB.pStats[k1];});}}
+  else if(m1.outcome&&m1.outcome!=='-'&&m1.status!=='À coder'){var a=+m1.scoreA||0,b=+m1.scoreB||0,p=m1.home?a:b,e=m1.home?b:a,tm=(DB.teams||[]).filter(function(t){return t.id===m1.teamId;})[0];
+    if(tm){tm.mCount=Math.max(0,(tm.mCount||0)-1);tm.ptsFor=(tm.ptsFor||0)-p;tm.ptsAgainst=(tm.ptsAgainst||0)-e;if(p>e)tm.wins=Math.max(0,(tm.wins||0)-1);else tm.losses=Math.max(0,(tm.losses||0)-1);}}
+  Object.keys(DB.pStats||{}).forEach(function(k){if(k.indexOf(m1.id+'_')===0)delete DB.pStats[k];});
+  ['manualAdverseStats','statLogs','lineupStats','teamTimeTracked','onCourtState','adverseShots','advStats'].forEach(function(n){if(DB[n]&&DB[n][m1.id]!=null)delete DB[n][m1.id];});
+  DB.matches=DB.matches.filter(function(x){return x.id!==m1.id;});}catch(e){console.error(e);}}
 function impMatches(T,lg,slug,y,msg){db();DB.matches=DB.matches||[];DB.pStats=DB.pStats||{};wipeOrphans();
-  var G=schOf(lg,slug,y),p0=G?Promise.resolve(G):fetchSch(lg,slug,y);
+  var G=schOf(lg,slug,y),p0=(G&&!msg)?Promise.resolve(G):fetchSch(lg,slug,y).catch(function(){return G;});
   return p0.then(function(G){var D=(G||[]).filter(function(g){return g.done;}),UP=(G||[]).filter(function(g){return !g.done;}),ch=Promise.resolve(),n=0;
     UP.forEach(function(g){if(impUpcoming(T,slug,g))n++;});
-    D.forEach(function(g,i){ch=ch.then(function(){if(sxm().mt[g.id])return;if(msg)msg(T.name+' : feuille de match '+(i+1)+'/'+D.length);return fetchMatch(g.id).catch(function(){});});});
-    return ch.then(function(){uniqG(D).forEach(function(g){if(sxm().mt[g.id]){if(impOneMatch(T,slug,g))n++;}else if(impUpcoming(T,slug,g))n++;});return n;});});}
+    D.forEach(function(g,i){ch=ch.then(function(){if(sxm().mt[g.id])return;if(msg)msg(T.name+' : feuille de match '+(i+1)+'/'+D.length);return fetchMatch(g.id).catch(function(){return wait(500).then(function(){return fetchMatch(g.id);});}).catch(function(){});});});
+    return ch.then(function(){uniqG(D).forEach(function(g){mergeDup(T,slug,g);if(sxm().mt[g.id]){if(impOneMatch(T,slug,g))n++;}else if(impOneMatch(T,slug,g))n++;else if(impUpcoming(T,slug,g))n++;});return n;});});}
 function pRow(q){var r2=Math.max(0,(q.a2||0)-(q.m2||0)),r3=Math.max(0,(q.a3||0)-(q.m3||0)),rl=Math.max(0,(q.fta||0)-(q.ftm||0)),reb=(q.oreb||0)+(q.dreb||0);
   return{pts2m:q.m2||0,pts2r:q.a2||0,pts3m:q.m3||0,pts3r:q.a3||0,lfm:q.ftm||0,lfr:q.fta||0,rebo:q.oreb||0,rebd:q.dreb||0,pd:q.ast||0,inter:q.stl||0,contre:q.blk||0,bp:q.to||0,fi:q.fd||0,fc:q.pf||0,pts:q.pts||0,pm:q.pm||0,eval:(q.pts||0)+reb+(q.ast||0)+(q.stl||0)+(q.blk||0)-r2-r3-rl-(q.to||0),min:q.min||0,shots:[],scImp:1};}
-function fillSide(m,Tm,box,own){var ids=own?m.players:m.oppPlayers,nums=own?m.nums:m.oppNums;
-  box.forEach(function(b){var pl=Tm.players.filter(function(x){return(b.slug&&x.scSlug===b.slug)||nz(x.first+x.last)===nz(b.name);})[0];if(!pl)return;if(!(b.st.sec>0)&&!(b.st.pts>0))return;
+function fillSide(m,Tm,box,own){m.players=m.players||[];m.nums=m.nums||{};m.oppPlayers=m.oppPlayers||[];m.oppNums=m.oppNums||{};var ids=own?m.players:m.oppPlayers,nums=own?m.nums:m.oppNums,used={};
+  box.forEach(function(b){var pl=Tm.players.filter(function(x){return(b.slug&&x.scSlug===b.slug)||nz(x.first+x.last)===nz(b.name);})[0];
+    if(!pl){var w=String(b.name||'').trim().split(/\s+/),f0=w.shift()||'';pl=fzPl(Tm.players,f0,w.join(' '),b.num,function(x){return used[x.id]||(x.scSlug&&b.slug&&x.scSlug!==b.slug);});}
+    if(!pl)return;used[pl.id]=1;if(!(b.st.sec>0)&&!(b.st.pts>0))return;
     if(ids.indexOf(pl.id)<0)ids.push(pl.id);if(b.num!=='')nums[pl.id]=b.num;var k=m.id+'_'+pl.id;if(!DB.pStats[k])DB.pStats[k]=pRow(b.st);});}
 /* adversaire non importé : total d'équipe (format « stats adverses » de la prise de stats) ; adversaire importé : joueur par joueur */
 function advTot(m,box,known){DB.manualAdverseStats=DB.manualAdverseStats||{};var cur=DB.manualAdverseStats[m.id];
@@ -46753,7 +46799,7 @@ function impFinish(m,T,mp,op){if(!m.scUp)return;m.scUp=0;m.outcome=mp>op?'V':'D'
   if(!coded)m.status='Terminé';
   var own=DB.teams.filter(function(t){return t.id===m.teamId;})[0];m.scTeams=[m.teamId];
   if(own){var h=own.id===T.id;bump(own,h?mp:op,h?op:mp);}}
-function impOneMatch(T,slug,g){var mt=sxm().mt[g.id];if(!mt)return false;var home=g.h.slug===slug,side=home?'h':'a',oside=home?'a':'h',mine=mt.players.filter(function(p){return p.v===side;}),opp=mt.players.filter(function(p){return p.v===oside;});
+function impOneMatch(T,slug,g){var NS=!sxm().mt[g.id],mt=sxm().mt[g.id]||((g.hs!=null&&g.as!=null)?{players:[]}:null);if(!mt)return false;var home=g.h.slug===slug,side=home?'h':'a',oside=home?'a':'h',mine=mt.players.filter(function(p){return p.v===side;}),opp=mt.players.filter(function(p){return p.v===oside;});
   var mp=home?g.hs:g.as,op=home?g.as:g.hs,oname=(home?g.a:g.h).name,oslug=(home?g.a:g.h).slug;
   var oT=DB.teams.filter(function(t){return t.scoutSrc&&t.scoutSrc.slug===oslug&&t.id!==T.id;})[0];
   var m=DB.matches.filter(function(x){return x.scId===g.id;})[0];
@@ -46761,12 +46807,12 @@ function impOneMatch(T,slug,g){var mt=sxm().mt[g.id];if(!mt)return false;var hom
   if(!m){m={id:nid(),round:g.round,teamId:T.id,opp:oname,oppTeamId:oT?oT.id:null,oppPlayers:[],oppNums:{},home:home,date:g.date,champ:g.comp||T.champ,scoreA:g.hs,scoreB:g.as,status:'Terminé',outcome:mp>op?'V':'D',players:[],nums:{},adversePlayers:[],videoFile:null,videoURL:null,videos:[],liveUrl:'',liveMode:false,scId:g.id,scTeams:[T.id]};DB.matches.push(m);bump(T,mp,op);
     fillSide(m,T,mine,true);
     if(oT){m.scTeams.push(oT.id);bump(oT,op,mp);fillSide(m,oT,opp,false);}
-    else{m.adversePlayers=opp.filter(function(p){return(p.st.sec||0)>0;}).map(function(p){return{num:parseInt(p.num)||0,last:p.name};});advTot(m,opp,false);}
+    else if(!NS){m.adversePlayers=opp.filter(function(p){return(p.st.sec||0)>0;}).map(function(p){return{num:parseInt(p.num)||0,last:p.name};});advTot(m,opp,false);}
     return true;}
   m.scTeams=m.scTeams||[m.teamId];if(m.scMerged&&!m.scOv)ovWrite(m,T,g,slug);if(!m.scMerged){m.scoreA=g.hs;m.scoreB=g.as;}
   if(m.scUp){if(m.teamId===T.id)impFinish(m,T,mp,op);else{var ow=DB.teams.filter(function(t){return t.id===m.teamId;})[0];if(ow){var oh=m.home;impFinish(m,ow,oh?g.hs:g.as,oh?g.as:g.hs);}}}
   var asOwn=m.teamId===T.id;
-  if(asOwn){fillSide(m,T,mine,true);if(!oT&&!m.oppTeamId)advTot(m,opp,false);
+  if(asOwn){fillSide(m,T,mine,true);if(!oT&&!m.oppTeamId&&!NS)advTot(m,opp,false);
     if(oT&&m.oppTeamId!==oT.id&&!m.oppTeamId){m.oppTeamId=oT.id;m.opp=oT.name;m.adversePlayers=[];advTot(m,[],true);if(m.scTeams.indexOf(oT.id)<0){m.scTeams.push(oT.id);bump(oT,op,mp);}fillSide(m,oT,opp,false);}
     else if(oT&&m.oppTeamId===oT.id){if(m.scTeams.indexOf(oT.id)<0){m.scTeams.push(oT.id);bump(oT,op,mp);}fillSide(m,oT,opp,false);}}
   else if(m.teamId!==T.id&&(m.oppTeamId===T.id||!m.oppTeamId)){ /* T est l'adversaire d'un match déjà créé par l'autre équipe */
