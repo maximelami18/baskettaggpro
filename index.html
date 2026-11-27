@@ -460,7 +460,7 @@ document.addEventListener('DOMContentLoaded', function(){
 var _SB_URL="https://umuvirwbtpflizxupwbr.supabase.co";
 // Version de ce fichier — à incrémenter à chaque déploiement, en cohérence avec la valeur
 // mise à jour dans la table Supabase `app_version` (voir _checkAppVersion ci-dessous).
-var APP_VERSION = "2026-11-25-659";
+var APP_VERSION = "2026-11-27-660";
 var _SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtdXZpcndidHBmbGl6eHVwd2JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3MTI1MDEsImV4cCI6MjA5MDI4ODUwMX0.fFQaF-zP9dzcWITJDf6GBmvu0pdcuvlaUz0A0qW0kfo";
 var _LICENCE_KEY='btp_licence';
 var _MACHINE_KEY='btp_machine';
@@ -42908,7 +42908,7 @@ function topHtml(b){var m=curMatch(),h='';
   if(CS.boardIdAdv){var tn=(curTeam()||{}).name||'Mon équipe',on=m&&m.oppTeamId&&gT(m.oppTeamId)?gT(m.oppTeamId).name:(m&&m.opp)||'Adversaire',adv=CS.liveTeam==='adverse';
     h+='<div style="flex-shrink:0;display:flex;align-items:center;gap:8px;padding:6px 8px 0"><div class="cg2seg"><span class="'+(!adv?'on':'')+'" onclick="CS.liveTeam=\'notre\';CS.pendingSub=null;renderActionPanel()">'+E(tn)+'</span><span class="'+(adv?'on':'')+'" style="'+(adv?'background:#e05252;color:#fff':'')+'" onclick="CS.liveTeam=\'adverse\';CS.pendingSub=null;renderActionPanel()">'+E(on)+'</span></div></div>';}
   if(CS.chainDefActive){h+='<div style="flex-shrink:0;display:flex;align-items:center;gap:9px;margin:6px 8px 0;padding:7px 12px;border-radius:10px;background:rgba(224,82,82,.12);border:1px solid rgba(224,82,82,.35);color:#FF8A8A;font-size:13px;font-weight:700">🔗 Codage lié — défense<span style="flex:1"></span><button class="cg2btn" style="height:30px" onclick="cancelAction()">Annuler l\'enchaînement</button></div>';}
-  var scp='',scShow=false;(function(){try{var sq=(DB.sequences||[]).filter(function(q){return q.matchId===CS.matchId&&(q.seqTeam||'notre')==='notre';}),M=0,Ee=0,any=false;
+  var scp='',scShow=false;(function(){try{var sq=(DB.sequences||[]).filter(function(q){return q.matchId===CS.matchId&&(q.seqTeam||'notre')===team();}),M=0,Ee=0,any=false;
     sq.forEach(function(q){var pts=+q.resultPts||0;if(pts>0)any=true;var an=b.nodes.find(function(n){return n.id===q.actionId;});if(an&&an.polarity==='encaisse')Ee+=pts;else if(an&&an.polarity==='marque')M+=pts;});
     scShow=any||b.nodes.some(function(n){return n.type==='Résultat'&&+n.resultPts>0;});
     scp='<div class="scp"><span class="m"><b>'+M+'</b><i>pts marqués codés</i></span><span class="e"><b>'+Ee+'</b><i>pts encaissés codés</i></span></div>';}catch(e){}})();
@@ -46843,7 +46843,8 @@ function nzClub(x){var t=nz(String(x||'').normalize('NFD').replace(/[̀-ͯ]/g,''
 function nameSim(a,b){var A=nzClub(a),B=nzClub(b);if(!A.length||!B.length)return 0;var x=A.join(''),y=B.join('');if(x===y)return 100;if(Math.min(x.length,y.length)>=4&&(x.indexOf(y)>=0||y.indexOf(x)>=0))return 80;var inter=A.filter(function(w){return B.indexOf(w)>=0;}).length,un=A.length+B.length-inter;return inter&&inter/un>=.5?60:0;}
 function dayDiff(a,b){var x=Date.parse(a),y=Date.parse(b);if(isNaN(x)||isNaN(y))return null;return Math.abs(x-y)/864e5;}
 function oppNameOf(m,T){if(m.teamId===T.id){var ot=m.oppTeamId&&DB.teams.filter(function(t){return t.id===m.oppTeamId;})[0];return ot?ot.name:(m.opp||'');}var o=DB.teams.filter(function(t){return t.id===m.teamId;})[0];return o?o.name:'';}
-function findManual(T,g,slug){var home=g.h.slug===slug,on=(home?g.a:g.h).name;
+function hmSide(g,slug,T){var s=gSide(g,slug,T&&T.name);return s?s==='h':g.h.slug===slug;}
+function findManual(T,g,slug){var home=hmSide(g,slug,T),on=(home?g.a:g.h).name;
   var hasS=g.hs!=null&&g.as!=null,mine=hasS?(home?+g.hs:+g.as):null,theirs=hasS?(home?+g.as:+g.hs):null;
   var P=(DB.matches||[]).filter(function(m){if(m.scId)return false;if(m.teamId!==T.id&&m.oppTeamId!==T.id&&nameSim(m.opp,T.name)<60)return false;return nameSim(oppNameOf(m,T),on)>=60;});
   /* match daté : plus la date, le score, le domicile et la journée concordent, plus il est sûr */
@@ -46862,7 +46863,7 @@ function findManual(T,g,slug){var home=g.h.slug===slug,on=(home?g.a:g.h).name;
 /* le match saisi à la main est remplacé par les stats Scout : score, stats joueurs et totaux adverses ; les actions de prise de stats (statLogs) sont effacées ; codage, vidéos, Shoot Lab (séquences) ne sont jamais touchés */
 function ovJ(m){if(!MJ)return;var e=MJ.adopted.filter(function(a){return a.id===m.id;})[0];if(!e){e={id:m.id,prev:JSON.parse(JSON.stringify({scId:m.scId,scTeams:m.scTeams,scUp:m.scUp,scMerged:m.scMerged,round:m.round,date:m.date,scoreA:m.scoreA,scoreB:m.scoreB,outcome:m.outcome,status:m.status,players:m.players,nums:m.nums,oppPlayers:m.oppPlayers,oppNums:m.oppNums,adversePlayers:m.adversePlayers,scAdv:m.scAdv,home:m.home,scOv:m.scOv}))};MJ.adopted.push(e);}
   e.pst={};Object.keys(DB.pStats||{}).forEach(function(k){if(k.indexOf(m.id+'_')===0)e.pst[k]=JSON.parse(JSON.stringify(DB.pStats[k]));});e.advp=DB.manualAdverseStats&&DB.manualAdverseStats[m.id]?JSON.parse(JSON.stringify(DB.manualAdverseStats[m.id])):null;e.live={};['statLogs','lineupStats','teamTimeTracked','onCourtState','adverseShots'].forEach(function(n){if(DB[n]&&DB[n][m.id]!=null)e.live[n]=JSON.parse(JSON.stringify(DB[n][m.id]));});e.ov=1;}
-function ovWrite(m,T,g,slug){if(g.hs==null||g.as==null)return;ovJ(m);var home=g.h.slug===slug,tm=DB.teams.filter(function(t){return t.id===m.teamId;})[0];
+function ovWrite(m,T,g,slug){if(g.hs==null||g.as==null)return;ovJ(m);var home=hmSide(g,slug,T),tm=DB.teams.filter(function(t){return t.id===m.teamId;})[0];
   var sc=function(){var h=m.home;return{p:Number(h?m.scoreA:m.scoreB)||0,e:Number(h?m.scoreB:m.scoreA)||0};};
   var o=sc(),oo=m.outcome,played=!!oo&&oo!=='-';
   m.home=(m.teamId===T.id)?home:!home;m.scoreA=g.hs;m.scoreB=g.as;var n=sc();m.outcome=n.p>n.e?'V':'D';
@@ -46969,7 +46970,7 @@ function wipeOrphans(){db();var bad=(DB.matches||[]).filter(function(m){return m
   bad.forEach(function(m){DB.matches=DB.matches.filter(function(x){return x.id!==m.id;});DB.sequences=(DB.sequences||[]).filter(function(q){return q.matchId!==m.id;});Object.keys(DB.pStats||{}).forEach(function(k){if(k.indexOf(m.id+'_')===0)delete DB.pStats[k];});['statLogs','manualAdverseStats','adverseShots'].forEach(function(n){if(DB[n]&&DB[n][m.id]!=null)delete DB[n][m.id];});});return bad.length;}
 window.x48WipeOrphans=wipeOrphans;
 /* match à venir : créé « À coder » (score 0, sans stats) pour pouvoir coder la vidéo pendant le match ; rien n'est compté dans le bilan */
-function impUpcoming(T,slug,g){var home=g.h.slug===slug,oname=(home?g.a:g.h).name,oslug=(home?g.a:g.h).slug;
+function impUpcoming(T,slug,g){var home=hmSide(g,slug,T),oname=(home?g.a:g.h).name,oslug=(home?g.a:g.h).slug;
   var oT=DB.teams.filter(function(t){return t.scoutSrc&&t.scoutSrc.slug===oslug&&t.id!==T.id;})[0];
   var m=DB.matches.filter(function(x){return x.scId===g.id;})[0];
   if(!m&&adoptManual(T,slug,g,oT,1))return false;
@@ -46983,7 +46984,7 @@ function impFinish(m,T,mp,op){if(!m.scUp)return;m.scUp=0;m.outcome=mp>op?'V':'D'
 function sheetOver(m){ovJ(m);Object.keys(DB.pStats||{}).forEach(function(k){if(k.indexOf(m.id+'_')===0)delete DB.pStats[k];});if(DB.manualAdverseStats)delete DB.manualAdverseStats[m.id];
   ['statLogs','lineupStats','teamTimeTracked','onCourtState','adverseShots'].forEach(function(n){if(DB[n]&&DB[n][m.id]!=null)delete DB[n][m.id];});
   m.players=[];m.nums={};m.oppPlayers=[];m.oppNums={};m.adversePlayers=[];m.scAdv=0;m.scNS=0;m.scOv=1;}
-function impOneMatch(T,slug,g){var NS=!sxm().mt[g.id],mt=sxm().mt[g.id]||((g.hs!=null&&g.as!=null)?{players:[]}:null);if(!mt)return false;var home=g.h.slug===slug,side=home?'h':'a',oside=home?'a':'h',mine=mt.players.filter(function(p){return p.v===side;}),opp=mt.players.filter(function(p){return p.v===oside;});
+function impOneMatch(T,slug,g){var NS=!sxm().mt[g.id],mt=sxm().mt[g.id]||((g.hs!=null&&g.as!=null)?{players:[]}:null);if(!mt)return false;var home=hmSide(g,slug,T),side=home?'h':'a',oside=home?'a':'h',mine=mt.players.filter(function(p){return p.v===side;}),opp=mt.players.filter(function(p){return p.v===oside;});
   var mp=home?g.hs:g.as,op=home?g.as:g.hs,oname=(home?g.a:g.h).name,oslug=(home?g.a:g.h).slug;
   var oT=DB.teams.filter(function(t){return t.scoutSrc&&t.scoutSrc.slug===oslug&&t.id!==T.id;})[0];
   var m=DB.matches.filter(function(x){return x.scId===g.id;})[0];
@@ -46994,6 +46995,7 @@ function impOneMatch(T,slug,g){var NS=!sxm().mt[g.id],mt=sxm().mt[g.id]||((g.hs!
     else if(!NS){m.adversePlayers=opp.filter(function(p){return(p.st.sec||0)>0;}).map(function(p){return{num:parseInt(p.num)||0,last:p.name};});advTot(m,opp,false);}
     return true;}
   m.scTeams=m.scTeams||[m.teamId];if(m.scMerged&&!m.scOv)ovWrite(m,T,g,slug);if(!m.scMerged){m.scoreA=g.hs;m.scoreB=g.as;}
+  if(m.teamId===T.id&&m.scId){if(m.home!==home)m.home=home;if(nz(m.opp)===nz(T.name)&&nz(oname)!==nz(T.name))m.opp=oname;}
   var _wasUp=!!m.scUp||!!m.scNS;
   if(m.scUp){if(m.teamId===T.id)impFinish(m,T,mp,op);else{var ow=DB.teams.filter(function(t){return t.id===m.teamId;})[0];if(ow){var oh=m.home;impFinish(m,ow,oh?g.hs:g.as,oh?g.as:g.hs);}}}
   if(_wasUp){if(NS)m.scNS=1;else sheetOver(m);}
